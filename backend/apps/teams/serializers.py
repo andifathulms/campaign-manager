@@ -1,0 +1,1 @@
+# Serializers for teams app

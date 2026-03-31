@@ -1,0 +1,1 @@
+# Serializers for ai app
