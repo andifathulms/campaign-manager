@@ -34,7 +34,7 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const { collapsed, toggle } = useSidebarStore();
   const { data: candidate } = useCandidate();
-  const tenantSlug = (candidate as any)?.tenant_slug as string | undefined;
+  const tenantSlug = candidate?.tenant_slug;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
   const publicUrl = tenantSlug ? `${appUrl}/${tenantSlug}` : null;
 

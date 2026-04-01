@@ -41,7 +41,7 @@ export default function CampaignPageBuilderPage() {
   const [publishMsg, setPublishMsg] = useState('');
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-  const slug = (candidate as any)?.tenant_slug || '';
+  const slug = candidate?.tenant_slug || '';
   const publicUrl = slug ? `${appUrl}/${slug}` : '';
   const isPublished = candidate?.status === 'published';
 
@@ -84,7 +84,7 @@ export default function CampaignPageBuilderPage() {
   const completionPct = Math.round((completedSections / sections.length) * 100);
 
   return (
-    <div className="p-8 w-full max-w-5xl">
+    <div className="p-8 w-full">
       <div className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Halaman Kampanye</h1>
@@ -241,7 +241,7 @@ export default function CampaignPageBuilderPage() {
             <CardContent>
               <div className="text-center">
                 <p className="text-3xl font-bold text-sky-600">
-                  {(candidate as any)?.campaign_page?.view_count ?? 0}
+                  {candidate?.campaign_page?.view_count ?? 0}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">total kunjungan</p>
               </div>

@@ -3,8 +3,6 @@ import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import type { CandidateProfile } from '@/types';
 
-// Direct axios instance that uses the session token inline —
-// avoids the race condition between AuthSync useEffect and query firing.
 const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 function authHeaders(token: string) {
@@ -12,19 +10,27 @@ function authHeaders(token: string) {
 }
 
 export function useCandidate() {
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const token = (session as any)?.accessToken as string | undefined;
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['candidate', token],
     queryFn: () =>
       axios
         .get<CandidateProfile>(`${apiBase}/candidates/me/`, { headers: authHeaders(token!) })
         .then(r => r.data),
     enabled: !!token,
-    staleTime: 60_000,
+    // Low staleTime so stale cache doesn't persist across serializer changes
+    staleTime: 10_000,
     retry: false,
   });
+
+  // While session is still initialising, token is undefined and the query is
+  // disabled — but isLoading would be false, causing pages to render with
+  // candidate=undefined. Override isLoading to cover that window.
+  const isLoading = sessionStatus === 'loading' || query.isLoading;
+
+  return { ...query, isLoading };
 }
 
 export function useUpdateCandidate() {

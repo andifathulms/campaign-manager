@@ -82,6 +82,17 @@ export interface CandidateProfile {
   status: 'draft' | 'published' | 'paused';
   color_primary: string;
   color_secondary: string;
+  tenant_slug: string;
+  campaign_page: {
+    id: string;
+    is_published: boolean;
+    published_at: string | null;
+    view_count: number;
+    hero_image_url: string | null;
+    hero_video_url: string | null;
+    seo_title: string | null;
+    seo_description: string | null;
+  } | null;
 }
 
 export interface ReferralLink {
