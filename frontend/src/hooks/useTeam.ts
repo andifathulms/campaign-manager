@@ -21,6 +21,7 @@ export function useTeamMembers() {
         .then(r => r.data),
     enabled: !!token,
     staleTime: 30_000,
+    retry: false,
   });
 }
 
@@ -36,6 +37,7 @@ export function useLeaderboard() {
         .then(r => r.data),
     enabled: !!token,
     staleTime: 30_000,
+    retry: false,
   });
 }
 

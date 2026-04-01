@@ -23,6 +23,7 @@ export function useSupporters(search?: string) {
     },
     enabled: !!token,
     staleTime: 30_000,
+    retry: false,
   });
 }
 
@@ -38,5 +39,6 @@ export function useSupporterStats() {
         .then(r => r.data),
     enabled: !!token,
     staleTime: 30_000,
+    retry: false,
   });
 }
