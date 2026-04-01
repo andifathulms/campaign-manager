@@ -58,3 +58,41 @@ export interface Candidate {
   color_primary: string;
   color_secondary: string;
 }
+
+export interface CandidateProfile {
+  id: string;
+  nama_lengkap: string;
+  foto: string | null;
+  foto_url: string | null;
+  nomor_urut: number | null;
+  jenis_pemilihan: string;
+  dapil: string;
+  partai: string;
+  tagline: string;
+  visi: string;
+  misi: string[];
+  program_unggulan: Array<{ title: string; desc: string; icon: string }>;
+  sosmed: {
+    instagram?: string;
+    tiktok?: string;
+    facebook?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  status: 'draft' | 'published' | 'paused';
+  color_primary: string;
+  color_secondary: string;
+}
+
+export interface CampaignPage {
+  id: string;
+  hero_image_url: string | null;
+  hero_video_url: string | null;
+  sections_order: string[];
+  seo_title: string | null;
+  seo_description: string | null;
+  og_image_url: string | null;
+  is_published: boolean;
+  published_at: string | null;
+  view_count: number;
+}
