@@ -1,5 +1,14 @@
 import axios from 'axios';
 
+// Token is set by AuthSync component from NextAuth session — NOT localStorage.
+// NextAuth stores the JWT in a server-side cookie; the access token is
+// extracted into the session object and synced here via setAuthToken().
+let _authToken: string | null = null;
+
+export function setAuthToken(token: string | null) {
+  _authToken = token;
+}
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || '/api/v1',
   headers: {
@@ -7,42 +16,16 @@ const api = axios.create({
   },
 });
 
-// Attach JWT access token
 api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+  if (_authToken) {
+    config.headers.Authorization = `Bearer ${_authToken}`;
   }
   return config;
 });
 
-// Handle 401: attempt token refresh
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL || '/api/v1'}/auth/refresh/`,
-          { refresh: refreshToken }
-        );
-        const { access } = response.data;
-        localStorage.setItem('access_token', access);
-        originalRequest.headers.Authorization = `Bearer ${access}`;
-        return api(originalRequest);
-      } catch {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
-      }
-    }
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 export default api;

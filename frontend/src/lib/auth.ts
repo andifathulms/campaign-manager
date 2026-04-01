@@ -1,7 +1,9 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://backend:8000/api/v1';
+// NEXTAUTH_BACKEND_URL is for server-side (container-to-container).
+// NEXT_PUBLIC_API_URL is browser-only — cannot be used inside authorize().
+const API_URL = process.env.NEXTAUTH_BACKEND_URL || 'http://backend:8000/api/v1';
 
 export const authOptions: NextAuthOptions = {
   providers: [

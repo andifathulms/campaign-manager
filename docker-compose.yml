@@ -93,10 +93,11 @@ services:
     working_dir: /app
     command: sh -c "npm install && npm run dev"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
-      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:8001/api/v1
+      NEXT_PUBLIC_APP_URL: http://localhost:3001
+      NEXTAUTH_URL: http://localhost:3001
       NEXTAUTH_SECRET: dev-nextauth-secret
+      NEXTAUTH_BACKEND_URL: http://backend:8000/api/v1
     ports:
       - "3001:3000"
     volumes:
