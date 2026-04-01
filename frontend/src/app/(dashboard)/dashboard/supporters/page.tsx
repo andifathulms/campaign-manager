@@ -2,7 +2,7 @@ export const metadata = { title: 'Pendukung — KampanyeKit' };
 
 export default function SupportersPage() {
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-8 w-full">
       <div className="mb-8">
         <h1 className="text-2xl font-bold">Pendukung</h1>
         <p className="text-muted-foreground text-sm mt-1">Daftar pendukung dan statistik per wilayah.</p>

@@ -2,7 +2,7 @@ export const metadata = { title: 'Tim Sukses — KampanyeKit' };
 
 export default function TeamPage() {
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-8 w-full">
       <div className="mb-8">
         <h1 className="text-2xl font-bold">Tim Sukses</h1>
         <p className="text-muted-foreground text-sm mt-1">Kelola tim, relawan, dan lacak referral.</p>

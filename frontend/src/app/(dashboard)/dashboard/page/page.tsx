@@ -2,7 +2,7 @@ export const metadata = { title: 'Halaman Kampanye — KampanyeKit' };
 
 export default function CampaignPageBuilderPage() {
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-8 w-full">
       <div className="mb-8">
         <h1 className="text-2xl font-bold">Halaman Kampanye</h1>
         <p className="text-muted-foreground text-sm mt-1">Atur dan pratinjau halaman kampanye publik Anda.</p>

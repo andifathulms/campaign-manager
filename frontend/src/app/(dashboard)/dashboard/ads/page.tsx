@@ -2,7 +2,7 @@ export const metadata = { title: 'Dashboard Iklan — KampanyeKit' };
 
 export default function AdsPage() {
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-8 w-full">
       <div className="mb-8">
         <h1 className="text-2xl font-bold">Dashboard Iklan</h1>
         <p className="text-muted-foreground text-sm mt-1">Pantau Meta & TikTok Ads dalam satu tempat.</p>

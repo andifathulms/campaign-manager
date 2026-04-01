@@ -50,7 +50,7 @@ export default async function OverviewPage() {
   const name = session?.user?.name || 'Kandidat';
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-8 w-full">
       {/* Header */}
       <div className="mb-8">
         <p className="text-muted-foreground text-sm font-medium mb-1">

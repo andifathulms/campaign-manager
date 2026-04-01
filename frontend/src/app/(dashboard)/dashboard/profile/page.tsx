@@ -99,7 +99,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-8 w-full max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Profil Kandidat</h1>
