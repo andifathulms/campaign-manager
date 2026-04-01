@@ -38,9 +38,9 @@ interface PublicCandidate {
   } | null;
 }
 
-// Server component: use internal Docker URL (NEXTAUTH_BACKEND_URL), not the
-// browser-facing NEXT_PUBLIC_API_URL which resolves to localhost on the host.
-const API_BASE = process.env.NEXTAUTH_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://backend:8000/api/v1';
+// Server component: always use the internal backend URL.
+// NEXT_PUBLIC_API_URL is a browser URL (localhost) and doesn't resolve inside Docker.
+const API_BASE = process.env.NEXTAUTH_BACKEND_URL || 'http://backend:8000/api/v1';
 
 async function getCandidate(slug: string): Promise<PublicCandidate | null> {
   try {
