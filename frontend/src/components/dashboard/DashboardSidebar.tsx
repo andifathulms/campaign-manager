@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '@/stores/sidebarStore';
+import { useCandidate } from '@/hooks/useCandidate';
 import {
   LayoutDashboard,
   User,
@@ -16,6 +17,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ExternalLink,
 } from 'lucide-react';
 
 const navItems = [
@@ -31,6 +33,10 @@ const navItems = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { collapsed, toggle } = useSidebarStore();
+  const { data: candidate } = useCandidate();
+  const tenantSlug = (candidate as any)?.tenant_slug as string | undefined;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+  const publicUrl = tenantSlug ? `${appUrl}/${tenantSlug}` : null;
 
   return (
     <aside
@@ -81,6 +87,21 @@ export function DashboardSidebar() {
 
       {/* Footer */}
       <div className="px-2 py-3 border-t border-slate-800/60 space-y-0.5">
+        {publicUrl && (
+          <a
+            href={publicUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={collapsed ? 'Lihat Halaman Publik' : undefined}
+            className={cn(
+              'flex items-center gap-3 px-2.5 py-2.5 rounded-lg text-sm font-medium text-indigo-400 hover:text-indigo-300 hover:bg-indigo-900/30 w-full transition-all duration-150',
+              collapsed ? 'justify-center' : ''
+            )}
+          >
+            <ExternalLink className="h-4 w-4 flex-shrink-0" />
+            {!collapsed && <span>Lihat Halaman Publik</span>}
+          </a>
+        )}
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
           title={collapsed ? 'Keluar' : undefined}

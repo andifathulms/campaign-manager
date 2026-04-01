@@ -18,8 +18,8 @@ export function useSupporters(search?: string) {
     queryFn: () => {
       const params = search ? `?search=${encodeURIComponent(search)}` : '';
       return axios
-        .get<Supporter[]>(`${apiBase}/supporters/${params}`, { headers: authHeaders(token!) })
-        .then(r => r.data);
+        .get<{ results: Supporter[] } | Supporter[]>(`${apiBase}/supporters/${params}`, { headers: authHeaders(token!) })
+        .then(r => Array.isArray(r.data) ? r.data : r.data.results);
     },
     enabled: !!token,
     staleTime: 30_000,

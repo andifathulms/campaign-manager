@@ -17,8 +17,8 @@ export function useTeamMembers() {
     queryKey: ['team-members', token],
     queryFn: () =>
       axios
-        .get<TeamMember[]>(`${apiBase}/teams/members/`, { headers: authHeaders(token!) })
-        .then(r => r.data),
+        .get<{ results: TeamMember[] } | TeamMember[]>(`${apiBase}/teams/members/`, { headers: authHeaders(token!) })
+        .then(r => Array.isArray(r.data) ? r.data : r.data.results),
     enabled: !!token,
     staleTime: 30_000,
     retry: false,
@@ -33,8 +33,8 @@ export function useLeaderboard() {
     queryKey: ['team-leaderboard', token],
     queryFn: () =>
       axios
-        .get<TeamMember[]>(`${apiBase}/teams/leaderboard/`, { headers: authHeaders(token!) })
-        .then(r => r.data),
+        .get<{ results: TeamMember[] } | TeamMember[]>(`${apiBase}/teams/leaderboard/`, { headers: authHeaders(token!) })
+        .then(r => Array.isArray(r.data) ? r.data : r.data.results),
     enabled: !!token,
     staleTime: 30_000,
     retry: false,

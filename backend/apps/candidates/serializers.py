@@ -2,29 +2,6 @@ from rest_framework import serializers
 from .models import Candidate, CampaignPage
 
 
-class CandidateSerializer(serializers.ModelSerializer):
-    foto_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Candidate
-        fields = [
-            'id', 'nama_lengkap', 'foto', 'foto_url', 'nomor_urut',
-            'jenis_pemilihan', 'dapil', 'partai', 'tagline',
-            'visi', 'misi', 'program_unggulan', 'sosmed',
-            'status', 'color_primary', 'color_secondary',
-            'created_at', 'updated_at',
-        ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'foto_url']
-
-    def get_foto_url(self, obj):
-        if obj.foto:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.foto.url)
-            return obj.foto.url
-        return None
-
-
 class CampaignPageSerializer(serializers.ModelSerializer):
     hero_image_url = serializers.SerializerMethodField()
     og_image_url = serializers.SerializerMethodField()
@@ -52,6 +29,32 @@ class CampaignPageSerializer(serializers.ModelSerializer):
             request = self.context.get('request')
             if request:
                 return request.build_absolute_uri(obj.og_image.url)
+        return None
+
+
+class CandidateSerializer(serializers.ModelSerializer):
+    foto_url = serializers.SerializerMethodField()
+    tenant_slug = serializers.CharField(source='tenant.slug', read_only=True)
+    campaign_page = CampaignPageSerializer(read_only=True)
+
+    class Meta:
+        model = Candidate
+        fields = [
+            'id', 'nama_lengkap', 'foto', 'foto_url', 'nomor_urut',
+            'jenis_pemilihan', 'dapil', 'partai', 'tagline',
+            'visi', 'misi', 'program_unggulan', 'sosmed',
+            'status', 'color_primary', 'color_secondary',
+            'tenant_slug', 'campaign_page',
+            'created_at', 'updated_at',
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'foto_url', 'tenant_slug', 'campaign_page']
+
+    def get_foto_url(self, obj):
+        if obj.foto:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.foto.url)
+            return obj.foto.url
         return None
 
 
