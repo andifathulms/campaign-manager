@@ -84,6 +84,56 @@ export interface CandidateProfile {
   color_secondary: string;
 }
 
+export interface ReferralLink {
+  id: string;
+  code: string;
+  label: string;
+  clicks: number;
+  unique_visitors: number;
+  last_clicked_at: string | null;
+  created_at: string;
+}
+
+export interface TeamMember {
+  id: string;
+  nama: string;
+  phone: string;
+  level: 1 | 2 | 3 | 4;
+  level_display: string;
+  wilayah_name: string;
+  wilayah_level: string;
+  wilayah_level_display: string;
+  parent: string | null;
+  is_active: boolean;
+  referral_links: ReferralLink[];
+  total_clicks: number;
+  created_at: string;
+}
+
+export interface Supporter {
+  id: string;
+  nama: string;
+  phone: string;
+  email: string | null;
+  foto_url: string | null;
+  kelurahan: string;
+  kecamatan: string;
+  kabupaten_kota: string;
+  provinsi: string;
+  referred_by_team: string | null;
+  membership_id: string;
+  statement: string | null;
+  is_verified: boolean;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface SupporterStats {
+  total: number;
+  by_kecamatan: Array<{ kecamatan: string; count: number }>;
+  by_kabupaten: Array<{ kabupaten_kota: string; count: number }>;
+}
+
 export interface CampaignPage {
   id: string;
   hero_image_url: string | null;
