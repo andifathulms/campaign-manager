@@ -1,8 +1,18 @@
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth';
+import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions);
+  if (!session) redirect('/login');
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Sidebar and nav will be implemented in Step 2 */}
-      <main>{children}</main>
+    <div className="flex h-screen bg-secondary">
+      <DashboardSidebar />
+      <main className="flex-1 overflow-auto">
+        {children}
+      </main>
     </div>
   );
 }

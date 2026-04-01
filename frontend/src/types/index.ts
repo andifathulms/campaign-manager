@@ -14,6 +14,27 @@ export interface Tenant {
   is_active: boolean;
 }
 
+export interface LoginForm {
+  username: string;
+  password: string;
+}
+
+export interface RegisterForm {
+  username: string;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  tenant_name: string;
+  tenant_slug: string;
+}
+
+export interface AuthResponse {
+  access: string;
+  refresh: string;
+  user: User;
+}
+
 export interface Candidate {
   id: string;
   nama_lengkap: string;
