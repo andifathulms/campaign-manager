@@ -41,6 +41,7 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'corsheaders',
     'storages',
+    'django_celery_beat',
 ]
 
 LOCAL_APPS = [
@@ -183,6 +184,19 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = True
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# Celery beat schedule (weekly report every Monday 07:00 WIB)
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'weekly-report': {
+        'task': 'apps.core.tasks.generate_weekly_report_all_tenants',
+        'schedule': crontab(hour=7, minute=0, day_of_week=1),
+    },
+}
+
+# Report settings
+REPORT_FROM_EMAIL = env('EMAIL_HOST_USER', default='noreply@kampanyekit.id')
 
 # Google Cloud Storage
 GCS_BUCKET_NAME = env('GCS_BUCKET_NAME', default='')

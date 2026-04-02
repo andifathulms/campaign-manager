@@ -45,7 +45,28 @@ class DashboardOverviewView(APIView):
         })
 
 
+class WeeklyReportView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """Return latest report metadata (task ID, generated_at)."""
+        # In a full implementation this would query a Report model.
+        # For now return a simple status response.
+        return Response({'status': 'Report is generated every Monday at 07:00 WIB.'})
+
+    def post(self, request):
+        """Manually trigger report generation for the current tenant."""
+        from apps.core.tasks import generate_weekly_report
+        tenant = request.user.tenant
+        if not tenant:
+            return Response({'detail': 'No tenant found.'}, status=400)
+        task = generate_weekly_report.delay(str(tenant.id))
+        return Response({'status': 'queued', 'task_id': task.id}, status=202)
+
+
 urlpatterns = [
     path('health/', health_check, name='health-check'),
     path('dashboard/overview/', DashboardOverviewView.as_view(), name='dashboard-overview'),
+    path('dashboard/report/weekly/', WeeklyReportView.as_view(), name='weekly-report'),
+    path('dashboard/report/generate/', WeeklyReportView.as_view(), name='weekly-report-generate'),
 ]

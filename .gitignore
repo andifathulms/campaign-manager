@@ -21,6 +21,7 @@ staticfiles/
 .env.local
 .env.*.local
 !.env.example
+!.env.prod.example
 !.env.local.example
 
 # Node
@@ -53,3 +54,4 @@ credentials/
 !package.json
 !tsconfig.json
 !postcss.config.js
+.env.prod
