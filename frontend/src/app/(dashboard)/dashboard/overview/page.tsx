@@ -2,56 +2,69 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { Users, TrendingUp, Megaphone, Wallet } from 'lucide-react';
 
-export const metadata = {
-  title: 'Overview — KampanyeKit',
-};
+export const metadata = { title: 'Overview — KampanyeKit' };
 
-const statCards = [
-  {
-    label: 'Total Pendukung',
-    value: '0',
-    desc: 'Mulai daftarkan pendukung',
-    icon: Users,
-    color: 'text-violet-600',
-    bg: 'bg-violet-50',
-    border: 'border-violet-100',
-  },
-  {
-    label: 'Jangkauan Iklan',
-    value: '0',
-    desc: 'Hubungkan akun iklan',
-    icon: TrendingUp,
-    color: 'text-indigo-600',
-    bg: 'bg-indigo-50',
-    border: 'border-indigo-100',
-  },
-  {
-    label: 'Anggota Tim',
-    value: '0',
-    desc: 'Tambahkan tim sukses',
-    icon: Megaphone,
-    color: 'text-sky-600',
-    bg: 'bg-sky-50',
-    border: 'border-sky-100',
-  },
-  {
-    label: 'Total Belanja Iklan',
-    value: 'Rp 0',
-    desc: 'Tidak ada data',
-    icon: Wallet,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-100',
-  },
-];
+const API_BASE = process.env.NEXTAUTH_BACKEND_URL || 'http://backend:8000/api/v1';
+
+async function getOverview(accessToken: string) {
+  try {
+    const res = await fetch(`${API_BASE}/dashboard/overview/`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      next: { revalidate: 0 },
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+function formatRp(n: number) {
+  return `Rp ${Math.round(n).toLocaleString('id-ID')}`;
+}
+
+function formatNum(n: number) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString('id-ID');
+}
 
 export default async function OverviewPage() {
   const session = await getServerSession(authOptions);
   const name = session?.user?.name || 'Kandidat';
+  const token = (session as any)?.accessToken as string | undefined;
+
+  const stats = token ? await getOverview(token) : null;
+
+  const statCards = [
+    {
+      label: 'Total Pendukung',
+      value: stats ? String(stats.supporter_count) : '—',
+      desc: stats?.supporter_count > 0 ? `${stats.supporter_count} pendukung terdaftar` : 'Mulai daftarkan pendukung',
+      icon: Users, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100',
+    },
+    {
+      label: 'Jangkauan Iklan',
+      value: stats ? formatNum(stats.total_reach) : '—',
+      desc: stats?.total_reach > 0 ? 'Total jangkauan iklan' : 'Hubungkan akun iklan',
+      icon: TrendingUp, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100',
+    },
+    {
+      label: 'Anggota Tim',
+      value: stats ? String(stats.team_count) : '—',
+      desc: stats?.team_count > 0 ? `${stats.team_count} anggota aktif` : 'Tambahkan tim sukses',
+      icon: Megaphone, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100',
+    },
+    {
+      label: 'Total Belanja Iklan',
+      value: stats ? formatRp(stats.total_spend) : '—',
+      desc: stats?.total_spend > 0 ? 'Dari semua platform' : 'Tidak ada data',
+      icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100',
+    },
+  ];
 
   return (
     <div className="p-8 w-full">
-      {/* Header */}
       <div className="mb-8">
         <p className="text-muted-foreground text-sm font-medium mb-1">
           {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -59,12 +72,9 @@ export default async function OverviewPage() {
         <h1 className="text-2xl font-bold text-foreground">
           Selamat datang, <span className="text-indigo-600">{name}</span>
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Berikut ringkasan kampanye Anda hari ini.
-        </p>
+        <p className="text-muted-foreground text-sm mt-1">Berikut ringkasan kampanye Anda hari ini.</p>
       </div>
 
-      {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         {statCards.map((card) => {
           const Icon = card.icon;
@@ -86,7 +96,6 @@ export default async function OverviewPage() {
         })}
       </div>
 
-      {/* Quick actions */}
       <div className="bg-white rounded-xl border border-border p-6 shadow-sm">
         <h2 className="text-sm font-semibold text-foreground mb-4">Mulai dari sini</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

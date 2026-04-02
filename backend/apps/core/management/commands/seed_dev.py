@@ -179,4 +179,95 @@ class Command(BaseCommand):
                 count += 1
 
         self.stdout.write(self.style.SUCCESS(f'✓ {count} new supporters created'))
+
+        # ── Ads accounts + snapshots ──────────────────────────────────────────
+        from apps.ads.models import AdsAccount, AdsCampaignSnapshot, BudgetAllocation
+        from datetime import date, timedelta
+        import random
+
+        accounts_data = [
+            ('meta', 'ACT-123456789', 'Meta Ads — Kampanye Andi'),
+            ('tiktok', 'TT-987654321', 'TikTok Ads — Andi Fathul'),
+        ]
+        ads_accounts = []
+        for platform, acc_id, acc_name in accounts_data:
+            acc, _ = AdsAccount.objects.get_or_create(
+                tenant=tenant, platform=platform, account_id=acc_id,
+                defaults={'account_name': acc_name, 'access_token': 'dev-token', 'is_active': True},
+            )
+            ads_accounts.append(acc)
+
+        self.stdout.write(self.style.SUCCESS(f'✓ {len(ads_accounts)} ads accounts ready'))
+
+        # Seed 30 days of campaign snapshots
+        meta_campaigns = [
+            ('meta-c-001', 'Kampanye Kesadaran Nama'),
+            ('meta-c-002', 'Iklan Program Pendidikan'),
+            ('meta-c-003', 'Boost Halaman Kampanye'),
+        ]
+        tiktok_campaigns = [
+            ('tt-c-001', 'TikTok Brand Awareness'),
+            ('tt-c-002', 'Video Program Unggulan'),
+        ]
+
+        today = date.today()
+        snap_count = 0
+        for days_ago in range(30, 0, -1):
+            snap_date = today - timedelta(days=days_ago)
+            meta_acc = ads_accounts[0]
+            tiktok_acc = ads_accounts[1]
+
+            for cid, cname in meta_campaigns:
+                spend = round(random.uniform(150_000, 800_000), 0)
+                impressions = int(spend * random.uniform(8, 15))
+                reach = int(impressions * random.uniform(0.6, 0.85))
+                clicks = int(impressions * random.uniform(0.02, 0.06))
+                AdsCampaignSnapshot.objects.get_or_create(
+                    ads_account=meta_acc, campaign_id=cid, snapshot_date=snap_date,
+                    defaults=dict(
+                        tenant=tenant, platform='meta', campaign_name=cname,
+                        status='ACTIVE', spend=spend, impressions=impressions,
+                        reach=reach, clicks=clicks,
+                        cpm=round(spend / impressions * 1000, 2) if impressions else None,
+                        ctr=round(clicks / impressions * 100, 4) if impressions else None,
+                    )
+                )
+                snap_count += 1
+
+            for cid, cname in tiktok_campaigns:
+                spend = round(random.uniform(100_000, 500_000), 0)
+                impressions = int(spend * random.uniform(10, 20))
+                reach = int(impressions * random.uniform(0.5, 0.8))
+                clicks = int(impressions * random.uniform(0.01, 0.04))
+                AdsCampaignSnapshot.objects.get_or_create(
+                    ads_account=tiktok_acc, campaign_id=cid, snapshot_date=snap_date,
+                    defaults=dict(
+                        tenant=tenant, platform='tiktok', campaign_name=cname,
+                        status='ACTIVE', spend=spend, impressions=impressions,
+                        reach=reach, clicks=clicks,
+                        cpm=round(spend / impressions * 1000, 2) if impressions else None,
+                        ctr=round(clicks / impressions * 100, 4) if impressions else None,
+                    )
+                )
+                snap_count += 1
+
+        self.stdout.write(self.style.SUCCESS(f'✓ {snap_count} ad snapshots seeded'))
+
+        # Budget allocation
+        period_start = today.replace(day=1)
+        import calendar
+        last_day = calendar.monthrange(today.year, today.month)[1]
+        period_end = today.replace(day=last_day)
+        BudgetAllocation.objects.get_or_create(
+            tenant=tenant,
+            period_start=period_start,
+            defaults={
+                'total_budget': 50_000_000,
+                'allocations': {'meta': 30_000_000, 'tiktok': 15_000_000, 'google': 5_000_000},
+                'period_end': period_end,
+                'alert_threshold_pct': 80,
+                'notes': 'Anggaran iklan digital bulan ini',
+            }
+        )
+        self.stdout.write(self.style.SUCCESS('✓ Budget allocation seeded (Rp 50 juta)'))
         self.stdout.write(self.style.SUCCESS('\n🚀 Seed complete! Visit http://localhost:3001/afms to see the public campaign.'))
