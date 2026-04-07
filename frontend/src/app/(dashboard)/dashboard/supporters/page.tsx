@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Download, Heart, MapPin, Phone, Mail } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { Search, Download, Heart, MapPin, Phone, Mail, CreditCard } from 'lucide-react';
 import { useSupporters, useSupporterStats } from '@/hooks/useSupporters';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,21 @@ import type { Supporter } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
-function SupporterCard({ supporter }: { supporter: Supporter }) {
+function SupporterCard({ supporter, token }: { supporter: Supporter; token?: string }) {
+  const downloadCard = async () => {
+    if (!token) return;
+    const res = await fetch(`${API_URL}/supporters/${supporter.id}/card/image/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kartu-${supporter.membership_id}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="bg-white rounded-xl border border-border p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
@@ -21,9 +36,18 @@ function SupporterCard({ supporter }: { supporter: Supporter }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <p className="font-medium text-sm truncate">{supporter.nama}</p>
-            <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono text-muted-foreground flex-shrink-0">
-              {supporter.membership_id}
-            </code>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono text-muted-foreground">
+                {supporter.membership_id}
+              </code>
+              <button
+                onClick={downloadCard}
+                title="Unduh Kartu Anggota"
+                className="text-muted-foreground hover:text-indigo-600 transition-colors"
+              >
+                <CreditCard className="w-4 h-4" />
+              </button>
+            </div>
           </div>
           <div className="mt-1.5 space-y-0.5">
             <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -53,6 +77,8 @@ function SupporterCard({ supporter }: { supporter: Supporter }) {
 export default function SupportersPage() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const { data: session } = useSession();
+  const token = (session as any)?.accessToken as string | undefined;
 
   const { data: supporters, isLoading } = useSupporters(debouncedSearch || undefined);
   const { data: stats } = useSupporterStats();
@@ -129,7 +155,7 @@ export default function SupportersPage() {
           ) : (
             <div className="space-y-3">
               {supporters.map(s => (
-                <SupporterCard key={s.id} supporter={s} />
+                <SupporterCard key={s.id} supporter={s} token={token} />
               ))}
             </div>
           )}

@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { FileDown } from 'lucide-react';
 import { useCandidate, useUpdateCandidate } from '@/hooks/useCandidate';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +14,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+
+const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 const profileSchema = z.object({
   nama_lengkap: z.string().min(1, 'Nama wajib diisi'),
@@ -44,6 +48,22 @@ export default function ProfilePage() {
   const { data: candidate, isLoading } = useCandidate();
   const updateCandidate = useUpdateCandidate();
   const [saved, setSaved] = useState(false);
+  const { data: session } = useSession();
+  const token = (session as any)?.accessToken as string | undefined;
+
+  const downloadPressKit = async () => {
+    if (!token) return;
+    const res = await fetch(`${apiBase}/candidates/me/press-kit/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'press-kit.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const { register, handleSubmit, formState: { errors, isDirty } } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -107,11 +127,16 @@ export default function ProfilePage() {
             Informasi ini ditampilkan di halaman kampanye publik Anda.
           </p>
         </div>
-        {candidate && (
-          <Badge variant={candidate.status === 'published' ? 'success' : 'secondary'}>
-            {candidate.status === 'published' ? 'Dipublikasikan' : 'Draft'}
-          </Badge>
-        )}
+        <div className="flex items-center gap-3">
+          {candidate && (
+            <Badge variant={candidate.status === 'published' ? 'success' : 'secondary'}>
+              {candidate.status === 'published' ? 'Dipublikasikan' : 'Draft'}
+            </Badge>
+          )}
+          <Button variant="outline" size="sm" onClick={downloadPressKit} className="gap-2">
+            <FileDown className="w-4 h-4" /> Press Kit
+          </Button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

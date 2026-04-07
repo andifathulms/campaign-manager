@@ -78,3 +78,70 @@ class ReferralClick(BaseModel):
 
     class Meta:
         ordering = ['-clicked_at']
+
+
+class Task(BaseModel):
+    PRIORITY_CHOICES = [
+        ('high', 'Tinggi'),
+        ('medium', 'Sedang'),
+        ('low', 'Rendah'),
+    ]
+    STATUS_CHOICES = [
+        ('assigned', 'Ditugaskan'),
+        ('in_progress', 'Dikerjakan'),
+        ('done', 'Selesai'),
+    ]
+
+    tenant = models.ForeignKey(
+        'accounts.Tenant', on_delete=models.CASCADE, related_name='tasks'
+    )
+    assigned_to = models.ForeignKey(
+        TeamMember, on_delete=models.CASCADE, related_name='tasks'
+    )
+    assigned_by = models.ForeignKey(
+        'accounts.User', on_delete=models.SET_NULL, null=True, related_name='assigned_tasks'
+    )
+    judul = models.CharField(max_length=300)
+    deskripsi = models.TextField(blank=True)
+    prioritas = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='assigned')
+    deadline = models.DateField(null=True, blank=True)
+    wilayah = models.CharField(max_length=200, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.judul} → {self.assigned_to.nama}"
+
+
+class Announcement(BaseModel):
+    """Internal announcement board for the tim sukses."""
+    LEVEL_CHOICES = [
+        (0, 'Semua'),
+        (1, 'Koordinator Wilayah ke atas'),
+        (2, 'Koordinator Kecamatan ke atas'),
+        (3, 'Koordinator Kelurahan ke atas'),
+        (4, 'Semua termasuk Relawan'),
+    ]
+
+    tenant = models.ForeignKey(
+        'accounts.Tenant', on_delete=models.CASCADE, related_name='announcements'
+    )
+    author = models.ForeignKey(
+        'accounts.User', on_delete=models.SET_NULL, null=True, related_name='announcements'
+    )
+    judul = models.CharField(max_length=300)
+    isi = models.TextField()
+    min_level = models.IntegerField(
+        choices=LEVEL_CHOICES, default=4,
+        help_text='Members at this level and above will see this announcement.'
+    )
+    is_pinned = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-is_pinned', '-created_at']
+
+    def __str__(self):
+        return self.judul

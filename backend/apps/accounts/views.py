@@ -61,3 +61,50 @@ class MeView(APIView):
     @extend_schema(responses={200: UserSerializer})
     def get(self, request):
         return Response(UserSerializer(request.user).data)
+
+    @extend_schema(request=UserSerializer, responses={200: UserSerializer})
+    def patch(self, request):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        old_password = request.data.get('old_password', '')
+        new_password = request.data.get('new_password', '')
+
+        if not request.user.check_password(old_password):
+            return Response({'detail': 'Password lama tidak sesuai.'}, status=status.HTTP_400_BAD_REQUEST)
+        if len(new_password) < 8:
+            return Response({'detail': 'Password baru minimal 8 karakter.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.set_password(new_password)
+        request.user.save(update_fields=['password'])
+        return Response({'detail': 'Password berhasil diubah.'})
+
+
+class TenantSettingsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from .serializers import TenantSerializer
+        tenant = request.user.tenant
+        if not tenant:
+            return Response({'detail': 'No tenant.'}, status=404)
+        return Response(TenantSerializer(tenant).data)
+
+    def patch(self, request):
+        from .serializers import TenantSerializer
+        tenant = request.user.tenant
+        if not tenant:
+            return Response({'detail': 'No tenant.'}, status=404)
+        # Only allow updating name and custom_domain
+        allowed = {k: v for k, v in request.data.items() if k in ('name', 'custom_domain')}
+        serializer = TenantSerializer(tenant, data=allowed, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

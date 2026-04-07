@@ -23,6 +23,12 @@ class Supporter(BaseModel):
         'teams.TeamMember', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='supporters'
     )
+    referred_by_supporter = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='referrals'
+    )
+    referral_code = models.CharField(max_length=20, unique=True, blank=True)
+    referral_count = models.IntegerField(default=0)
     membership_id = models.CharField(max_length=20, unique=True)
     statement = models.CharField(max_length=100, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
@@ -32,6 +38,8 @@ class Supporter(BaseModel):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
+        if not self.referral_code:
+            self.referral_code = secrets.token_urlsafe(8)
         if not self.membership_id:
             # Ensure uniqueness
             for _ in range(10):

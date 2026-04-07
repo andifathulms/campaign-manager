@@ -10,10 +10,10 @@ class SupporterSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'nama', 'phone', 'email', 'foto_url',
             'kelurahan', 'kecamatan', 'kabupaten_kota', 'provinsi',
-            'referred_by_team', 'membership_id', 'statement',
-            'is_verified', 'is_active', 'created_at',
+            'referred_by_team', 'membership_id', 'referral_code', 'referral_count',
+            'statement', 'is_verified', 'is_active', 'created_at',
         ]
-        read_only_fields = ['id', 'membership_id', 'created_at', 'foto_url']
+        read_only_fields = ['id', 'membership_id', 'referral_code', 'referral_count', 'created_at', 'foto_url']
 
     def get_foto_url(self, obj):
         if obj.foto:
@@ -39,16 +39,30 @@ class PublicJoinSerializer(serializers.ModelSerializer):
         tenant = self.context['tenant']
 
         referred_by_team = None
+        referred_by_supporter = None
+
         if ref_code:
+            # Try team referral first
             try:
                 link = ReferralLink.objects.get(code=ref_code, team_member__tenant=tenant)
                 referred_by_team = link.team_member
             except ReferralLink.DoesNotExist:
                 pass
 
+            # Try supporter referral
+            if not referred_by_team:
+                try:
+                    ref_sup = Supporter.objects.get(referral_code=ref_code, tenant=tenant)
+                    referred_by_supporter = ref_sup
+                    ref_sup.referral_count += 1
+                    ref_sup.save(update_fields=['referral_count'])
+                except Supporter.DoesNotExist:
+                    pass
+
         return Supporter.objects.create(
             tenant=tenant,
             referred_by_team=referred_by_team,
+            referred_by_supporter=referred_by_supporter,
             **validated_data,
         )
 
@@ -60,9 +74,9 @@ class MembershipCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supporter
         fields = [
-            'id', 'nama', 'membership_id', 'kelurahan', 'kecamatan',
-            'kabupaten_kota', 'provinsi', 'candidate_name', 'candidate_partai',
-            'created_at',
+            'id', 'nama', 'membership_id', 'referral_code', 'referral_count',
+            'kelurahan', 'kecamatan', 'kabupaten_kota', 'provinsi',
+            'candidate_name', 'candidate_partai', 'created_at',
         ]
 
     def get_candidate_name(self, obj):

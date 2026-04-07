@@ -6,6 +6,7 @@ from .views import (
     AdsCampaignListView,
     AdsDashboardView,
     BudgetView,
+    AdsDailySpendView,
 )
 
 urlpatterns = [
@@ -14,5 +15,6 @@ urlpatterns = [
     path('ads/accounts/<uuid:pk>/', DisconnectAdsAccountView.as_view(), name='ads-disconnect'),
     path('ads/campaigns/', AdsCampaignListView.as_view(), name='ads-campaigns'),
     path('ads/dashboard/', AdsDashboardView.as_view(), name='ads-dashboard'),
+    path('ads/daily-spend/', AdsDailySpendView.as_view(), name='ads-daily-spend'),
     path('ads/budget/', BudgetView.as_view(), name='ads-budget'),
 ]

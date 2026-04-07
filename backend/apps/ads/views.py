@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.db.models import Sum, Max
@@ -105,6 +105,21 @@ class AdsDashboardView(APIView):
         today = date.today()
 
         snapshots = AdsCampaignSnapshot.objects.filter(tenant=tenant)
+
+        # Optional date range filter
+        date_from = request.query_params.get('date_from')
+        date_to = request.query_params.get('date_to')
+        if date_from:
+            try:
+                snapshots = snapshots.filter(snapshot_date__gte=date.fromisoformat(date_from))
+            except ValueError:
+                pass
+        if date_to:
+            try:
+                snapshots = snapshots.filter(snapshot_date__lte=date.fromisoformat(date_to))
+            except ValueError:
+                pass
+
         agg = snapshots.aggregate(
             total_spend=Sum('spend'),
             total_reach=Sum('reach'),
@@ -192,3 +207,43 @@ class BudgetView(APIView):
             serializer.save(tenant=request.user.tenant)
 
         return Response(serializer.data)
+
+
+@extend_schema(tags=['ads'])
+class AdsDailySpendView(APIView):
+    """Return daily spend per platform for the last N days (default 30)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        tenant = request.user.tenant
+        today = date.today()
+
+        try:
+            days = min(int(request.query_params.get('days', 30)), 90)
+        except ValueError:
+            days = 30
+
+        start = today - timedelta(days=days - 1)
+        snapshots = AdsCampaignSnapshot.objects.filter(
+            tenant=tenant, snapshot_date__gte=start, snapshot_date__lte=today
+        )
+
+        # Group by date + platform
+        by_date: dict = {}
+        for snap in snapshots.values('snapshot_date', 'platform').annotate(
+            spend=Sum('spend'), reach=Sum('reach'), clicks=Sum('clicks')
+        ):
+            d = snap['snapshot_date'].isoformat()
+            if d not in by_date:
+                by_date[d] = {'date': d, 'total': 0.0}
+            v = float(snap['spend'] or 0)
+            by_date[d][snap['platform']] = v
+            by_date[d]['total'] = round(by_date[d]['total'] + v, 2)
+
+        # Fill missing dates
+        result = []
+        for i in range(days):
+            d = (start + timedelta(days=i)).isoformat()
+            result.append(by_date.get(d, {'date': d, 'meta': 0, 'tiktok': 0, 'google': 0, 'total': 0}))
+
+        return Response(result)

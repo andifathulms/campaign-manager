@@ -31,8 +31,16 @@ def _build_report_pdf(tenant) -> bytes:
     )
 
     from apps.supporters.models import Supporter
-    from apps.teams.models import TeamMember
+    from apps.teams.models import TeamMember, Task
     from apps.ads.models import AdsCampaignSnapshot, BudgetAllocation
+    try:
+        from apps.engagement.models import Aspirasi
+    except Exception:
+        Aspirasi = None
+    try:
+        from apps.analytics.models import ElectabilitySurvey
+    except Exception:
+        ElectabilitySurvey = None
 
     today = date.today()
     week_start = today - timedelta(days=7)
@@ -65,6 +73,27 @@ def _build_report_pdf(tenant) -> bytes:
         tenant=tenant, snapshot_date__gte=month_start
     ).aggregate(total=Sum('spend'))
     month_spend = float(month_spend_agg['total'] or 0)
+
+    # Phase 2 data
+    task_qs = Task.objects.filter(tenant=tenant)
+    task_total = task_qs.count()
+    task_done = task_qs.filter(status='done').count()
+    task_overdue = task_qs.filter(
+        status__in=['assigned', 'in_progress'], deadline__lt=today
+    ).count()
+
+    aspirasi_total = 0
+    aspirasi_unread = 0
+    if Aspirasi is not None:
+        aspirasi_qs = Aspirasi.objects.filter(tenant=tenant)
+        aspirasi_total = aspirasi_qs.count()
+        aspirasi_unread = aspirasi_qs.filter(status='unread').count()
+
+    latest_elektabilitas = None
+    if ElectabilitySurvey is not None:
+        latest_elektabilitas = ElectabilitySurvey.objects.filter(
+            tenant=tenant
+        ).order_by('-tanggal').first()
 
     try:
         candidate = tenant.candidate
@@ -152,6 +181,45 @@ def _build_report_pdf(tenant) -> bytes:
                 f"⚠ Peringatan: Anggaran telah melampaui {budget.alert_threshold_pct}% batas.",
                 ParagraphStyle('Warn', parent=body_style, textColor=colors.HexColor('#D97706'))
             ))
+
+    # Tasks section
+    if task_total > 0:
+        story.append(Paragraph("Tugas Tim", section_style))
+        tasks_data = [
+            ['Total Tugas', 'Selesai', 'Terlambat'],
+            [num(task_total), num(task_done), num(task_overdue)],
+        ]
+        tasks_tbl = Table(tasks_data, colWidths=[5.6*cm, 5.6*cm, 5.6*cm])
+        tasks_tbl.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), INDIGO),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [LIGHT]),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#E5E7EB')),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ]))
+        story.append(tasks_tbl)
+
+    # Aspirasi section
+    if aspirasi_total > 0:
+        story.append(Paragraph("Aspirasi Masyarakat", section_style))
+        story.append(Paragraph(
+            f"Total aspirasi masuk: <b>{num(aspirasi_total)}</b> &nbsp;|&nbsp; "
+            f"Belum ditanggapi: <b>{num(aspirasi_unread)}</b>",
+            body_style
+        ))
+
+    # Electability
+    if latest_elektabilitas is not None:
+        story.append(Paragraph("Elektabilitas Terkini", section_style))
+        story.append(Paragraph(
+            f"Survei terakhir ({latest_elektabilitas.tanggal.strftime('%d %b %Y')}): "
+            f"<b>{latest_elektabilitas.elektabilitas_pct}%</b> — {latest_elektabilitas.sumber}",
+            body_style
+        ))
 
     # Footer
     story.append(Spacer(1, 1*cm))

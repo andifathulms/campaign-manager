@@ -11,13 +11,17 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.core.mixins import TenantQuerysetMixin
-from .models import TeamMember, ReferralLink, ReferralClick
+from .models import TeamMember, ReferralLink, ReferralClick, Task, Announcement
 from .serializers import (
     TeamMemberSerializer,
     TeamMemberCreateSerializer,
     ReferralLinkSerializer,
     LeaderboardSerializer,
     PublicReferralClickSerializer,
+    TaskSerializer,
+    TaskCreateSerializer,
+    TaskUpdateSerializer,
+    AnnouncementSerializer,
 )
 
 
@@ -113,3 +117,101 @@ class PublicReferralClickView(APIView):
         link.save(update_fields=['clicks', 'unique_visitors', 'last_clicked_at'])
 
         return Response({'status': 'recorded'}, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=['tasks'])
+class TaskListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        qs = Task.objects.filter(tenant=request.user.tenant).select_related('assigned_to', 'assigned_by')
+        status_filter = request.query_params.get('status')
+        assigned_to = request.query_params.get('assigned_to')
+        prioritas = request.query_params.get('prioritas')
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if assigned_to:
+            qs = qs.filter(assigned_to=assigned_to)
+        if prioritas:
+            qs = qs.filter(prioritas=prioritas)
+        return Response(TaskSerializer(qs, many=True).data)
+
+    def post(self, request):
+        serializer = TaskCreateSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        task = serializer.save()
+        return Response(TaskSerializer(task).data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(tags=['tasks'])
+class TaskDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def _get_task(self, request, pk):
+        return get_object_or_404(Task, pk=pk, tenant=request.user.tenant)
+
+    def get(self, request, pk):
+        return Response(TaskSerializer(self._get_task(request, pk)).data)
+
+    def patch(self, request, pk):
+        task = self._get_task(request, pk)
+        serializer = TaskUpdateSerializer(task, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        task = serializer.save()
+        return Response(TaskSerializer(task).data)
+
+    def delete(self, request, pk):
+        self._get_task(request, pk).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema(tags=['tasks'])
+class TaskStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        from django.db.models import Count
+        from django.utils import timezone
+        tenant = request.user.tenant
+        qs = Task.objects.filter(tenant=tenant)
+        today = timezone.now().date()
+        return Response({
+            'total': qs.count(),
+            'assigned': qs.filter(status='assigned').count(),
+            'in_progress': qs.filter(status='in_progress').count(),
+            'done': qs.filter(status='done').count(),
+            'overdue': qs.filter(status__in=['assigned', 'in_progress'], deadline__lt=today).count(),
+        })
+
+
+@extend_schema(tags=['announcements'])
+class AnnouncementListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        qs = Announcement.objects.filter(tenant=request.user.tenant)
+        return Response(AnnouncementSerializer(qs, many=True).data)
+
+    def post(self, request):
+        serializer = AnnouncementSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        ann = serializer.save(tenant=request.user.tenant, author=request.user)
+        return Response(AnnouncementSerializer(ann).data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(tags=['announcements'])
+class AnnouncementDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def _get(self, request, pk):
+        return get_object_or_404(Announcement, pk=pk, tenant=request.user.tenant)
+
+    def patch(self, request, pk):
+        ann = self._get(request, pk)
+        serializer = AnnouncementSerializer(ann, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        return Response(AnnouncementSerializer(serializer.save()).data)
+
+    def delete(self, request, pk):
+        self._get(request, pk).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

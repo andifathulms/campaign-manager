@@ -109,3 +109,22 @@ export function useDashboardOverview() {
     retry: false,
   });
 }
+
+export interface DailySpend {
+  date: string;
+  meta?: number;
+  tiktok?: number;
+  google?: number;
+  total: number;
+}
+
+export function useAdsDailySpend(days = 30) {
+  const { token } = useToken();
+  return useQuery({
+    queryKey: ['ads-daily-spend', token, days],
+    queryFn: () => axios.get<DailySpend[]>(`${apiBase}/ads/daily-spend/?days=${days}`, { headers: auth(token!) }).then(r => r.data),
+    enabled: !!token,
+    staleTime: 30_000,
+    retry: false,
+  });
+}

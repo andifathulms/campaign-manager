@@ -1,34 +1,50 @@
 'use client';
 
 import { useState } from 'react';
-import { TrendingUp, Wallet, Eye, MousePointer, Plus, Trash2, Link2, AlertTriangle } from 'lucide-react';
-import { useAdsDashboard, useAdsAccounts, useConnectAdsAccount, useDisconnectAdsAccount } from '@/hooks/useAds';
+import {
+  TrendingUp, Wallet, Eye, MousePointer, Plus, Trash2, Link2, AlertTriangle, Calendar,
+} from 'lucide-react';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
+} from 'recharts';
+import {
+  useAdsDashboard, useAdsAccounts, useConnectAdsAccount,
+  useDisconnectAdsAccount, useAdsDailySpend,
+} from '@/hooks/useAds';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 const PLATFORM_COLORS: Record<string, string> = {
   meta: 'bg-blue-100 text-blue-700',
   tiktok: 'bg-pink-100 text-pink-700',
   google: 'bg-green-100 text-green-700',
 };
-
 const PLATFORM_BAR: Record<string, string> = {
   meta: 'bg-blue-500',
   tiktok: 'bg-pink-500',
   google: 'bg-green-500',
 };
+const CHART_COLORS: Record<string, string> = {
+  meta: '#3B82F6',
+  tiktok: '#EC4899',
+  google: '#22C55E',
+};
+const PIE_FALLBACK = ['#6366F1', '#8B5CF6', '#EC4899'];
 
 function formatRp(n: number) {
   return `Rp ${Math.round(n).toLocaleString('id-ID')}`;
 }
-
 function formatNum(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return n.toLocaleString('id-ID');
+}
+function shortDate(d: string) {
+  const dt = new Date(d);
+  return `${dt.getDate()}/${dt.getMonth() + 1}`;
 }
 
 function ConnectModal({ onClose }: { onClose: () => void }) {
@@ -82,9 +98,25 @@ function ConnectModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-white border border-border rounded-xl shadow-lg p-3 text-xs">
+      <p className="font-semibold text-foreground mb-2">{label}</p>
+      {payload.map((p: any) => (
+        <p key={p.dataKey} style={{ color: p.color }}>
+          {p.name}: {formatRp(p.value)}
+        </p>
+      ))}
+    </div>
+  );
+};
+
 export default function AdsPage() {
+  const [days, setDays] = useState(30);
   const { data: dashboard, isLoading } = useAdsDashboard();
   const { data: accounts } = useAdsAccounts();
+  const { data: dailySpend } = useAdsDailySpend(days);
   const disconnect = useDisconnectAdsAccount();
   const [showConnect, setShowConnect] = useState(false);
 
@@ -92,23 +124,21 @@ export default function AdsPage() {
   const spendPct = budget?.spend_pct ?? 0;
   const overBudget = spendPct >= (budget?.alert_threshold_pct ?? 80);
 
+  // Detect which platforms have data in daily spend
+  const activePlatforms = ['meta', 'tiktok', 'google'].filter(p =>
+    dailySpend?.some(d => (d as any)[p] > 0)
+  );
+
+  // Pie data from by_platform
+  const pieData = (dashboard?.by_platform ?? []).map(p => ({
+    name: p.label, value: p.spend,
+  }));
+
   const statCards = [
-    {
-      label: 'Total Belanja Iklan', value: formatRp(dashboard?.total_spend ?? 0),
-      icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100',
-    },
-    {
-      label: 'Total Jangkauan', value: formatNum(dashboard?.total_reach ?? 0),
-      icon: Eye, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100',
-    },
-    {
-      label: 'Total Impresi', value: formatNum(dashboard?.total_impressions ?? 0),
-      icon: TrendingUp, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100',
-    },
-    {
-      label: 'Total Klik', value: formatNum(dashboard?.total_clicks ?? 0),
-      icon: MousePointer, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100',
-    },
+    { label: 'Total Belanja Iklan', value: formatRp(dashboard?.total_spend ?? 0), icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+    { label: 'Total Jangkauan', value: formatNum(dashboard?.total_reach ?? 0), icon: Eye, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' },
+    { label: 'Total Impresi', value: formatNum(dashboard?.total_impressions ?? 0), icon: TrendingUp, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
+    { label: 'Total Klik', value: formatNum(dashboard?.total_clicks ?? 0), icon: MousePointer, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100' },
   ];
 
   return (
@@ -128,7 +158,7 @@ export default function AdsPage() {
       {/* Connected accounts */}
       {accounts && accounts.length > 0 && (
         <div className="flex flex-wrap gap-3 mb-6">
-          {accounts.map((acc: import("@/hooks/useAds").AdsAccount) => (
+          {accounts.map((acc: import('@/hooks/useAds').AdsAccount) => (
             <div key={acc.id} className="flex items-center gap-2 bg-white border border-border rounded-xl px-4 py-2 shadow-sm">
               <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${PLATFORM_COLORS[acc.platform]}`}>
                 {acc.platform_display}
@@ -146,7 +176,6 @@ export default function AdsPage() {
         </div>
       )}
 
-      {/* No accounts */}
       {accounts && accounts.length === 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6 flex items-start gap-3">
           <Link2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -177,6 +206,74 @@ export default function AdsPage() {
         })}
       </div>
 
+      {/* Daily spend chart */}
+      <Card className="mb-6">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div>
+            <CardTitle>Tren Belanja Harian</CardTitle>
+            <CardDescription>Total pengeluaran iklan per hari</CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-muted-foreground" />
+            <select
+              className="text-sm border border-border rounded-lg px-3 py-1.5 bg-white"
+              value={days}
+              onChange={e => setDays(Number(e.target.value))}
+            >
+              <option value={7}>7 hari</option>
+              <option value={14}>14 hari</option>
+              <option value={30}>30 hari</option>
+              <option value={60}>60 hari</option>
+              <option value={90}>90 hari</option>
+            </select>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {!dailySpend ? (
+            <div className="h-48 bg-secondary/40 rounded-lg animate-pulse" />
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={dailySpend} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                <defs>
+                  {activePlatforms.map(p => (
+                    <linearGradient key={p} id={`grad-${p}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={CHART_COLORS[p]} stopOpacity={0.25} />
+                      <stop offset="95%" stopColor={CHART_COLORS[p]} stopOpacity={0} />
+                    </linearGradient>
+                  ))}
+                  {activePlatforms.length === 0 && (
+                    <linearGradient id="grad-total" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                    </linearGradient>
+                  )}
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+                <XAxis dataKey="date" tickFormatter={shortDate} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                <YAxis tickFormatter={v => `${(v / 1000).toFixed(0)}K`} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={48} />
+                <Tooltip content={<CustomTooltip />} />
+                {activePlatforms.length > 0 ? (
+                  activePlatforms.map(p => (
+                    <Area
+                      key={p}
+                      type="monotone"
+                      dataKey={p}
+                      name={p.charAt(0).toUpperCase() + p.slice(1)}
+                      stroke={CHART_COLORS[p]}
+                      fill={`url(#grad-${p})`}
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  ))
+                ) : (
+                  <Area type="monotone" dataKey="total" name="Total" stroke="#6366F1" fill="url(#grad-total)" strokeWidth={2} dot={false} />
+                )}
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Campaign table */}
         <div className="lg:col-span-2">
@@ -188,7 +285,7 @@ export default function AdsPage() {
             <CardContent className="p-0">
               {isLoading ? (
                 <div className="p-6 space-y-3">
-                  {[1,2,3].map(i => <div key={i} className="h-10 bg-secondary rounded animate-pulse" />)}
+                  {[1, 2, 3].map(i => <div key={i} className="h-10 bg-secondary rounded animate-pulse" />)}
                 </div>
               ) : !dashboard?.recent_campaigns?.length ? (
                 <div className="p-12 text-center text-sm text-muted-foreground">Belum ada data kampanye.</div>
@@ -227,36 +324,58 @@ export default function AdsPage() {
           </Card>
         </div>
 
-        {/* Right column: platform breakdown + budget */}
+        {/* Right column */}
         <div className="space-y-6">
-          {/* Platform breakdown */}
+          {/* Pie chart: platform breakdown */}
           <Card>
             <CardHeader>
               <CardTitle>Per Platform</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {!dashboard?.by_platform?.length ? (
+            <CardContent>
+              {!pieData.length ? (
                 <p className="text-sm text-muted-foreground">Belum ada data.</p>
               ) : (
-                dashboard.by_platform.map(p => {
-                  const total = dashboard.by_platform.reduce((s, x) => s + x.spend, 0);
-                  const pct = total > 0 ? Math.round((p.spend / total) * 100) : 0;
-                  return (
-                    <div key={p.platform}>
-                      <div className="flex items-center justify-between text-sm mb-1.5">
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${PLATFORM_COLORS[p.platform]}`}>{p.label}</span>
-                        <span className="font-semibold text-foreground">{formatRp(p.spend)}</span>
-                      </div>
-                      <div className="w-full bg-secondary rounded-full h-1.5">
-                        <div className={`h-1.5 rounded-full ${PLATFORM_BAR[p.platform]}`} style={{ width: `${pct}%` }} />
-                      </div>
-                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                        <span>{formatNum(p.reach)} jangkauan</span>
-                        <span>{pct}%</span>
-                      </div>
-                    </div>
-                  );
-                })
+                <>
+                  <ResponsiveContainer width="100%" height={180}>
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        paddingAngle={3}
+                        dataKey="value"
+                      >
+                        {pieData.map((entry, i) => {
+                          const platform = (dashboard?.by_platform ?? [])[i]?.platform;
+                          const color = CHART_COLORS[platform] ?? PIE_FALLBACK[i % PIE_FALLBACK.length];
+                          return <Cell key={entry.name} fill={color} />;
+                        })}
+                      </Pie>
+                      <Tooltip formatter={(v: number) => formatRp(v)} />
+                      <Legend iconType="circle" iconSize={8} formatter={v => <span className="text-xs">{v}</span>} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* Bar breakdown */}
+                  <div className="space-y-3 mt-2">
+                    {(dashboard?.by_platform ?? []).map(p => {
+                      const total = (dashboard?.by_platform ?? []).reduce((s, x) => s + x.spend, 0);
+                      const pct = total > 0 ? Math.round((p.spend / total) * 100) : 0;
+                      return (
+                        <div key={p.platform}>
+                          <div className="flex items-center justify-between text-sm mb-1">
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${PLATFORM_COLORS[p.platform]}`}>{p.label}</span>
+                            <span className="font-semibold text-xs">{pct}%</span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-1.5">
+                            <div className={`h-1.5 rounded-full ${PLATFORM_BAR[p.platform]}`} style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -268,9 +387,7 @@ export default function AdsPage() {
                 Anggaran Iklan
                 {overBudget && <AlertTriangle className="w-4 h-4 text-amber-500" />}
               </CardTitle>
-              {budget && (
-                <CardDescription>{budget.period_start} – {budget.period_end}</CardDescription>
-              )}
+              {budget && <CardDescription>{budget.period_start} – {budget.period_end}</CardDescription>}
             </CardHeader>
             <CardContent>
               {!budget ? (
