@@ -96,3 +96,51 @@ class SupporterStatsSerializer(serializers.Serializer):
     total = serializers.IntegerField()
     by_kecamatan = serializers.ListField(child=serializers.DictField())
     by_kabupaten = serializers.ListField(child=serializers.DictField())
+
+
+class VolunteerSupporterCreateSerializer(serializers.ModelSerializer):
+    """For volunteer manual supporter entry in the field."""
+    class Meta:
+        model = Supporter
+        fields = [
+            'nama', 'phone', 'email', 'kelurahan', 'kecamatan',
+            'kabupaten_kota', 'provinsi',
+        ]
+
+    def validate_phone(self, value):
+        # Normalize phone
+        phone = value.strip().replace(' ', '').replace('-', '')
+        if phone.startswith('0'):
+            phone = '62' + phone[1:]
+        elif phone.startswith('+'):
+            phone = phone[1:]
+        return phone
+
+    def create(self, validated_data):
+        tenant = self.context['tenant']
+        volunteer = self.context['volunteer']
+
+        # Duplicate detection (warn, don't block)
+        duplicate = Supporter.objects.filter(
+            tenant=tenant, phone=validated_data['phone']
+        ).exists()
+
+        supporter = Supporter.objects.create(
+            tenant=tenant,
+            referred_by_team=volunteer,
+            source='manual_entry',
+            is_verified=True,  # volunteer vouches
+            **validated_data,
+        )
+
+        # Award points
+        from apps.teams.points import award_points
+        award_points(
+            volunteer, 'manual_supporter',
+            description=f'Input pendukung: {supporter.nama}',
+            reference_id=supporter.pk, reference_type='supporter',
+        )
+
+        # Attach duplicate flag to instance for response
+        supporter._is_duplicate = duplicate
+        return supporter

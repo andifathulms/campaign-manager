@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import TeamMember, ReferralLink, ReferralClick, Task, Announcement
+from .models import TeamMember, ReferralLink, ReferralClick, Task, TaskAssignment, Announcement, PointRule, PointTransaction
 
 
 class ReferralLinkSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'nama', 'phone', 'level', 'level_display',
             'wilayah_name', 'wilayah_level', 'wilayah_level_display',
-            'parent', 'is_active', 'referral_links', 'total_clicks', 'created_at',
+            'parent', 'is_active', 'total_points', 'referral_links', 'total_clicks', 'created_at',
         ]
         read_only_fields = ['id', 'created_at']
 
@@ -49,7 +49,7 @@ class LeaderboardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TeamMember
-        fields = ['id', 'nama', 'level', 'level_display', 'wilayah_name', 'total_clicks']
+        fields = ['id', 'nama', 'level', 'level_display', 'wilayah_name', 'total_points', 'total_clicks']
 
     def get_total_clicks(self, obj):
         return sum(link.clicks for link in obj.referral_links.all())
@@ -60,11 +60,13 @@ class PublicReferralClickSerializer(serializers.Serializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    assigned_to_nama = serializers.CharField(source='assigned_to.nama', read_only=True)
+    assigned_to_nama = serializers.SerializerMethodField()
     assigned_by_nama = serializers.SerializerMethodField()
     prioritas_display = serializers.CharField(source='get_prioritas_display', read_only=True)
     status_display = serializers.CharField(source='get_status_display', read_only=True)
+    kategori_display = serializers.CharField(source='get_kategori_display', read_only=True)
     is_overdue = serializers.SerializerMethodField()
+    assignments_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Task
@@ -73,8 +75,13 @@ class TaskSerializer(serializers.ModelSerializer):
             'status', 'status_display', 'deadline', 'wilayah',
             'assigned_to', 'assigned_to_nama', 'assigned_by_nama',
             'is_overdue', 'completed_at', 'created_at',
+            'is_pool', 'capacity', 'kategori', 'kategori_display', 'poin_reward',
+            'assignments_count',
         ]
-        read_only_fields = ['id', 'assigned_by_nama', 'assigned_to_nama', 'is_overdue', 'completed_at', 'created_at']
+        read_only_fields = ['id', 'assigned_by_nama', 'assigned_to_nama', 'is_overdue', 'completed_at', 'created_at', 'assignments_count']
+
+    def get_assigned_to_nama(self, obj):
+        return obj.assigned_to.nama if obj.assigned_to else ''
 
     def get_assigned_by_nama(self, obj):
         if obj.assigned_by:
@@ -91,7 +98,10 @@ class TaskSerializer(serializers.ModelSerializer):
 class TaskCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['judul', 'deskripsi', 'prioritas', 'deadline', 'wilayah', 'assigned_to']
+        fields = [
+            'judul', 'deskripsi', 'prioritas', 'deadline', 'wilayah', 'assigned_to',
+            'is_pool', 'capacity', 'kategori', 'poin_reward',
+        ]
 
     def create(self, validated_data):
         request = self.context['request']
@@ -130,3 +140,62 @@ class TaskUpdateSerializer(serializers.ModelSerializer):
         if new_status == 'done' and instance.status != 'done':
             validated_data['completed_at'] = timezone.now()
         return super().update(instance, validated_data)
+
+
+class TaskPoolSerializer(serializers.ModelSerializer):
+    """Serializer for pool tasks visible to volunteers."""
+    kategori_display = serializers.CharField(source='get_kategori_display', read_only=True)
+    prioritas_display = serializers.CharField(source='get_prioritas_display', read_only=True)
+    assignments_count = serializers.IntegerField(read_only=True)
+    is_full = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Task
+        fields = [
+            'id', 'judul', 'deskripsi', 'kategori', 'kategori_display',
+            'prioritas', 'prioritas_display', 'deadline', 'wilayah',
+            'poin_reward', 'capacity', 'assignments_count', 'is_full', 'created_at',
+        ]
+        read_only_fields = fields
+
+
+class TaskAssignmentSerializer(serializers.ModelSerializer):
+    task_judul = serializers.CharField(source='task.judul', read_only=True)
+    task_deadline = serializers.DateField(source='task.deadline', read_only=True)
+    task_poin_reward = serializers.IntegerField(source='task.poin_reward', read_only=True)
+    volunteer_nama = serializers.CharField(source='volunteer.nama', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+
+    class Meta:
+        model = TaskAssignment
+        fields = [
+            'id', 'task', 'task_judul', 'task_deadline', 'task_poin_reward',
+            'volunteer', 'volunteer_nama', 'status', 'status_display',
+            'evidence_photo', 'evidence_notes', 'completed_at',
+            'approved_by', 'approved_at', 'created_at',
+        ]
+        read_only_fields = [
+            'id', 'task', 'volunteer', 'status', 'completed_at',
+            'approved_by', 'approved_at', 'created_at',
+        ]
+
+
+class PointRuleSerializer(serializers.ModelSerializer):
+    action_type_display = serializers.CharField(source='get_action_type_display', read_only=True)
+
+    class Meta:
+        model = PointRule
+        fields = ['id', 'action_type', 'action_type_display', 'points', 'is_active']
+        read_only_fields = ['id', 'action_type']
+
+
+class PointTransactionSerializer(serializers.ModelSerializer):
+    team_member_nama = serializers.CharField(source='team_member.nama', read_only=True)
+
+    class Meta:
+        model = PointTransaction
+        fields = [
+            'id', 'team_member', 'team_member_nama', 'action_type',
+            'points', 'description', 'reference_id', 'reference_type', 'created_at',
+        ]
+        read_only_fields = fields

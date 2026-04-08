@@ -30,6 +30,15 @@ class Supporter(BaseModel):
     referral_code = models.CharField(max_length=20, unique=True, blank=True)
     referral_count = models.IntegerField(default=0)
     membership_id = models.CharField(max_length=20, unique=True)
+    source = models.CharField(
+        max_length=30,
+        choices=[
+            ('self_registration', 'Registrasi Mandiri'),
+            ('manual_entry', 'Input Manual oleh Relawan'),
+            ('referral_link', 'Via Link Referral'),
+        ],
+        default='self_registration',
+    )
     statement = models.CharField(max_length=100, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

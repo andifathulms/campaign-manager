@@ -9,6 +9,8 @@ from .views import (
     PledgeWallView,
     PublicPledgeWallView,
     PublicJoinView,
+    VolunteerSupporterCreateView,
+    VolunteerSupporterSummaryView,
 )
 
 urlpatterns = [
@@ -22,4 +24,7 @@ urlpatterns = [
     path('supporters/<uuid:pk>/moderate/', PledgeWallView.as_view(), name='supporter-moderate'),
     path('public/<slug:slug>/join/', PublicJoinView.as_view(), name='public-join'),
     path('public/<slug:slug>/pledge-wall/', PublicPledgeWallView.as_view(), name='public-pledge-wall'),
+    # Volunteer field recruitment
+    path('volunteer/supporters/', VolunteerSupporterCreateView.as_view(), name='volunteer-supporter-create'),
+    path('volunteer/supporters/summary/', VolunteerSupporterSummaryView.as_view(), name='volunteer-supporter-summary'),
 ]

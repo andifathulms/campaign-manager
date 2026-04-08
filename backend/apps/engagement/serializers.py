@@ -11,7 +11,7 @@ class AspirasiSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'nama', 'phone', 'email', 'pesan', 'tema', 'tema_display',
             'wilayah', 'status', 'status_display', 'balasan_publik',
-            'is_published', 'created_at',
+            'is_published', 'tags', 'is_archived', 'created_at',
         ]
         read_only_fields = ['id', 'created_at', 'status_display', 'tema_display']
 
@@ -26,7 +26,7 @@ class PublicAspirasiSerializer(serializers.ModelSerializer):
 class AspirasiReplySerializer(serializers.ModelSerializer):
     class Meta:
         model = Aspirasi
-        fields = ['status', 'balasan_publik', 'is_published']
+        fields = ['status', 'balasan_publik', 'is_published', 'tags', 'is_archived']
 
 
 class PollOptionSerializer(serializers.ModelSerializer):

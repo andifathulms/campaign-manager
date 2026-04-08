@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { OTPLoginForm } from './OTPLoginForm';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username wajib diisi'),
@@ -21,6 +22,7 @@ export function LoginForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -50,11 +52,36 @@ export function LoginForm() {
 
   return (
     <div className="w-full">
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-foreground">Selamat datang kembali</h1>
         <p className="text-muted-foreground text-sm mt-1">Masuk ke dashboard kampanye Anda</p>
       </div>
 
+      {/* Login method tabs */}
+      <div className="flex gap-1 p-1 bg-muted rounded-lg mb-6">
+        <button
+          type="button"
+          onClick={() => setLoginMethod('password')}
+          className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+            loginMethod === 'password' ? 'bg-white shadow-sm text-foreground' : 'text-muted-foreground'
+          }`}
+        >
+          Username
+        </button>
+        <button
+          type="button"
+          onClick={() => setLoginMethod('otp')}
+          className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+            loginMethod === 'otp' ? 'bg-white shadow-sm text-foreground' : 'text-muted-foreground'
+          }`}
+        >
+          WhatsApp OTP
+        </button>
+      </div>
+
+      {loginMethod === 'otp' ? (
+        <OTPLoginForm />
+      ) : (
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {error && (
           <div className="flex items-center gap-2.5 p-3.5 text-sm text-destructive bg-destructive/8 border border-destructive/20 rounded-lg">
@@ -113,6 +140,7 @@ export function LoginForm() {
           </a>
         </p>
       </form>
+      )}
     </div>
   );
 }

@@ -33,12 +33,14 @@ def _load_font(paths, size):
 
 from apps.candidates.models import Candidate
 from apps.core.mixins import TenantQuerysetMixin
+from apps.core.permissions import IsVolunteer
 from .models import Supporter
 from .serializers import (
     SupporterSerializer,
     PublicJoinSerializer,
     MembershipCardSerializer,
     SupporterStatsSerializer,
+    VolunteerSupporterCreateSerializer,
 )
 
 
@@ -306,3 +308,58 @@ class PublicJoinView(APIView):
             MembershipCardSerializer(supporter).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+# --------------- Volunteer Field Recruitment ---------------
+
+@extend_schema(tags=['volunteer-supporters'])
+class VolunteerSupporterCreateView(APIView):
+    """Volunteer: manually register a supporter found in the field."""
+    permission_classes = [IsVolunteer]
+
+    def post(self, request):
+        member = request.user.team_member
+        serializer = VolunteerSupporterCreateSerializer(
+            data=request.data,
+            context={'tenant': request.user.tenant, 'volunteer': member},
+        )
+        serializer.is_valid(raise_exception=True)
+        supporter = serializer.save()
+        data = MembershipCardSerializer(supporter).data
+        if getattr(supporter, '_is_duplicate', False):
+            data['warning'] = 'Nomor HP sudah terdaftar sebelumnya. Data tetap disimpan.'
+        return Response(data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(tags=['volunteer-supporters'])
+class VolunteerSupporterSummaryView(APIView):
+    """Volunteer: summary of own recruitment stats."""
+    permission_classes = [IsVolunteer]
+
+    def get(self, request):
+        from django.db.models import Count
+        from django.utils import timezone
+        member = request.user.team_member
+        qs = Supporter.objects.filter(
+            tenant=request.user.tenant, referred_by_team=member, is_active=True
+        )
+        today = timezone.now().date()
+        total = qs.count()
+        today_count = qs.filter(created_at__date=today).count()
+        by_kecamatan = list(
+            qs.values('kecamatan').annotate(count=Count('id')).order_by('-count')[:10]
+        )
+        # Points from supporter recruitment
+        from django.db.models import Sum as DjSum
+        from apps.teams.models import PointTransaction
+        pts = PointTransaction.objects.filter(
+            team_member=member,
+            action_type__in=['manual_supporter', 'link_supporter'],
+        ).aggregate(total=DjSum('points'))['total'] or 0
+
+        return Response({
+            'total': total,
+            'today': today_count,
+            'by_kecamatan': by_kecamatan,
+            'points_from_supporters': pts,
+        })

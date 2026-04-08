@@ -14,6 +14,7 @@ export interface Aspirasi {
   pesan: string; tema: string; tema_display: string;
   wilayah: string; status: string; status_display: string;
   balasan_publik: string; is_published: boolean; created_at: string;
+  tags: string[]; is_archived: boolean;
 }
 
 export interface PollOption { id: string; teks: string; vote_count: number; pct: number; }
@@ -24,11 +25,13 @@ export interface Poll {
 
 // ── Aspirasi ─────────────────────────────────────────────────────────────────
 
-export function useAspirasi(filters?: { status?: string; tema?: string }) {
+export function useAspirasi(filters?: { status?: string; tema?: string; archived?: boolean; tag?: string }) {
   const { token, loading } = useToken();
   const params = new URLSearchParams();
   if (filters?.status) params.set('status', filters.status);
   if (filters?.tema) params.set('tema', filters.tema);
+  if (filters?.archived) params.set('archived', 'true');
+  if (filters?.tag) params.set('tag', filters.tag);
   return useQuery<Aspirasi[]>({
     queryKey: ['aspirasi', token, filters],
     queryFn: () => axios.get<Aspirasi[]>(`${apiBase}/engagement/aspirasi/?${params}`, { headers: auth(token!) }).then(r => (Array.isArray(r.data) ? r.data : (r.data as any).results ?? []) as Aspirasi[]),
@@ -42,7 +45,7 @@ export function useReplyAspirasi() {
   const { token } = useToken();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, ...data }: { id: string; balasan_publik?: string; is_published?: boolean; status?: string }) =>
+    mutationFn: ({ id, ...data }: { id: string; balasan_publik?: string; is_published?: boolean; status?: string; tags?: string[]; is_archived?: boolean }) =>
       axios.patch(`${apiBase}/engagement/aspirasi/${id}/`, data, { headers: auth(token!) }).then(r => r.data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['aspirasi'] }),
   });

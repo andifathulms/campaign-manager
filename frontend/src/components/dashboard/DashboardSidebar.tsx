@@ -48,6 +48,7 @@ const navItems = [
   { href: '/dashboard/polls', label: 'Survey & Poll', icon: BarChart3, group: 'Engagement' },
   { href: '/dashboard/content', label: 'Kalender Konten', icon: CalendarDays, group: 'Konten' },
   { href: '/dashboard/content/library', label: 'Library Kreatif', icon: Image, group: 'Konten' },
+  { href: '/dashboard/berita', label: 'Berita', icon: Globe, group: 'Konten' },
   { href: '/dashboard/analytics', label: 'Elektabilitas', icon: TrendingUp, group: 'Analitik' },
   // Settings
   { href: '/dashboard/settings', label: 'Pengaturan', icon: Settings, group: 'Akun' },

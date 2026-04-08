@@ -53,3 +53,19 @@ class User(AbstractUser):
 
     class Meta:
         db_table = 'accounts_user'
+
+
+class OTPCode(BaseModel):
+    """One-time password for WhatsApp-based authentication."""
+    phone = models.CharField(max_length=20, db_index=True)
+    code = models.CharField(max_length=6)
+    expires_at = models.DateTimeField()
+    attempts = models.IntegerField(default=0)
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'accounts_otpcode'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"OTP {self.phone} ({self.code})"

@@ -31,6 +31,9 @@ class Aspirasi(BaseModel):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='unread')
     balasan_publik = models.TextField(blank=True)
     is_published = models.BooleanField(default=False)
+    tags = models.JSONField(default=list, blank=True)
+    is_archived = models.BooleanField(default=False)
+    ip_hash = models.CharField(max_length=64, blank=True)
 
     class Meta:
         ordering = ['-created_at']

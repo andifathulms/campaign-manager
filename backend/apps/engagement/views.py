@@ -30,10 +30,16 @@ class AspirasiListView(APIView):
         qs = Aspirasi.objects.filter(tenant=request.user.tenant)
         status_filter = request.query_params.get('status')
         tema = request.query_params.get('tema')
+        archived = request.query_params.get('archived', 'false')
+        tag = request.query_params.get('tag')
         if status_filter:
             qs = qs.filter(status=status_filter)
         if tema:
             qs = qs.filter(tema=tema)
+        if archived.lower() != 'true':
+            qs = qs.filter(is_archived=False)
+        if tag:
+            qs = [a for a in qs if tag in (a.tags or [])]
         return Response(AspirasiSerializer(qs, many=True).data)
 
 
@@ -71,10 +77,31 @@ class PublicAspirasiSubmitView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, slug):
+        from datetime import timedelta
+        from django.utils import timezone
+
         candidate = get_object_or_404(Candidate, tenant__slug=slug)
+
+        # Rate limit: max 3 aspirasi per IP per hour
+        ip = request.META.get('REMOTE_ADDR', '')
+        ip_hash = hashlib.sha256(f"{ip}{date.today().isoformat()}".encode()).hexdigest()
+        one_hour_ago = timezone.now() - timedelta(hours=1)
+        recent_count = Aspirasi.objects.filter(
+            tenant=candidate.tenant, ip_hash=ip_hash, created_at__gte=one_hour_ago
+        ).count()
+        if recent_count >= 3:
+            return Response(
+                {'detail': 'Terlalu banyak aspirasi. Coba lagi dalam 1 jam.'},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
         serializer = PublicAspirasiSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        Aspirasi.objects.create(tenant=candidate.tenant, **serializer.validated_data)
+        Aspirasi.objects.create(
+            tenant=candidate.tenant,
+            ip_hash=ip_hash,
+            **serializer.validated_data,
+        )
         return Response({'detail': 'Aspirasi Anda telah diterima. Terima kasih!'}, status=status.HTTP_201_CREATED)
 
 
