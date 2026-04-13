@@ -54,5 +54,6 @@ credentials/
 !package.json
 !package-lock.json
 !tsconfig.json
+!.eslintrc.json
 !postcss.config.js
 .env.prod
