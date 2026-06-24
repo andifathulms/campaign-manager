@@ -226,3 +226,9 @@ TIKTOK_APP_SECRET = env('TIKTOK_APP_SECRET', default='')
 
 # Anthropic (Phase 3)
 ANTHROPIC_API_KEY = env('ANTHROPIC_API_KEY', default='')
+
+# CAPTCHA for public forms (supporter join, aspirasi). Leave secret blank to
+# disable verification in dev; rate limiting still applies. Provider:
+# 'turnstile' (Cloudflare, default) or 'recaptcha' (Google).
+CAPTCHA_PROVIDER = env('CAPTCHA_PROVIDER', default='turnstile')
+CAPTCHA_SECRET = env('CAPTCHA_SECRET', default='')

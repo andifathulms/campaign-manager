@@ -35,6 +35,7 @@ from apps.candidates.models import Candidate
 from apps.core.feature_flags import FeatureGatedMixin
 from apps.core.mixins import TenantQuerysetMixin
 from apps.core.permissions import IsVolunteer
+from apps.core.public_guard import client_ip, make_ip_hash, throttle, verify_captcha
 from .models import Supporter
 from .serializers import (
     SupporterSerializer,
@@ -301,6 +302,20 @@ class PublicJoinView(APIView):
     def post(self, request, slug):
         candidate = get_object_or_404(Candidate, tenant__slug=slug)
         tenant = candidate.tenant
+
+        # Abuse protection: 5 registrations / IP / hour + CAPTCHA (if configured).
+        ip = client_ip(request)
+        if throttle('supporter-join', f"{tenant.id}:{make_ip_hash(ip)}", limit=5, window_seconds=3600):
+            return Response(
+                {'detail': 'Terlalu banyak pendaftaran. Coba lagi dalam 1 jam.'},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+        if not verify_captcha(request.data.get('captcha_token', ''), ip):
+            return Response(
+                {'detail': 'Verifikasi CAPTCHA gagal. Silakan coba lagi.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         serializer = PublicJoinSerializer(
             data=request.data,
             context={'tenant': tenant, 'request': request},

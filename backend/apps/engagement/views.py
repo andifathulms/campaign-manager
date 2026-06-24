@@ -10,6 +10,7 @@ from drf_spectacular.utils import extend_schema
 
 from apps.candidates.models import Candidate
 from apps.core.feature_flags import FeatureGatedMixin
+from apps.core.public_guard import client_ip, make_ip_hash, verify_captcha
 from .models import Aspirasi, Poll, PollOption, PollResponse
 from .serializers import (
     AspirasiSerializer,
@@ -83,9 +84,9 @@ class PublicAspirasiSubmitView(APIView):
 
         candidate = get_object_or_404(Candidate, tenant__slug=slug)
 
-        # Rate limit: max 3 aspirasi per IP per hour
-        ip = request.META.get('REMOTE_ADDR', '')
-        ip_hash = hashlib.sha256(f"{ip}{date.today().isoformat()}".encode()).hexdigest()
+        # Rate limit: max 3 aspirasi per IP per hour + CAPTCHA (if configured).
+        ip = client_ip(request)
+        ip_hash = make_ip_hash(ip)
         one_hour_ago = timezone.now() - timedelta(hours=1)
         recent_count = Aspirasi.objects.filter(
             tenant=candidate.tenant, ip_hash=ip_hash, created_at__gte=one_hour_ago
@@ -94,6 +95,11 @@ class PublicAspirasiSubmitView(APIView):
             return Response(
                 {'detail': 'Terlalu banyak aspirasi. Coba lagi dalam 1 jam.'},
                 status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+        if not verify_captcha(request.data.get('captcha_token', ''), ip):
+            return Response(
+                {'detail': 'Verifikasi CAPTCHA gagal. Silakan coba lagi.'},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         serializer = PublicAspirasiSerializer(data=request.data)
