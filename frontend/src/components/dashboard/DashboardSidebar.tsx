@@ -30,26 +30,36 @@ import {
   Map,
 } from 'lucide-react';
 
-const navItems = [
-  // Phase 1
+// `flag` items are Phase-2 surfaces hidden unless the tenant has the matching
+// feature enabled (see backend apps/core/feature_flags.py — keep keys in sync).
+const navItems: Array<{
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  group: string;
+  flag?: string;
+}> = [
+  // v1 spine
   { href: '/dashboard/overview', label: 'Overview', icon: LayoutDashboard, group: 'Utama' },
   { href: '/dashboard/profile', label: 'Profil Kandidat', icon: User, group: 'Utama' },
   { href: '/dashboard/page', label: 'Halaman Kampanye', icon: Globe, group: 'Utama' },
   { href: '/dashboard/ads', label: 'Iklan', icon: Megaphone, group: 'Utama' },
   { href: '/dashboard/team', label: 'Tim Sukses', icon: Users, group: 'Utama' },
   { href: '/dashboard/team/tasks', label: 'Tugas Tim', icon: ClipboardList, group: 'Utama' },
-  { href: '/dashboard/team/announcements', label: 'Pengumuman', icon: Bell, group: 'Utama' },
+  { href: '/dashboard/team/announcements', label: 'Pengumuman', icon: Bell, group: 'Utama', flag: 'announcements' },
   { href: '/dashboard/supporters', label: 'Pendukung', icon: Heart, group: 'Utama' },
   { href: '/dashboard/supporters/map', label: 'Peta Sebaran', icon: Map, group: 'Utama' },
-  { href: '/dashboard/supporters/pledge-wall', label: 'Pledge Wall', icon: Shield, group: 'Utama' },
-  { href: '/dashboard/events', label: 'Events', icon: CalendarCheck, group: 'Utama' },
-  // Phase 2
+  { href: '/dashboard/supporters/pledge-wall', label: 'Pledge Wall', icon: Shield, group: 'Utama', flag: 'pledge_wall' },
+  { href: '/dashboard/events', label: 'Events', icon: CalendarCheck, group: 'Utama', flag: 'events' },
+  // Engagement
   { href: '/dashboard/aspirasi', label: 'Aspirasi', icon: MessageSquare, group: 'Engagement' },
-  { href: '/dashboard/polls', label: 'Survey & Poll', icon: BarChart3, group: 'Engagement' },
+  { href: '/dashboard/polls', label: 'Survey & Poll', icon: BarChart3, group: 'Engagement', flag: 'polls' },
+  // Konten
   { href: '/dashboard/content', label: 'Kalender Konten', icon: CalendarDays, group: 'Konten' },
   { href: '/dashboard/content/library', label: 'Library Kreatif', icon: Image, group: 'Konten' },
   { href: '/dashboard/berita', label: 'Berita', icon: Globe, group: 'Konten' },
-  { href: '/dashboard/analytics', label: 'Elektabilitas', icon: TrendingUp, group: 'Analitik' },
+  // Analitik
+  { href: '/dashboard/analytics', label: 'Elektabilitas', icon: TrendingUp, group: 'Analitik', flag: 'electability' },
   // Settings
   { href: '/dashboard/settings', label: 'Pengaturan', icon: Settings, group: 'Akun' },
 ];
@@ -61,6 +71,10 @@ export function DashboardSidebar() {
   const tenantSlug = candidate?.tenant_slug;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
   const publicUrl = tenantSlug ? `${appUrl}/${tenantSlug}` : null;
+
+  // Hide Phase-2 nav items unless the tenant has the matching feature enabled.
+  const enabledFeatures = (candidate?.enabled_features ?? {}) as Record<string, boolean>;
+  const visibleNavItems = navItems.filter((item) => !item.flag || enabledFeatures[item.flag]);
 
   return (
     <aside
@@ -89,7 +103,7 @@ export function DashboardSidebar() {
         {(() => {
           const groups: string[] = [];
           const result: React.ReactNode[] = [];
-          navItems.forEach((item) => {
+          visibleNavItems.forEach((item) => {
             const Icon = item.icon;
             // Exact match for items that are parents of others (team, content)
             // Exact match for parent routes that have sub-routes in the nav

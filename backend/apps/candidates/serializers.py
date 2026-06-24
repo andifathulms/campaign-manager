@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from apps.core.feature_flags import enabled_features
 from .models import Candidate, CampaignPage
 
 
@@ -35,6 +36,7 @@ class CampaignPageSerializer(serializers.ModelSerializer):
 class CandidateSerializer(serializers.ModelSerializer):
     foto_url = serializers.SerializerMethodField()
     tenant_slug = serializers.CharField(source='tenant.slug', read_only=True)
+    enabled_features = serializers.SerializerMethodField()
     campaign_page = CampaignPageSerializer(read_only=True)
 
     class Meta:
@@ -44,10 +46,14 @@ class CandidateSerializer(serializers.ModelSerializer):
             'jenis_pemilihan', 'dapil', 'partai', 'tagline',
             'visi', 'misi', 'program_unggulan', 'sosmed',
             'status', 'color_primary', 'color_secondary',
-            'tenant_slug', 'campaign_page',
+            'tenant_slug', 'enabled_features', 'campaign_page',
             'created_at', 'updated_at',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'foto_url', 'tenant_slug', 'campaign_page']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'foto_url', 'tenant_slug',
+                            'enabled_features', 'campaign_page']
+
+    def get_enabled_features(self, obj):
+        return enabled_features(obj.tenant)
 
     def get_foto_url(self, obj):
         if obj.foto:

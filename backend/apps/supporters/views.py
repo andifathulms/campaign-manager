@@ -32,6 +32,7 @@ def _load_font(paths, size):
     return ImageFont.load_default(size=size)
 
 from apps.candidates.models import Candidate
+from apps.core.feature_flags import FeatureGatedMixin
 from apps.core.mixins import TenantQuerysetMixin
 from apps.core.permissions import IsVolunteer
 from .models import Supporter
@@ -239,8 +240,9 @@ class SupporterExportView(APIView):
 
 
 @extend_schema(tags=['supporters'])
-class PledgeWallView(APIView):
+class PledgeWallView(FeatureGatedMixin, APIView):
     """Admin: list supporters with statements pending/approved moderation."""
+    feature_flag = 'pledge_wall'
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -269,8 +271,9 @@ class PledgeWallView(APIView):
 
 
 @extend_schema(tags=['public'])
-class PublicPledgeWallView(APIView):
+class PublicPledgeWallView(FeatureGatedMixin, APIView):
     """Public: approved supporter statements for the campaign page."""
+    feature_flag = 'pledge_wall'
     permission_classes = [AllowAny]
 
     def get(self, request, slug):

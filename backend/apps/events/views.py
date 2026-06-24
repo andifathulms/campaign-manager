@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.candidates.models import Candidate
+from apps.core.feature_flags import FeatureGatedMixin
 from apps.teams.models import TeamMember
 from .models import Event, EventAttendance
 from .serializers import (
@@ -18,7 +19,8 @@ from .serializers import (
 
 
 @extend_schema(tags=['events'])
-class EventListCreateView(APIView):
+class EventListCreateView(FeatureGatedMixin, APIView):
+    feature_flag = 'events'
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -36,7 +38,8 @@ class EventListCreateView(APIView):
 
 
 @extend_schema(tags=['events'])
-class EventDetailView(APIView):
+class EventDetailView(FeatureGatedMixin, APIView):
+    feature_flag = 'events'
     permission_classes = [IsAuthenticated]
 
     def _get(self, request, pk):
@@ -58,8 +61,9 @@ class EventDetailView(APIView):
 
 
 @extend_schema(tags=['events'])
-class EventAttendanceListView(APIView):
+class EventAttendanceListView(FeatureGatedMixin, APIView):
     """List attendances for an event, and register team members."""
+    feature_flag = 'events'
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
@@ -82,8 +86,9 @@ class EventAttendanceListView(APIView):
 
 
 @extend_schema(tags=['events'])
-class QRCheckInView(APIView):
+class QRCheckInView(FeatureGatedMixin, APIView):
     """Scan a QR code to mark a team member as checked in."""
+    feature_flag = 'events'
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
@@ -107,8 +112,9 @@ class QRCheckInView(APIView):
 
 
 @extend_schema(tags=['public'])
-class PublicEventListView(APIView):
+class PublicEventListView(FeatureGatedMixin, APIView):
     """Public: upcoming/ongoing events for the campaign page."""
+    feature_flag = 'events'
     permission_classes = [AllowAny]
 
     def get(self, request, slug):

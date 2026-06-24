@@ -1,13 +1,19 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from apps.core.feature_flags import enabled_features
 from .models import User, Tenant
 
 
 class TenantSerializer(serializers.ModelSerializer):
+    enabled_features = serializers.SerializerMethodField()
+
     class Meta:
         model = Tenant
-        fields = ['id', 'name', 'slug', 'plan', 'is_active', 'feature_flags']
+        fields = ['id', 'name', 'slug', 'plan', 'is_active', 'feature_flags', 'enabled_features']
+
+    def get_enabled_features(self, obj):
+        return enabled_features(obj)
 
 
 class UserSerializer(serializers.ModelSerializer):

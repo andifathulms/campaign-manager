@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
+from apps.core.feature_flags import FeatureGatedMixin
 from apps.core.mixins import TenantQuerysetMixin
 from apps.core.permissions import IsVolunteer
 from .models import TeamMember, ReferralLink, ReferralClick, Task, TaskAssignment, Announcement, PointRule, PointTransaction
@@ -187,7 +188,8 @@ class TaskStatsView(APIView):
 
 
 @extend_schema(tags=['announcements'])
-class AnnouncementListCreateView(APIView):
+class AnnouncementListCreateView(FeatureGatedMixin, APIView):
+    feature_flag = 'announcements'
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -202,7 +204,8 @@ class AnnouncementListCreateView(APIView):
 
 
 @extend_schema(tags=['announcements'])
-class AnnouncementDetailView(APIView):
+class AnnouncementDetailView(FeatureGatedMixin, APIView):
+    feature_flag = 'announcements'
     permission_classes = [IsAuthenticated]
 
     def _get(self, request, pk):

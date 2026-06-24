@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.candidates.models import Candidate
+from apps.core.feature_flags import FeatureGatedMixin
 from .models import Aspirasi, Poll, PollOption, PollResponse
 from .serializers import (
     AspirasiSerializer,
@@ -132,7 +133,8 @@ class PublicAspirasiRepliesView(APIView):
 # ── Poll ──────────────────────────────────────────────────────────────────────
 
 @extend_schema(tags=['engagement'])
-class PollListCreateView(APIView):
+class PollListCreateView(FeatureGatedMixin, APIView):
+    feature_flag = 'polls'
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -150,7 +152,8 @@ class PollListCreateView(APIView):
 
 
 @extend_schema(tags=['engagement'])
-class PollDetailView(APIView):
+class PollDetailView(FeatureGatedMixin, APIView):
+    feature_flag = 'polls'
     permission_classes = [IsAuthenticated]
 
     def _get(self, request, pk):
@@ -173,8 +176,9 @@ class PollDetailView(APIView):
 
 
 @extend_schema(tags=['public'])
-class PublicPollVoteView(APIView):
+class PublicPollVoteView(FeatureGatedMixin, APIView):
     """Public: vote on an active poll (once per IP per day)."""
+    feature_flag = 'polls'
     permission_classes = [AllowAny]
 
     def get(self, request, pk):

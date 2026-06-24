@@ -83,6 +83,7 @@ export interface CandidateProfile {
   color_primary: string;
   color_secondary: string;
   tenant_slug: string;
+  enabled_features: Record<string, boolean>;
   campaign_page: {
     id: string;
     is_published: boolean;

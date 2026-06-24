@@ -5,12 +5,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
+from apps.core.feature_flags import FeatureGatedMixin
 from .models import ElectabilitySurvey
 from .serializers import ElectabilitySurveySerializer
 
 
 @extend_schema(tags=['analytics'])
-class ElectabilityListCreateView(APIView):
+class ElectabilityListCreateView(FeatureGatedMixin, APIView):
+    feature_flag = 'electability'
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -25,7 +27,8 @@ class ElectabilityListCreateView(APIView):
 
 
 @extend_schema(tags=['analytics'])
-class ElectabilityDetailView(APIView):
+class ElectabilityDetailView(FeatureGatedMixin, APIView):
+    feature_flag = 'electability'
     permission_classes = [IsAuthenticated]
 
     def _get(self, request, pk):
