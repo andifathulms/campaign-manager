@@ -162,6 +162,23 @@ export default async function CampaignPage({ params }: Props) {
             </div>
           )}
 
+          {/* CTA buttons */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href={`/${candidate.tenant_slug}/dukung`}
+              className="px-7 py-3 rounded-full bg-white font-semibold shadow-lg hover:shadow-xl transition-shadow"
+              style={{ color: candidate.color_primary || '#4F46E5' }}
+            >
+              Daftar Jadi Pendukung
+            </Link>
+            <Link
+              href={`/${candidate.tenant_slug}/aspirasi`}
+              className="px-7 py-3 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 text-white font-semibold hover:bg-white/25 transition-colors"
+            >
+              Kirim Aspirasi
+            </Link>
+          </div>
+
           {/* Scroll hint */}
           <div className="mt-16 flex flex-col items-center gap-2 text-white/50 text-xs">
             <span>Gulir untuk selengkapnya</span>
