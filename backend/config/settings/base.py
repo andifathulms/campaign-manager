@@ -193,6 +193,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'apps.core.tasks.generate_weekly_report_all_tenants',
         'schedule': crontab(hour=7, minute=0, day_of_week=1),
     },
+    'sync-meta-ads': {
+        'task': 'apps.ads.tasks.sync_all_meta_accounts',
+        'schedule': crontab(minute='*/30'),
+    },
 }
 
 # Report settings
@@ -219,6 +223,9 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 # Meta Ads
 META_APP_ID = env('META_APP_ID', default='')
 META_APP_SECRET = env('META_APP_SECRET', default='')
+META_OAUTH_REDIRECT_URI = env('META_OAUTH_REDIRECT_URI', default='')
+# Force placeholder data even if credentials are set (demos/staging).
+META_SANDBOX = env.bool('META_SANDBOX', default=False)
 
 # TikTok Ads
 TIKTOK_APP_ID = env('TIKTOK_APP_ID', default='')

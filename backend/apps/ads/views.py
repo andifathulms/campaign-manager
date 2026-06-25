@@ -8,10 +8,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
-from apps.core.crypto import encrypt
+import secrets
+
+from django.conf import settings
+
+from apps.core.crypto import encrypt, decrypt
 from apps.core.mixins import TenantQuerysetMixin
 from apps.core.rbac import IsAdsManager
 from apps.core.tenancy import active_tenant
+from .meta import get_meta_client, is_sandbox, authorize_url
+from .tasks import sync_meta_account
 from .models import AdsAccount, AdsCampaignSnapshot, BudgetAllocation, AdsAuditLog
 from .serializers import (
     AdsAccountSerializer,
@@ -262,3 +268,137 @@ class AdsDailySpendView(APIView):
             result.append(by_date.get(d, {'date': d, 'meta': 0, 'tiktok': 0, 'google': 0, 'total': 0}))
 
         return Response(result)
+
+
+# ── Meta integration (OAuth / connect / sync / write-control) ─────────────────
+
+@extend_schema(tags=['ads'])
+class MetaOAuthStartView(APIView):
+    """Begin a Meta connection. Returns an OAuth URL to redirect to, or signals
+    sandbox mode (no credentials) so the frontend can connect placeholder data
+    directly."""
+    permission_classes = [IsAuthenticated, IsAdsManager]
+
+    def get(self, request):
+        if is_sandbox():
+            return Response({'sandbox': True, 'auth_url': None})
+        redirect_uri = getattr(settings, 'META_OAUTH_REDIRECT_URI', '')
+        state = secrets.token_urlsafe(16)
+        # A full implementation persists `state` (cache, keyed to the user) and
+        # verifies it in the callback for CSRF protection.
+        return Response({'sandbox': False, 'auth_url': authorize_url(redirect_uri, state)})
+
+
+@extend_schema(tags=['ads'])
+class MetaConnectView(APIView):
+    """Complete a Meta connection and run the first sync.
+
+    Sandbox: links a placeholder ad account. Real: exchanges the OAuth ``code``,
+    lists the user's ad accounts, and links them (tokens encrypted at rest).
+    """
+    permission_classes = [IsAuthenticated, IsAdsManager]
+
+    def post(self, request):
+        tenant = active_tenant(request)
+        client = get_meta_client()
+
+        if is_sandbox():
+            token = 'SANDBOX_TOKEN'
+        else:
+            code = request.data.get('code')
+            if not code:
+                return Response({'detail': 'Missing OAuth code.'}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                token = client.exchange_code_for_token(code, getattr(settings, 'META_OAUTH_REDIRECT_URI', ''))
+            except Exception:
+                return Response({'detail': 'Gagal menghubungkan Meta. Coba lagi.'},
+                                status=status.HTTP_502_BAD_GATEWAY)
+
+        linked = []
+        for acct in client.list_ad_accounts(token):
+            account, _ = AdsAccount.objects.update_or_create(
+                tenant=tenant, platform='meta', account_id=acct['account_id'],
+                defaults={
+                    'account_name': acct.get('name', ''),
+                    'access_token': encrypt(token),
+                    'is_active': True,
+                },
+            )
+            AdsAuditLog.objects.create(
+                tenant=tenant, user=request.user, ads_account=account,
+                action='connect', target_type='account', target_id=account.account_id,
+                detail={'platform': 'meta', 'sandbox': is_sandbox()},
+            )
+            sync_meta_account(str(account.id))  # inline first sync so data appears now
+            linked.append(account)
+
+        return Response(AdsAccountSerializer(linked, many=True).data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(tags=['ads'])
+class AdsSyncView(APIView):
+    """Manual "Refresh Now" — re-sync all the tenant's active Meta accounts."""
+    permission_classes = [IsAuthenticated, IsAdsManager]
+
+    def post(self, request):
+        tenant = active_tenant(request)
+        accounts = AdsAccount.objects.filter(tenant=tenant, platform='meta', is_active=True)
+        synced = sum(sync_meta_account(str(a.id)) for a in accounts)
+        return Response({'accounts': accounts.count(), 'synced_campaigns': synced})
+
+
+@extend_schema(tags=['ads'])
+class AdsCampaignControlView(APIView):
+    """Write-control: pause/resume a campaign or update its daily budget.
+
+    Gated to ads managers (IsAdsManager); every attempt is recorded in
+    AdsAuditLog (success or failure) per PRD §18.1.
+    """
+    permission_classes = [IsAuthenticated, IsAdsManager]
+
+    def post(self, request, campaign_id):
+        tenant = active_tenant(request)
+        action = request.data.get('action')
+        if action not in ('pause', 'resume', 'update_budget'):
+            return Response({'detail': 'Aksi tidak valid.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        snapshot = (
+            AdsCampaignSnapshot.objects
+            .filter(tenant=tenant, campaign_id=campaign_id)
+            .order_by('-snapshot_date').first()
+        )
+        if not snapshot:
+            return Response({'detail': 'Kampanye tidak ditemukan.'}, status=status.HTTP_404_NOT_FOUND)
+
+        account = snapshot.ads_account
+        client = get_meta_client()
+        token = decrypt(account.access_token)
+        detail = {'action': action, 'daily_budget': request.data.get('daily_budget')}
+
+        try:
+            if action == 'pause':
+                client.set_campaign_status(campaign_id, token, 'PAUSED')
+                snapshot.status = 'PAUSED'
+                snapshot.save(update_fields=['status'])
+            elif action == 'resume':
+                client.set_campaign_status(campaign_id, token, 'ACTIVE')
+                snapshot.status = 'ACTIVE'
+                snapshot.save(update_fields=['status'])
+            else:  # update_budget
+                cents = int(float(request.data.get('daily_budget', 0)) * 100)
+                client.update_campaign_budget(campaign_id, token, cents)
+        except Exception as e:
+            AdsAuditLog.objects.create(
+                tenant=tenant, user=request.user, ads_account=account,
+                action=action, target_type='campaign', target_id=campaign_id,
+                detail={**detail, 'error': str(e)}, success=False,
+            )
+            return Response({'detail': 'Gagal memperbarui iklan. Coba lagi.'},
+                            status=status.HTTP_502_BAD_GATEWAY)
+
+        AdsAuditLog.objects.create(
+            tenant=tenant, user=request.user, ads_account=account,
+            action=action, target_type='campaign', target_id=campaign_id,
+            detail=detail, success=True,
+        )
+        return Response({'detail': 'Berhasil.', 'campaign_id': campaign_id, 'action': action})

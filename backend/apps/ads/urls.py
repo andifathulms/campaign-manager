@@ -7,6 +7,10 @@ from .views import (
     AdsDashboardView,
     BudgetView,
     AdsDailySpendView,
+    MetaOAuthStartView,
+    MetaConnectView,
+    AdsSyncView,
+    AdsCampaignControlView,
 )
 
 urlpatterns = [
@@ -17,4 +21,9 @@ urlpatterns = [
     path('ads/dashboard/', AdsDashboardView.as_view(), name='ads-dashboard'),
     path('ads/daily-spend/', AdsDailySpendView.as_view(), name='ads-daily-spend'),
     path('ads/budget/', BudgetView.as_view(), name='ads-budget'),
+    # Meta integration
+    path('ads/meta/oauth/start/', MetaOAuthStartView.as_view(), name='ads-meta-oauth-start'),
+    path('ads/meta/connect/', MetaConnectView.as_view(), name='ads-meta-connect'),
+    path('ads/sync/', AdsSyncView.as_view(), name='ads-sync'),
+    path('ads/campaigns/<str:campaign_id>/control/', AdsCampaignControlView.as_view(), name='ads-campaign-control'),
 ]
