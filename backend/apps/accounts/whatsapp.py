@@ -84,8 +84,25 @@ def get_whatsapp_backend():
 def notify(phone: str, message: str) -> bool:
     """Fire-and-forget notification. Never raises — a failed notification must
     not break the request that triggered it. Returns True on success."""
+    if not phone:
+        return False
     try:
         return bool(get_whatsapp_backend().send_message(phone, message))
     except Exception:
         logger.exception("notify: WhatsApp send failed for %s", phone)
         return False
+
+
+def notify_tenant_admins(tenant, message: str):
+    """Notify a tenant's decision-makers (candidate / koordinator utama / staf
+    admin) — e.g. for a new supporter or relawan registration."""
+    if tenant is None:
+        return
+    from apps.accounts.models import User
+    phones = (
+        User.objects.filter(tenant=tenant, role__in=['candidate', 'koordinator_utama', 'staf_admin'])
+        .exclude(phone__isnull=True).exclude(phone='')
+        .values_list('phone', flat=True)
+    )
+    for phone in set(phones):
+        notify(phone, message)

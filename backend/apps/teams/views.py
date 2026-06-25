@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.accounts.models import Tenant, User
-from apps.accounts.whatsapp import normalize_phone
+from apps.accounts.whatsapp import normalize_phone, notify, notify_tenant_admins
 from apps.core.feature_flags import FeatureGatedMixin
 from apps.core.mixins import TenantQuerysetMixin
 from apps.core.permissions import IsVolunteer
@@ -96,6 +96,11 @@ class PublicRelawanRegisterView(APIView):
         if auto:
             award_points(member, 'register', description='Registrasi relawan')
 
+        notify_tenant_admins(
+            tenant,
+            f"Relawan baru: {member.nama} dari {member.kecamatan or member.wilayah_name}"
+            + ("" if auto else " menunggu persetujuan."),
+        )
         msg = ('Pendaftaran berhasil! Akun Anda telah aktif.' if auto
                else 'Pendaftaran berhasil! Menunggu persetujuan tim kampanye.')
         return Response({'detail': msg, 'status': member.status}, status=status.HTTP_201_CREATED)
@@ -129,6 +134,7 @@ class RelawanRequestApproveView(APIView):
             member.user.is_active = True
             member.user.save(update_fields=['is_active'])
         award_points(member, 'register', description='Registrasi relawan (disetujui)')
+        notify(member.phone, f"Selamat {member.nama}! Pendaftaran relawan Anda disetujui. Silakan login.")
         return Response(RelawanRequestSerializer(member).data)
 
 
@@ -147,6 +153,8 @@ class RelawanRequestRejectView(APIView):
         if member.user:
             member.user.is_active = False
             member.user.save(update_fields=['is_active'])
+        reason = member.rejection_reason or ''
+        notify(member.phone, f"Mohon maaf, pendaftaran relawan Anda belum dapat diproses. {reason}".strip())
         return Response(RelawanRequestSerializer(member).data)
 
 
@@ -496,6 +504,8 @@ class AdminTaskAssignmentApproveView(APIView):
         if action == 'reject':
             assignment.status = 'rejected'
             assignment.save(update_fields=['status'])
+            notify(assignment.volunteer.phone,
+                   f"Tugas \"{assignment.task.judul}\" belum dapat diverifikasi. Silakan ulangi.")
             return Response(TaskAssignmentSerializer(assignment).data)
 
         assignment.approved_by = request.user
@@ -523,6 +533,9 @@ class AdminTaskAssignmentApproveView(APIView):
                 reference_type='task',
             )
 
+        notify(assignment.volunteer.phone,
+               f"Tugas \"{assignment.task.judul}\" Anda telah diverifikasi! "
+               f"+{assignment.task.poin_reward or 'beberapa'} poin ditambahkan.")
         return Response(TaskAssignmentSerializer(assignment).data)
 
 

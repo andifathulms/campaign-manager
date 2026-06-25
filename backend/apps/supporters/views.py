@@ -31,6 +31,7 @@ def _load_font(paths, size):
             continue
     return ImageFont.load_default(size=size)
 
+from apps.accounts.whatsapp import notify_tenant_admins
 from apps.candidates.models import Candidate
 from apps.core.feature_flags import FeatureGatedMixin
 from apps.core.mixins import TenantQuerysetMixin
@@ -327,6 +328,10 @@ class PublicJoinView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         supporter = serializer.save()
+        notify_tenant_admins(
+            tenant,
+            f"Pendukung baru: {supporter.nama} dari {supporter.kecamatan or supporter.kelurahan}.",
+        )
         return Response(
             MembershipCardSerializer(supporter).data,
             status=status.HTTP_201_CREATED,
