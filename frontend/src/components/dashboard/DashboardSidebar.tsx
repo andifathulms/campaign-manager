@@ -28,6 +28,7 @@ import {
   Bell,
   Shield,
   Map,
+  UserCheck,
 } from 'lucide-react';
 
 // `flag` items are Phase-2 surfaces hidden unless the tenant has the matching
@@ -45,6 +46,7 @@ const navItems: Array<{
   { href: '/dashboard/page', label: 'Halaman Kampanye', icon: Globe, group: 'Utama' },
   { href: '/dashboard/ads', label: 'Iklan', icon: Megaphone, group: 'Utama' },
   { href: '/dashboard/team', label: 'Tim Sukses', icon: Users, group: 'Utama' },
+  { href: '/dashboard/team/relawan-requests', label: 'Permintaan Relawan', icon: UserCheck, group: 'Utama' },
   { href: '/dashboard/team/tasks', label: 'Tugas Tim', icon: ClipboardList, group: 'Utama' },
   { href: '/dashboard/team/announcements', label: 'Pengumuman', icon: Bell, group: 'Utama', flag: 'announcements' },
   { href: '/dashboard/supporters', label: 'Pendukung', icon: Heart, group: 'Utama' },

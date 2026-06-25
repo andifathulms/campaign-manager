@@ -25,6 +25,61 @@ export function useTeamMembers() {
   });
 }
 
+export interface RelawanRequest {
+  id: string;
+  nama: string;
+  phone: string;
+  email: string | null;
+  wilayah_name: string;
+  kecamatan: string;
+  kabupaten_kota: string;
+  alasan_bergabung: string;
+  referred_by_nama: string | null;
+  status: string;
+  source: string;
+  created_at: string;
+}
+
+export function useRelawanRequests() {
+  const { data: session } = useSession();
+  const token = (session as any)?.accessToken as string | undefined;
+  return useQuery({
+    queryKey: ['relawan-requests', token],
+    queryFn: () =>
+      axios.get<RelawanRequest[]>(`${apiBase}/teams/relawan/requests/`, { headers: authHeaders(token!) })
+        .then(r => r.data),
+    enabled: !!token,
+    staleTime: 15_000,
+    retry: false,
+  });
+}
+
+export function useApproveRelawan() {
+  const { data: session } = useSession();
+  const token = (session as any)?.accessToken as string | undefined;
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      axios.post(`${apiBase}/teams/relawan/requests/${id}/approve/`, {}, { headers: authHeaders(token!) }).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['relawan-requests'] });
+      qc.invalidateQueries({ queryKey: ['team-members'] });
+    },
+  });
+}
+
+export function useRejectRelawan() {
+  const { data: session } = useSession();
+  const token = (session as any)?.accessToken as string | undefined;
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { id: string; reason: string }) =>
+      axios.post(`${apiBase}/teams/relawan/requests/${vars.id}/reject/`,
+        { rejection_reason: vars.reason }, { headers: authHeaders(token!) }).then(r => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['relawan-requests'] }),
+  });
+}
+
 export function useLeaderboard() {
   const { data: session } = useSession();
   const token = (session as any)?.accessToken as string | undefined;
