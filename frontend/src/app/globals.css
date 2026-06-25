@@ -4,26 +4,62 @@
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 224 47% 11%;
+    /* Civic Gold — light (dashboard, public, default) */
+    --background: 40 33% 98%;
+    --foreground: 222 30% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 224 47% 11%;
+    --card-foreground: 222 30% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 47% 11%;
-    --primary: 243 75% 59%;
+    --popover-foreground: 222 30% 11%;
+    --primary: 224 78% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 16% 93%;
-    --secondary-foreground: 224 47% 11%;
-    --muted: 220 16% 93%;
-    --muted-foreground: 220 10% 50%;
-    --accent: 243 75% 96%;
-    --accent-foreground: 243 75% 40%;
+    --secondary: 40 20% 94%;
+    --secondary-foreground: 222 30% 11%;
+    --muted: 40 20% 94%;
+    --muted-foreground: 224 12% 45%;
+    --accent: 224 70% 95%;
+    --accent-foreground: 224 60% 38%;
+    --gold: 38 92% 55%;
+    --gold-foreground: 28 60% 14%;
+    --success: 142 60% 38%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 28 60% 14%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 16% 88%;
-    --input: 220 16% 88%;
-    --ring: 243 75% 59%;
-    --radius: 0.625rem;
+    --border: 40 15% 88%;
+    --input: 40 15% 88%;
+    --ring: 224 78% 52%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Civic Gold — warm near-black (landing + login) */
+    --background: 222 30% 7%;
+    --foreground: 40 20% 96%;
+    --card: 222 25% 10%;
+    --card-foreground: 40 20% 96%;
+    --popover: 222 25% 10%;
+    --popover-foreground: 40 20% 96%;
+    --primary: 224 80% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 20% 16%;
+    --secondary-foreground: 40 20% 96%;
+    --muted: 222 18% 16%;
+    --muted-foreground: 220 12% 62%;
+    --accent: 224 50% 18%;
+    --accent-foreground: 224 80% 82%;
+    --gold: 38 92% 58%;
+    --gold-foreground: 28 60% 12%;
+    --success: 142 55% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 28 60% 12%;
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 18% 18%;
+    --input: 222 18% 18%;
+    --ring: 224 80% 60%;
   }
 }
 
