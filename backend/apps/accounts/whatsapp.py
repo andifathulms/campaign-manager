@@ -1,33 +1,57 @@
-"""
-WhatsApp OTP delivery backends.
-In development: prints to console.
-In production: use Fonnte, Wablas, or similar Indonesian WhatsApp API.
+"""WhatsApp messaging backends (OTP + notifications).
+
+Development: logs to console. Production: Fonnte (Indonesian WhatsApp BSP).
+Configure via settings ``WHATSAPP_BACKEND`` ('console' | 'fonnte') and
+``WHATSAPP_API_KEY``.
+
+All sends go through ``normalize_phone`` so numbers are stored/sent as
+``62XXXXXXXXXX`` (per CLAUDE.md gotcha #10).
 """
 import logging
+import re
+
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 
+def normalize_phone(phone: str) -> str:
+    """Normalise an Indonesian number to ``62XXXXXXXXXX`` (no +, no leading 0)."""
+    digits = re.sub(r'\D', '', phone or '')
+    if digits.startswith('0'):
+        digits = '62' + digits[1:]
+    elif digits.startswith('62'):
+        pass
+    elif digits.startswith('8'):
+        digits = '62' + digits
+    return digits
+
+
 class ConsoleWhatsAppBackend:
-    """Development backend — logs OTP to console."""
+    """Development backend — logs messages to the console."""
+
+    def send_message(self, phone: str, message: str):
+        phone = normalize_phone(phone)
+        logger.info("[WhatsApp] to %s: %s", phone, message)
+        print(f"\n{'='*44}\n  WhatsApp -> {phone}\n  {message}\n{'='*44}\n")
+        return True
 
     def send_otp(self, phone: str, code: str):
-        logger.info(f"[WhatsApp OTP] Sending to {phone}: {code}")
-        print(f"\n{'='*40}")
-        print(f"  WhatsApp OTP for {phone}")
-        print(f"  Code: {code}")
-        print(f"{'='*40}\n")
+        return self.send_message(
+            phone,
+            f"Kode OTP Anda: {code}\n\nJangan bagikan kode ini. Berlaku 10 menit.",
+        )
 
 
 class FonnteWhatsAppBackend:
-    """Production backend using Fonnte API."""
+    """Production backend using the Fonnte API."""
 
     def __init__(self, api_key: str):
         self.api_key = api_key
 
-    def send_otp(self, phone: str, code: str):
+    def send_message(self, phone: str, message: str):
         import requests
-        message = f"Kode OTP Anda: {code}\n\nJangan bagikan kode ini. Berlaku 10 menit."
+        phone = normalize_phone(phone)
         try:
             resp = requests.post(
                 'https://api.fonnte.com/send',
@@ -36,17 +60,32 @@ class FonnteWhatsAppBackend:
                 timeout=10,
             )
             resp.raise_for_status()
-            logger.info(f"Fonnte OTP sent to {phone}: {resp.json()}")
+            logger.info("Fonnte sent to %s: %s", phone, resp.json())
+            return True
         except Exception as e:
-            logger.error(f"Fonnte OTP failed for {phone}: {e}")
+            logger.error("Fonnte send failed for %s: %s", phone, e)
             raise
+
+    def send_otp(self, phone: str, code: str):
+        return self.send_message(
+            phone,
+            f"Kode OTP Anda: {code}\n\nJangan bagikan kode ini. Berlaku 10 menit.",
+        )
 
 
 def get_whatsapp_backend():
     """Factory: returns the configured WhatsApp backend."""
-    import os
-    backend = os.environ.get('WHATSAPP_BACKEND', 'console')
+    backend = getattr(settings, 'WHATSAPP_BACKEND', 'console')
     if backend == 'fonnte':
-        api_key = os.environ.get('WHATSAPP_API_KEY', '')
-        return FonnteWhatsAppBackend(api_key)
+        return FonnteWhatsAppBackend(getattr(settings, 'WHATSAPP_API_KEY', ''))
     return ConsoleWhatsAppBackend()
+
+
+def notify(phone: str, message: str) -> bool:
+    """Fire-and-forget notification. Never raises — a failed notification must
+    not break the request that triggered it. Returns True on success."""
+    try:
+        return bool(get_whatsapp_backend().send_message(phone, message))
+    except Exception:
+        logger.exception("notify: WhatsApp send failed for %s", phone)
+        return False

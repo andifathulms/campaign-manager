@@ -237,3 +237,7 @@ CAPTCHA_SECRET = env('CAPTCHA_SECRET', default='')
 # `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
 # If blank, a key is derived from SECRET_KEY (dev only — set this in prod).
 FERNET_KEY = env('FERNET_KEY', default='')
+
+# WhatsApp (OTP + notifications). Backend: 'console' (dev) or 'fonnte' (prod).
+WHATSAPP_BACKEND = env('WHATSAPP_BACKEND', default='console')
+WHATSAPP_API_KEY = env('WHATSAPP_API_KEY', default='')
