@@ -1,6 +1,6 @@
 import math
 
-from django.db.models import F
+from django.db.models import F, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
@@ -143,7 +143,10 @@ class VolunteerDailyContentView(APIView):
             tenant=request.user.tenant,
             is_daily_content=True,
             status='published',
-            scheduled_at__date__lte=today,
+        ).filter(
+            # Unscheduled daily content is active now; scheduled content shows
+            # once its date arrives.
+            Q(scheduled_at__isnull=True) | Q(scheduled_at__date__lte=today)
         ).select_related('creative')
         return Response(ContentItemSerializer(qs, many=True, context={'request': request}).data)
 
