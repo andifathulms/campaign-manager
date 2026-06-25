@@ -1,4 +1,7 @@
+'use client';
+
 import { Bell } from 'lucide-react';
+import { TenantSwitcher } from './TenantSwitcher';
 
 interface Props {
   user?: { name?: string | null; email?: string | null; image?: string | null };
@@ -11,6 +14,7 @@ export function DashboardTopbar({ user }: Props) {
 
   return (
     <header className="h-14 border-b border-border bg-white flex items-center justify-end px-6 gap-3 flex-shrink-0">
+      <TenantSwitcher />
       <button className="w-8 h-8 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground flex items-center justify-center transition-colors relative">
         <Bell className="w-4 h-4" />
       </button>
