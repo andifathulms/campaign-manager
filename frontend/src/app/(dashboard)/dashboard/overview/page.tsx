@@ -41,13 +41,13 @@ export default async function OverviewPage() {
       label: 'Total Pendukung',
       value: stats ? String(stats.supporter_count) : '—',
       desc: stats?.supporter_count > 0 ? `${stats.supporter_count} pendukung terdaftar` : 'Mulai daftarkan pendukung',
-      icon: Users, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100',
+      icon: Users, color: 'text-primary', bg: 'bg-accent', border: 'border-accent',
     },
     {
       label: 'Jangkauan Iklan',
       value: stats ? formatNum(stats.total_reach) : '—',
       desc: stats?.total_reach > 0 ? 'Total jangkauan iklan' : 'Hubungkan akun iklan',
-      icon: TrendingUp, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100',
+      icon: TrendingUp, color: 'text-primary', bg: 'bg-accent', border: 'border-accent',
     },
     {
       label: 'Anggota Tim',
@@ -70,7 +70,7 @@ export default async function OverviewPage() {
           {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
         <h1 className="text-2xl font-bold text-foreground">
-          Selamat datang, <span className="text-indigo-600">{name}</span>
+          Selamat datang, <span className="text-primary">{name}</span>
         </h1>
         <p className="text-muted-foreground text-sm mt-1">Berikut ringkasan kampanye Anda hari ini.</p>
       </div>
@@ -107,10 +107,10 @@ export default async function OverviewPage() {
             <a
               key={action.href}
               href={action.href}
-              className="flex flex-col gap-2 p-4 rounded-lg bg-slate-50 hover:bg-indigo-50 border border-transparent hover:border-indigo-200 transition-all group"
+              className="flex flex-col gap-2 p-4 rounded-lg bg-slate-50 hover:bg-accent border border-transparent hover:border-accent transition-all group"
             >
               <p className="text-sm font-medium text-foreground">{action.label}</p>
-              <p className="text-xs font-semibold text-indigo-600 group-hover:translate-x-0.5 transition-transform">
+              <p className="text-xs font-semibold text-primary group-hover:translate-x-0.5 transition-transform">
                 {action.cta}
               </p>
             </a>

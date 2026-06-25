@@ -11,8 +11,8 @@ import type { AdCreative } from '@/hooks/useContent';
 const TEMA_COLORS: Record<string, string> = {
   infrastruktur: 'bg-orange-100 text-orange-700', kesehatan: 'bg-red-100 text-red-700',
   pendidikan: 'bg-blue-100 text-blue-700', ekonomi: 'bg-emerald-100 text-emerald-700',
-  lingkungan: 'bg-green-100 text-green-700', profil: 'bg-indigo-100 text-indigo-700',
-  event: 'bg-violet-100 text-violet-700', lainnya: 'bg-slate-100 text-slate-700',
+  lingkungan: 'bg-green-100 text-green-700', profil: 'bg-accent text-primary',
+  event: 'bg-accent text-primary', lainnya: 'bg-slate-100 text-slate-700',
 };
 const MEDIA_ICONS: Record<string, React.ElementType> = {
   image: Image, video: Video, caption: FileText,
@@ -93,7 +93,7 @@ function UploadModal({ onClose }: { onClose: () => void }) {
                   key={p}
                   onClick={() => togglePlatform(p)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-colors border
-                    ${form.platform_tags.includes(p) ? 'bg-indigo-600 text-white border-indigo-600' : 'border-border text-muted-foreground'}`}
+                    ${form.platform_tags.includes(p) ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground'}`}
                 >
                   {p}
                 </button>

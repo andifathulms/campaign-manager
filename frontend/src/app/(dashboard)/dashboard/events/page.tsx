@@ -17,10 +17,10 @@ import {
 import { useTeamMembers } from '@/hooks/useTeam';
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-slate-700 text-slate-200',
+  draft: 'bg-muted text-muted-foreground',
   published: 'bg-blue-900/50 text-blue-300',
   ongoing: 'bg-green-900/50 text-green-300',
-  completed: 'bg-slate-600 text-slate-300',
+  completed: 'bg-muted text-muted-foreground',
   cancelled: 'bg-red-900/50 text-red-300',
 };
 
@@ -68,59 +68,59 @@ function EventModal({ event, onClose }: { event?: CampaignEvent; onClose: () => 
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-900 rounded-xl border border-slate-700 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-5 border-b border-slate-700">
-          <h2 className="text-white font-semibold">{event ? 'Edit Event' : 'Buat Event Baru'}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white"><X className="h-5 w-5" /></button>
+      <div className="bg-card rounded-xl border border-border w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-5 border-b border-border">
+          <h2 className="text-foreground font-semibold">{event ? 'Edit Event' : 'Buat Event Baru'}</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
         </div>
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Judul Event</label>
+            <label className="block text-sm text-muted-foreground mb-1">Judul Event</label>
             <input
               required
               value={form.judul}
               onChange={e => set('judul', e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
               placeholder="Nama acara kampanye"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Mulai</label>
+              <label className="block text-sm text-muted-foreground mb-1">Mulai</label>
               <input
                 required
                 type="datetime-local"
                 value={form.tanggal_mulai}
                 onChange={e => set('tanggal_mulai', e.target.value)}
-                className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
               />
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Selesai (opsional)</label>
+              <label className="block text-sm text-muted-foreground mb-1">Selesai (opsional)</label>
               <input
                 type="datetime-local"
                 value={form.tanggal_selesai}
                 onChange={e => set('tanggal_selesai', e.target.value)}
-                className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Lokasi</label>
+            <label className="block text-sm text-muted-foreground mb-1">Lokasi</label>
             <input
               value={form.lokasi}
               onChange={e => set('lokasi', e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
               placeholder="Nama tempat / alamat"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Status</label>
+              <label className="block text-sm text-muted-foreground mb-1">Status</label>
               <select
                 value={form.status}
                 onChange={e => set('status', e.target.value)}
-                className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
               >
                 {STATUS_OPTIONS.filter(s => s.value).map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
@@ -128,43 +128,43 @@ function EventModal({ event, onClose }: { event?: CampaignEvent; onClose: () => 
               </select>
             </div>
             <div>
-              <label className="block text-sm text-slate-400 mb-1">Target Peserta</label>
+              <label className="block text-sm text-muted-foreground mb-1">Target Peserta</label>
               <input
                 type="number"
                 min="0"
                 value={form.target_peserta}
                 onChange={e => set('target_peserta', e.target.value)}
-                className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">URL Live Stream (opsional)</label>
+            <label className="block text-sm text-muted-foreground mb-1">URL Live Stream (opsional)</label>
             <input
               value={form.live_url}
               onChange={e => set('live_url', e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
               placeholder="https://youtube.com/live/..."
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Deskripsi</label>
+            <label className="block text-sm text-muted-foreground mb-1">Deskripsi</label>
             <textarea
               rows={3}
               value={form.deskripsi}
               onChange={e => set('deskripsi', e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 resize-none"
+              className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary resize-none"
               placeholder="Detail acara..."
             />
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg border border-slate-600 text-slate-300 text-sm hover:bg-slate-800">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg border border-border text-muted-foreground text-sm hover:bg-muted">
               Batal
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="flex-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium disabled:opacity-50"
+              className="flex-1 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium disabled:opacity-50"
             >
               {isPending ? 'Menyimpan...' : event ? 'Simpan' : 'Buat Event'}
             </button>
@@ -197,30 +197,30 @@ function CheckInModal({ event, onClose }: { event: CampaignEvent; onClose: () =>
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-900 rounded-xl border border-slate-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-5 border-b border-slate-700">
+      <div className="bg-card rounded-xl border border-border w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-5 border-b border-border">
           <div>
-            <h2 className="text-white font-semibold">Check-In: {event.judul}</h2>
-            <p className="text-sm text-slate-400 mt-0.5">{checkedIn} / {attendances.length} hadir</p>
+            <h2 className="text-foreground font-semibold">Check-In: {event.judul}</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">{checkedIn} / {attendances.length} hadir</p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white"><X className="h-5 w-5" /></button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
         </div>
 
         <div className="p-5 space-y-5">
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Scan / Masukkan Kode QR</label>
+            <label className="block text-sm text-muted-foreground mb-2">Scan / Masukkan Kode QR</label>
             <div className="flex gap-2">
               <input
                 value={qrInput}
                 onChange={e => setQrInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleCheckIn()}
-                className="flex-1 bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                className="flex-1 bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
                 placeholder="Tempel atau ketik kode QR..."
               />
               <button
                 onClick={handleCheckIn}
                 disabled={checkIn.isPending || !qrInput.trim()}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg disabled:opacity-50"
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm rounded-lg disabled:opacity-50"
               >
                 Check In
               </button>
@@ -233,23 +233,23 @@ function CheckInModal({ event, onClose }: { event: CampaignEvent; onClose: () =>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-slate-300 mb-2">Daftar Hadir ({attendances.length})</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">Daftar Hadir ({attendances.length})</h3>
             <div className="space-y-1 max-h-60 overflow-y-auto">
               {attendances.length === 0 ? (
-                <p className="text-slate-500 text-sm text-center py-4">Belum ada peserta terdaftar</p>
+                <p className="text-muted-foreground text-sm text-center py-4">Belum ada peserta terdaftar</p>
               ) : attendances.map((a: CampaignEventAttendance) => (
-                <div key={a.id} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800/50">
-                  <CheckCircle className={`h-4 w-4 flex-shrink-0 ${a.checked_in ? 'text-green-400' : 'text-slate-600'}`} />
+                <div key={a.id} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-card">
+                  <CheckCircle className={`h-4 w-4 flex-shrink-0 ${a.checked_in ? 'text-green-400' : 'text-muted-foreground'}`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{a.team_member_nama}</p>
-                    <p className="text-slate-500 text-xs">{a.team_member_level} · {a.team_member_wilayah}</p>
+                    <p className="text-foreground text-sm font-medium truncate">{a.team_member_nama}</p>
+                    <p className="text-muted-foreground text-xs">{a.team_member_level} · {a.team_member_wilayah}</p>
                   </div>
                   {a.checked_in && a.checked_in_at && (
                     <span className="text-xs text-green-500 flex-shrink-0">
                       {format(new Date(a.checked_in_at), 'HH:mm')}
                     </span>
                   )}
-                  <span className="text-xs text-slate-600 font-mono flex-shrink-0">{a.qr_code.slice(0, 8)}…</span>
+                  <span className="text-xs text-muted-foreground font-mono flex-shrink-0">{a.qr_code.slice(0, 8)}…</span>
                 </div>
               ))}
             </div>
@@ -271,7 +271,7 @@ function EventCard({ event }: { event: CampaignEvent }) {
 
   return (
     <>
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 hover:border-slate-600 transition-colors">
+      <div className="bg-card border border-border rounded-xl p-4 hover:border-border transition-colors">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -279,19 +279,19 @@ function EventCard({ event }: { event: CampaignEvent }) {
                 {event.status_display}
               </span>
             </div>
-            <h3 className="text-white font-semibold text-sm leading-snug">{event.judul}</h3>
+            <h3 className="text-foreground font-semibold text-sm leading-snug">{event.judul}</h3>
           </div>
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
               onClick={() => setCheckingIn(true)}
-              className="p-1.5 text-slate-400 hover:text-green-400 hover:bg-green-900/30 rounded-lg transition-colors"
+              className="p-1.5 text-muted-foreground hover:text-green-400 hover:bg-green-900/30 rounded-lg transition-colors"
               title="Check-in peserta"
             >
               <QrCode className="h-4 w-4" />
             </button>
             <button
               onClick={() => setEditing(true)}
-              className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-900/30 rounded-lg transition-colors"
+              className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/30 rounded-lg transition-colors"
             >
               <Edit2 className="h-4 w-4" />
             </button>
@@ -299,14 +299,14 @@ function EventCard({ event }: { event: CampaignEvent }) {
               onClick={() => {
                 if (confirm('Hapus event ini?')) deleteEvent.mutate(event.id);
               }}
-              className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
+              className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
             >
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        <div className="space-y-1.5 text-sm text-slate-400 mb-3">
+        <div className="space-y-1.5 text-sm text-muted-foreground mb-3">
           <div className="flex items-center gap-2">
             <CalendarDays className="h-3.5 w-3.5 flex-shrink-0" />
             <span>
@@ -324,16 +324,16 @@ function EventCard({ event }: { event: CampaignEvent }) {
 
         {event.target_peserta > 0 && (
           <div>
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+            <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
               <div className="flex items-center gap-1">
                 <Users className="h-3.5 w-3.5" />
                 <span>{event.attendee_count} hadir</span>
               </div>
               <span>{pct}% dari target {event.target_peserta}</span>
             </div>
-            <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
               <div
-                className="h-full bg-indigo-500 rounded-full transition-all"
+                className="h-full bg-primary rounded-full transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -360,12 +360,12 @@ export default function EventsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Events Kampanye</h1>
-          <p className="text-slate-400 text-sm mt-1">Kelola acara kampanye dan check-in peserta via QR</p>
+          <h1 className="text-2xl font-bold text-foreground">Events Kampanye</h1>
+          <p className="text-muted-foreground text-sm mt-1">Kelola acara kampanye dan check-in peserta via QR</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium rounded-lg transition-colors"
         >
           <Plus className="h-4 w-4" />
           Buat Event
@@ -376,11 +376,11 @@ export default function EventsPage() {
         {[
           { label: 'Mendatang', value: upcoming, color: 'text-blue-400' },
           { label: 'Sedang Berlangsung', value: ongoing, color: 'text-green-400' },
-          { label: 'Selesai', value: completed, color: 'text-slate-400' },
+          { label: 'Selesai', value: completed, color: 'text-muted-foreground' },
         ].map(s => (
-          <div key={s.label} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
+          <div key={s.label} className="bg-card border border-border rounded-xl p-4 text-center">
             <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-            <p className="text-slate-400 text-xs mt-1">{s.label}</p>
+            <p className="text-muted-foreground text-xs mt-1">{s.label}</p>
           </div>
         ))}
       </div>
@@ -392,8 +392,8 @@ export default function EventsPage() {
             onClick={() => setStatusFilter(opt.value)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               statusFilter === opt.value
-                ? 'bg-indigo-600 text-white'
-                : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
             {opt.label}
@@ -404,11 +404,11 @@ export default function EventsPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 h-40 animate-pulse" />
+            <div key={i} className="bg-card border border-border rounded-xl p-4 h-40 animate-pulse" />
           ))}
         </div>
       ) : events.length === 0 ? (
-        <div className="text-center py-16 text-slate-500">
+        <div className="text-center py-16 text-muted-foreground">
           <CalendarDays className="h-12 w-12 mx-auto mb-3 opacity-30" />
           <p className="text-lg font-medium">Belum ada event</p>
           <p className="text-sm mt-1">Buat event kampanye pertama Anda</p>

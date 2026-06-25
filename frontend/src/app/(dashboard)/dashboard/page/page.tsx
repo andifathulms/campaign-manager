@@ -106,10 +106,10 @@ export default function CampaignPageBuilderPage() {
       </div>
 
       {/* Public URL card */}
-      <Card className="mb-6 border-indigo-200 bg-indigo-50/50">
+      <Card className="mb-6 border-accent bg-accent/50">
         <CardContent className="py-4">
           <div className="flex items-center gap-3 flex-wrap">
-            <Globe className="w-5 h-5 text-indigo-500 flex-shrink-0" />
+            <Globe className="w-5 h-5 text-primary flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-xs text-muted-foreground mb-0.5">URL Halaman Kampanye Publik</p>
               {slug ? (
@@ -139,11 +139,11 @@ export default function CampaignPageBuilderPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Kelengkapan Konten</CardTitle>
-                <span className="text-sm font-semibold text-indigo-600">{completionPct}%</span>
+                <span className="text-sm font-semibold text-primary">{completionPct}%</span>
               </div>
               <div className="w-full bg-secondary rounded-full h-2 mt-2">
                 <div
-                  className="bg-indigo-500 h-2 rounded-full transition-all"
+                  className="bg-primary h-2 rounded-full transition-all"
                   style={{ width: `${completionPct}%` }}
                 />
               </div>
@@ -167,7 +167,7 @@ export default function CampaignPageBuilderPage() {
                       <p className="text-xs text-muted-foreground">{s.desc}</p>
                     </div>
                     {!s.done && (
-                      <a href="/dashboard/profile" className="text-xs text-indigo-600 hover:underline flex-shrink-0">
+                      <a href="/dashboard/profile" className="text-xs text-primary hover:underline flex-shrink-0">
                         Isi →
                       </a>
                     )}

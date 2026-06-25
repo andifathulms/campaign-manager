@@ -31,11 +31,11 @@ function ShareRow({ s }: { s: ContentShare }) {
         <span className="inline-flex items-center gap-1"><Eye className="w-3.5 h-3.5" />{s.view_count.toLocaleString('id-ID')}</span>
       </td>
       <td className="px-4 py-3 text-right text-sm font-semibold">
-        <span className="inline-flex items-center gap-1"><Award className="w-3.5 h-3.5 text-indigo-500" />{s.points_earned}</span>
+        <span className="inline-flex items-center gap-1"><Award className="w-3.5 h-3.5 text-primary" />{s.points_earned}</span>
       </td>
       <td className="px-4 py-3 text-center">
         {s.proof_url ? (
-          <a href={s.proof_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline inline-flex items-center gap-1 text-xs">
+          <a href={s.proof_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 text-xs">
             <ExternalLink className="w-3.5 h-3.5" /> Bukti
           </a>
         ) : <span className="text-xs text-muted-foreground">—</span>}
@@ -68,8 +68,8 @@ export default function ContentPerformancePage() {
   return (
     <div className="p-8 w-full max-w-4xl">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-          <Share2 className="w-5 h-5 text-indigo-600" />
+        <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+          <Share2 className="w-5 h-5 text-primary" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Performa Konten</h1>
@@ -80,7 +80,7 @@ export default function ContentPerformancePage() {
       <div className="flex gap-2 border-b border-border mb-4">
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === t.key ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-muted-foreground hover:text-foreground'}`}>
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === t.key ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}>
             {t.label}
           </button>
         ))}

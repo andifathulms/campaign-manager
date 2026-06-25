@@ -22,10 +22,10 @@ const TEMA_LABELS: Record<string, string> = {
 const TEMA_COLORS: Record<string, string> = {
   infrastruktur: 'bg-blue-100 text-blue-700',
   kesehatan: 'bg-rose-100 text-rose-700',
-  pendidikan: 'bg-indigo-100 text-indigo-700',
+  pendidikan: 'bg-accent text-primary',
   ekonomi: 'bg-amber-100 text-amber-700',
   lingkungan: 'bg-emerald-100 text-emerald-700',
-  sosial: 'bg-purple-100 text-purple-700',
+  sosial: 'bg-accent text-primary',
   lainnya: 'bg-gray-100 text-gray-700',
 };
 
@@ -73,7 +73,7 @@ export default function TanggapanPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href={`/${slug}`} className="text-sm text-indigo-600 hover:underline">
+          <Link href={`/${slug}`} className="text-sm text-primary hover:underline">
             &larr; Kembali ke halaman kandidat
           </Link>
         </div>
@@ -91,8 +91,8 @@ export default function TanggapanPage() {
             onClick={() => setSelectedTema('')}
             className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
               !selectedTema
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-primary'
             }`}
           >
             Semua
@@ -103,8 +103,8 @@ export default function TanggapanPage() {
               onClick={() => setSelectedTema(key === selectedTema ? '' : key)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                 selectedTema === key
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                  ? 'bg-primary text-white border-primary'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-primary'
               }`}
             >
               {label}
@@ -158,7 +158,7 @@ export default function TanggapanPage() {
                       {reply.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="inline-flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full"
+                          className="inline-flex items-center gap-1 text-xs text-primary bg-accent px-2 py-0.5 rounded-full"
                         >
                           <Tag className="w-2.5 h-2.5" />
                           {tag}
@@ -169,11 +169,11 @@ export default function TanggapanPage() {
                 </div>
 
                 {/* Candidate reply */}
-                <div className="bg-indigo-50 border-t border-indigo-100 px-5 py-4">
-                  <p className="text-xs font-semibold text-indigo-600 mb-1.5 uppercase tracking-wide">
+                <div className="bg-accent border-t border-accent px-5 py-4">
+                  <p className="text-xs font-semibold text-primary mb-1.5 uppercase tracking-wide">
                     Tanggapan Kandidat
                   </p>
-                  <p className="text-sm text-indigo-900 leading-relaxed">{reply.balasan}</p>
+                  <p className="text-sm text-primary leading-relaxed">{reply.balasan}</p>
                 </div>
               </div>
             ))}

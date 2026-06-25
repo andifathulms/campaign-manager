@@ -20,7 +20,7 @@ interface Props {
   primary?: string;
 }
 
-export function AspirasiForm({ slug, primary = '#4F46E5' }: Props) {
+export function AspirasiForm({ slug, primary = '#2456E6' }: Props) {
   const [form, setForm] = useState({ nama: '', phone: '', email: '', wilayah: '', tema: 'infrastruktur', pesan: '' });
   const [captchaToken, setCaptchaToken] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');

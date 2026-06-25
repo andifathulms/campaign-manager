@@ -28,8 +28,8 @@ const WILAYAH_OPTIONS = [
 ];
 
 const LEVEL_COLORS: Record<number, string> = {
-  1: 'bg-violet-100 text-violet-700',
-  2: 'bg-indigo-100 text-indigo-700',
+  1: 'bg-accent text-primary',
+  2: 'bg-accent text-primary',
   3: 'bg-sky-100 text-sky-700',
   4: 'bg-emerald-100 text-emerald-700',
 };
@@ -73,7 +73,7 @@ function MemberRow({ member, onDelete }: { member: TeamMember; onDelete: (id: st
         onClick={() => setOpen(v => !v)}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-primary font-semibold text-sm flex-shrink-0">
             {member.nama.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
@@ -86,7 +86,7 @@ function MemberRow({ member, onDelete }: { member: TeamMember; onDelete: (id: st
             {member.level_display}
           </span>
           <span className="text-xs text-muted-foreground hidden sm:block">{member.wilayah_name}</span>
-          <span className="text-xs font-semibold text-indigo-600">{member.total_clicks} klik</span>
+          <span className="text-xs font-semibold text-primary">{member.total_clicks} klik</span>
           <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`} />
         </div>
       </div>
@@ -171,8 +171,8 @@ export default function TeamPage() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Total Anggota', value: totalMembers, color: 'text-violet-600', bg: 'bg-violet-50' },
-          { label: 'Total Klik Referral', value: totalClicks, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+          { label: 'Total Anggota', value: totalMembers, color: 'text-primary', bg: 'bg-accent' },
+          { label: 'Total Klik Referral', value: totalClicks, color: 'text-primary', bg: 'bg-accent' },
           { label: 'Koordinator', value: members?.filter(m => m.level <= 3).length ?? 0, color: 'text-sky-600', bg: 'bg-sky-50' },
           { label: 'Relawan', value: members?.filter(m => m.level === 4).length ?? 0, color: 'text-emerald-600', bg: 'bg-emerald-50' },
         ].map(card => (
@@ -246,7 +246,7 @@ export default function TeamPage() {
         {/* Member list */}
         <div className="lg:col-span-2 space-y-3">
           <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <Users className="w-4 h-4 text-indigo-600" /> Daftar Anggota
+            <Users className="w-4 h-4 text-primary" /> Daftar Anggota
           </h2>
           {isLoading ? (
             <div className="space-y-2">
@@ -291,7 +291,7 @@ export default function TeamPage() {
                         <p className="text-sm font-medium truncate">{m.nama}</p>
                         <p className="text-xs text-muted-foreground">{m.level_display}</p>
                       </div>
-                      <span className="text-sm font-bold text-indigo-600">{m.total_clicks}</span>
+                      <span className="text-sm font-bold text-primary">{m.total_clicks}</span>
                     </li>
                   ))}
                 </ol>

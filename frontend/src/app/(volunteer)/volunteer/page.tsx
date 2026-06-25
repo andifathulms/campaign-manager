@@ -27,7 +27,7 @@ export default function VolunteerDashboardPage() {
     { label: 'Poin Saya', value: data?.total_points ?? 0, icon: Star, color: 'text-amber-500', bg: 'bg-amber-50' },
     { label: 'Tugas Aktif', value: data?.active_tasks ?? 0, icon: ClipboardList, color: 'text-blue-500', bg: 'bg-blue-50' },
     { label: 'Pendukung Bulan Ini', value: data?.supporters_this_month ?? 0, icon: Users, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-    { label: 'Konten Dibagikan', value: data?.shares_this_month ?? 0, icon: Share2, color: 'text-violet-500', bg: 'bg-violet-50' },
+    { label: 'Konten Dibagikan', value: data?.shares_this_month ?? 0, icon: Share2, color: 'text-primary', bg: 'bg-accent' },
   ];
 
   return (

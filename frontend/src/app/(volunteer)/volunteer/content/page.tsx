@@ -59,7 +59,7 @@ export default function VolunteerContentPage() {
             key={t.key}
             onClick={() => setTab(t.key as 'daily' | 'history')}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              tab === t.key ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-muted-foreground hover:text-foreground'
+              tab === t.key ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
             {t.label}
@@ -119,7 +119,7 @@ export default function VolunteerContentPage() {
                         <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{s.view_count} views</span>
                         <span>{s.points_earned} poin</span>
                         {s.proof_url && (
-                          <a href={s.proof_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-indigo-600 hover:underline">
+                          <a href={s.proof_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline">
                             <ExternalLink className="w-3 h-3" /> Bukti
                           </a>
                         )}

@@ -85,7 +85,7 @@ export default async function CampaignPage({ params }: Props) {
   const candidate = await getCandidate(params.slug);
   if (!candidate) notFound();
 
-  const primary = candidate.color_primary || '#4F46E5';
+  const primary = candidate.color_primary || '#2456E6';
   const hasMisi = candidate.misi?.length > 0;
   const hasProgram = candidate.program_unggulan?.length > 0;
   const hasSosmed = Object.values(candidate.sosmed || {}).some(v => !!v);
@@ -97,7 +97,7 @@ export default async function CampaignPage({ params }: Props) {
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section
         className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${primary}ee 0%, ${primary}99 60%, #0f0c29 100%)` }}
+        style={{ background: `linear-gradient(135deg, ${primary}ee 0%, ${primary}99 60%, #14181F 100%)` }}
       >
         {/* Decorative circles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -144,7 +144,7 @@ export default async function CampaignPage({ params }: Props) {
           </div>
 
           {/* Name */}
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-4 leading-tight tracking-tight">
+          <h1 className="font-display text-5xl md:text-7xl font-extrabold text-white mb-4 leading-tight tracking-tight">
             {candidate.nama_lengkap}
           </h1>
 
@@ -167,7 +167,7 @@ export default async function CampaignPage({ params }: Props) {
             <Link
               href={`/${candidate.tenant_slug}/dukung`}
               className="px-7 py-3 rounded-full bg-white font-semibold shadow-lg hover:shadow-xl transition-shadow"
-              style={{ color: candidate.color_primary || '#4F46E5' }}
+              style={{ color: candidate.color_primary || '#2456E6' }}
             >
               Daftar Jadi Pendukung
             </Link>
@@ -263,7 +263,7 @@ export default async function CampaignPage({ params }: Props) {
                       {p.icon}
                     </div>
                   )}
-                  <h3 className="font-bold text-gray-900 text-lg mb-2 group-hover:text-indigo-600 transition-colors">{p.title}</h3>
+                  <h3 className="font-bold text-gray-900 text-lg mb-2 group-hover:text-primary transition-colors">{p.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{p.desc}</p>
                 </div>
               ))}
@@ -307,7 +307,7 @@ export default async function CampaignPage({ params }: Props) {
         </p>
         <p className="text-gray-600 text-xs">
           Dibuat dengan{' '}
-          <Link href="/" className="text-indigo-400 hover:text-indigo-300 transition-colors">
+          <Link href="/" className="text-primary hover:text-primary transition-colors">
             KampanyeKit
           </Link>
           {' '}— Platform Kampanye Digital Indonesia

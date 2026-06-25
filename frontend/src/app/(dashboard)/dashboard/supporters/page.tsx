@@ -30,7 +30,7 @@ function SupporterCard({ supporter, token }: { supporter: Supporter; token?: str
   return (
     <div className="bg-white rounded-xl border border-border p-4 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-primary font-semibold text-sm flex-shrink-0">
           {supporter.nama.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
@@ -43,7 +43,7 @@ function SupporterCard({ supporter, token }: { supporter: Supporter; token?: str
               <button
                 onClick={downloadCard}
                 title="Unduh Kartu Anggota"
-                className="text-muted-foreground hover:text-indigo-600 transition-colors"
+                className="text-muted-foreground hover:text-primary transition-colors"
               >
                 <CreditCard className="w-4 h-4" />
               </button>
@@ -64,7 +64,7 @@ function SupporterCard({ supporter, token }: { supporter: Supporter; token?: str
             )}
           </div>
           {supporter.statement && (
-            <p className="mt-2 text-xs italic text-foreground border-l-2 border-indigo-300 pl-2">
+            <p className="mt-2 text-xs italic text-foreground border-l-2 border-primary pl-2">
               "{supporter.statement}"
             </p>
           )}
@@ -111,12 +111,12 @@ export default function SupportersPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-border p-4 shadow-sm col-span-2 lg:col-span-1">
           <p className="text-xs text-muted-foreground mb-1">Total Pendukung</p>
-          <p className="text-3xl font-bold text-violet-600">{stats?.total ?? 0}</p>
+          <p className="text-3xl font-bold text-primary">{stats?.total ?? 0}</p>
         </div>
         {stats?.by_kecamatan?.slice(0, 3).map((item, i) => (
           <div key={i} className="bg-white rounded-xl border border-border p-4 shadow-sm">
             <p className="text-xs text-muted-foreground mb-1 truncate">{item.kecamatan}</p>
-            <p className="text-2xl font-bold text-indigo-600">{item.count}</p>
+            <p className="text-2xl font-bold text-primary">{item.count}</p>
             <p className="text-xs text-muted-foreground">pendukung</p>
           </div>
         ))}

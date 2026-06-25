@@ -73,8 +73,8 @@ export default function RelawanRequestsPage() {
   return (
     <div className="p-8 w-full max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-          <UserCheck className="w-5 h-5 text-indigo-600" />
+        <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+          <UserCheck className="w-5 h-5 text-primary" />
         </div>
         <div>
           <h1 className="text-2xl font-bold">Permintaan Relawan</h1>

@@ -22,7 +22,7 @@ export function VolunteerSidebar() {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-56 border-r border-border bg-white flex-shrink-0">
         <div className="h-14 flex items-center px-5 border-b border-border">
-          <span className="text-lg font-bold text-indigo-600">KampanyeKit</span>
+          <span className="text-lg font-bold text-primary">KampanyeKit</span>
         </div>
         <nav className="flex-1 py-3 space-y-0.5 px-2">
           {NAV_ITEMS.map(item => {
@@ -33,7 +33,7 @@ export function VolunteerSidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   active
-                    ? 'bg-indigo-50 text-indigo-700'
+                    ? 'bg-accent text-primary'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                 }`}
               >
@@ -63,7 +63,7 @@ export function VolunteerSidebar() {
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center gap-0.5 py-1 px-2 rounded-lg text-xs transition-colors ${
-                active ? 'text-indigo-600' : 'text-muted-foreground'
+                active ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
               <item.icon className="w-5 h-5" />

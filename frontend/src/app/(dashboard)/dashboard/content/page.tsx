@@ -92,7 +92,7 @@ function CreateItemModal({ onClose, defaultDate }: { onClose: () => void; defaul
           </div>
 
           {/* Daily content for relawan */}
-          <div className="rounded-lg border border-indigo-100 bg-indigo-50/50 p-3 space-y-3">
+          <div className="rounded-lg border border-accent bg-accent/50 p-3 space-y-3">
             <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
               <input
                 type="checkbox"
@@ -202,13 +202,13 @@ export default function ContentCalendarPage() {
               return (
                 <div
                   key={i}
-                  className={`min-h-[100px] p-2 border-r border-border last:border-0 ${!day ? 'bg-secondary/30' : 'cursor-pointer hover:bg-indigo-50/30'}`}
+                  className={`min-h-[100px] p-2 border-r border-border last:border-0 ${!day ? 'bg-secondary/30' : 'cursor-pointer hover:bg-accent/30'}`}
                   onClick={() => { if (day) { setCreateDate(dateStr); setShowCreate(true); } }}
                 >
                   {day && (
                     <>
                       <span className={`text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full mb-1
-                        ${isToday ? 'bg-indigo-600 text-white' : 'text-foreground'}`}>
+                        ${isToday ? 'bg-primary text-white' : 'text-foreground'}`}>
                         {day}
                       </span>
                       <div className="space-y-0.5">

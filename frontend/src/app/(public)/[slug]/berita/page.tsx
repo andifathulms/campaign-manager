@@ -10,7 +10,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   kegiatan: 'bg-blue-100 text-blue-700',
   program: 'bg-emerald-100 text-emerald-700',
   pengumuman: 'bg-amber-100 text-amber-700',
-  media: 'bg-violet-100 text-violet-700',
+  media: 'bg-accent text-primary',
 };
 
 export default function PublicBeritaPage() {
@@ -24,7 +24,7 @@ export default function PublicBeritaPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href={`/${slug}`} className="text-sm text-indigo-600 hover:underline">&larr; Kembali ke halaman kandidat</Link>
+          <Link href={`/${slug}`} className="text-sm text-primary hover:underline">&larr; Kembali ke halaman kandidat</Link>
         </div>
 
         <h1 className="text-2xl font-bold mb-6">Berita & Update</h1>
@@ -44,7 +44,7 @@ export default function PublicBeritaPage() {
                 key={c.value}
                 onClick={() => { setCategory(c.value); setPage(1); }}
                 className={`px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
-                  category === c.value ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  category === c.value ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
                 {c.label}
@@ -71,7 +71,7 @@ export default function PublicBeritaPage() {
                         <img src={a.featured_image_url} alt={a.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                       </div>
                     ) : (
-                      <div className="h-44 bg-gradient-to-br from-indigo-50 to-violet-50 flex items-center justify-center text-indigo-300 text-4xl font-bold">
+                      <div className="h-44 bg-gradient-to-br from-accent to-primary/10 flex items-center justify-center text-primary text-4xl font-bold">
                         {a.title[0]}
                       </div>
                     )}
@@ -80,7 +80,7 @@ export default function PublicBeritaPage() {
                         <span className={`text-xs px-2 py-0.5 rounded-full ${CATEGORY_COLORS[a.category] || 'bg-slate-100'}`}>{a.category_display}</span>
                         <span className="text-xs text-slate-400">{a.published_at ? new Date(a.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</span>
                       </div>
-                      <h3 className="text-sm font-semibold line-clamp-2 group-hover:text-indigo-600 transition-colors">{a.title}</h3>
+                      <h3 className="text-sm font-semibold line-clamp-2 group-hover:text-primary transition-colors">{a.title}</h3>
                       {a.excerpt && <p className="text-xs text-slate-500 mt-1 line-clamp-2">{a.excerpt}</p>}
                       <div className="flex items-center gap-1 mt-3 text-xs text-slate-400">
                         <Eye className="w-3 h-3" />{a.view_count} dibaca

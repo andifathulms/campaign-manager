@@ -19,8 +19,8 @@ const PLAN_LABELS: Record<string, string> = {
 };
 const PLAN_COLORS: Record<string, string> = {
   starter: 'bg-slate-100 text-slate-700',
-  pro: 'bg-indigo-100 text-indigo-700',
-  premium: 'bg-violet-100 text-violet-700',
+  pro: 'bg-accent text-primary',
+  premium: 'bg-accent text-primary',
   enterprise: 'bg-amber-100 text-amber-700',
 };
 
@@ -130,7 +130,7 @@ export default function SettingsPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left
-                  ${activeTab === tab.id ? 'bg-indigo-50 text-indigo-700' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
+                  ${activeTab === tab.id ? 'bg-accent text-primary' : 'text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
                 {tab.label}
@@ -303,7 +303,7 @@ export default function SettingsPage() {
                         </div>
                       ))}
                       <p className="text-xs text-muted-foreground pt-2">
-                        Kelola koneksi di <a href="/dashboard/ads" className="text-indigo-600 underline">Dashboard Iklan</a>.
+                        Kelola koneksi di <a href="/dashboard/ads" className="text-primary underline">Dashboard Iklan</a>.
                       </p>
                     </div>
                   )}

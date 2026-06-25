@@ -59,7 +59,7 @@ export function RelawanRegisterForm({ slug, refCode }: Props) {
   if (status === 'done') {
     return (
       <div className="text-center py-10">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-600 flex items-center justify-center text-white text-3xl">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary flex items-center justify-center text-white text-3xl">
           ✓
         </div>
         <h3 className="text-xl font-bold text-gray-900">{message}</h3>
@@ -82,7 +82,7 @@ export function RelawanRegisterForm({ slug, refCode }: Props) {
               placeholder={(f as any).placeholder}
               value={form[f.name] || ''}
               onChange={(e) => set(f.name, e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
         ))}
@@ -95,7 +95,7 @@ export function RelawanRegisterForm({ slug, refCode }: Props) {
           value={alasan}
           onChange={(e) => setAlasan(e.target.value)}
           placeholder="Mengapa Anda ingin bergabung?"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
 
@@ -106,7 +106,7 @@ export function RelawanRegisterForm({ slug, refCode }: Props) {
       <button
         type="submit"
         disabled={status === 'loading'}
-        className="w-full rounded-lg py-3 bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-60"
+        className="w-full rounded-lg py-3 bg-primary text-white font-semibold hover:bg-primary transition-colors disabled:opacity-60"
       >
         {status === 'loading' ? 'Mengirim...' : 'Daftar Jadi Relawan'}
       </button>

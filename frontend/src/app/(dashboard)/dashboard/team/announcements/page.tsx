@@ -104,39 +104,39 @@ function AnnouncementModal({ ann, onClose }: { ann?: Announcement; onClose: () =
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-900 rounded-xl border border-slate-700 w-full max-w-lg">
-        <div className="flex items-center justify-between p-5 border-b border-slate-700">
-          <h2 className="text-white font-semibold">{ann ? 'Edit Pengumuman' : 'Buat Pengumuman'}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white"><X className="h-5 w-5" /></button>
+      <div className="bg-card rounded-xl border border-border w-full max-w-lg">
+        <div className="flex items-center justify-between p-5 border-b border-border">
+          <h2 className="text-foreground font-semibold">{ann ? 'Edit Pengumuman' : 'Buat Pengumuman'}</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-5 w-5" /></button>
         </div>
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Judul</label>
+            <label className="block text-sm text-muted-foreground mb-1">Judul</label>
             <input
               required
               value={form.judul}
               onChange={e => set('judul', e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
               placeholder="Judul pengumuman..."
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Isi Pengumuman</label>
+            <label className="block text-sm text-muted-foreground mb-1">Isi Pengumuman</label>
             <textarea
               required
               rows={5}
               value={form.isi}
               onChange={e => set('isi', e.target.value)}
-              className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 resize-none"
+              className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary resize-none"
               placeholder="Tulis isi pengumuman di sini..."
             />
           </div>
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Target Penerima</label>
+            <label className="block text-sm text-muted-foreground mb-1">Target Penerima</label>
             <select
               value={form.min_level}
               onChange={e => set('min_level', parseInt(e.target.value))}
-              className="w-full bg-slate-800 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+              className="w-full bg-muted border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
             >
               {LEVEL_OPTIONS.map(l => (
                 <option key={l.value} value={l.value}>{l.label}</option>
@@ -148,18 +148,18 @@ function AnnouncementModal({ ann, onClose }: { ann?: Announcement; onClose: () =
               type="checkbox"
               checked={form.is_pinned}
               onChange={e => set('is_pinned', e.target.checked)}
-              className="w-4 h-4 rounded border-slate-600 bg-slate-800 accent-indigo-600"
+              className="w-4 h-4 rounded border-border bg-muted accent-primary"
             />
-            <span className="text-sm text-slate-300">Pin pengumuman ini di atas</span>
+            <span className="text-sm text-muted-foreground">Pin pengumuman ini di atas</span>
           </label>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg border border-slate-600 text-slate-300 text-sm hover:bg-slate-800">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg border border-border text-muted-foreground text-sm hover:bg-muted">
               Batal
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="flex-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium disabled:opacity-50"
+              className="flex-1 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium disabled:opacity-50"
             >
               {isPending ? 'Menyimpan...' : ann ? 'Simpan' : 'Kirim Pengumuman'}
             </button>
@@ -184,23 +184,23 @@ export default function AnnouncementsPage() {
     LEVEL_OPTIONS.find(l => l.value === level)?.label ?? 'Semua';
 
   const AnnCard = ({ ann }: { ann: Announcement }) => (
-    <div className={`bg-slate-800/50 border rounded-xl p-4 ${ann.is_pinned ? 'border-indigo-700/60' : 'border-slate-700'}`}>
+    <div className={`bg-card border rounded-xl p-4 ${ann.is_pinned ? 'border-primary/60' : 'border-border'}`}>
       <div className="flex items-start gap-3">
-        {ann.is_pinned && <Pin className="h-4 w-4 text-indigo-400 flex-shrink-0 mt-0.5" />}
+        {ann.is_pinned && <Pin className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1.5">
-            <h3 className="text-white font-semibold text-sm leading-snug">{ann.judul}</h3>
+            <h3 className="text-foreground font-semibold text-sm leading-snug">{ann.judul}</h3>
             <div className="flex gap-1 flex-shrink-0">
               <button
                 onClick={() => updateAnn.mutate({ id: ann.id, data: { is_pinned: !ann.is_pinned } })}
                 title={ann.is_pinned ? 'Unpin' : 'Pin'}
-                className={`p-1.5 rounded-lg transition-colors ${ann.is_pinned ? 'text-indigo-400 hover:text-slate-400' : 'text-slate-500 hover:text-indigo-400 hover:bg-indigo-900/30'}`}
+                className={`p-1.5 rounded-lg transition-colors ${ann.is_pinned ? 'text-primary hover:text-muted-foreground' : 'text-muted-foreground hover:text-primary hover:bg-primary/30'}`}
               >
                 <Pin className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={() => setEditing(ann)}
-                className="p-1.5 text-slate-500 hover:text-indigo-400 hover:bg-indigo-900/30 rounded-lg transition-colors"
+                className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/30 rounded-lg transition-colors"
               >
                 <Edit2 className="h-3.5 w-3.5" />
               </button>
@@ -208,19 +208,19 @@ export default function AnnouncementsPage() {
                 onClick={() => {
                   if (confirm('Hapus pengumuman ini?')) deleteAnn.mutate(ann.id);
                 }}
-                className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
+                className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
-          <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">{ann.isi}</p>
-          <div className="flex items-center gap-3 mt-3 text-xs text-slate-500">
+          <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap">{ann.isi}</p>
+          <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
             <span>{ann.author_nama}</span>
             <span>·</span>
             <span>{format(new Date(ann.created_at), 'd MMM yyyy, HH:mm', { locale: id })}</span>
             <span>·</span>
-            <span className="text-slate-600">{getLevelLabel(ann.min_level)}</span>
+            <span className="text-muted-foreground">{getLevelLabel(ann.min_level)}</span>
           </div>
         </div>
       </div>
@@ -232,12 +232,12 @@ export default function AnnouncementsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Papan Pengumuman</h1>
-          <p className="text-slate-400 text-sm mt-1">Broadcast informasi ke seluruh tim sukses</p>
+          <h1 className="text-2xl font-bold text-foreground">Papan Pengumuman</h1>
+          <p className="text-muted-foreground text-sm mt-1">Broadcast informasi ke seluruh tim sukses</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium rounded-lg transition-colors"
         >
           <Plus className="h-4 w-4" />
           Buat Pengumuman
@@ -248,11 +248,11 @@ export default function AnnouncementsPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-32 bg-slate-800/50 border border-slate-700 rounded-xl animate-pulse" />
+            <div key={i} className="h-32 bg-card border border-border rounded-xl animate-pulse" />
           ))}
         </div>
       ) : announcements.length === 0 ? (
-        <div className="text-center py-16 text-slate-500">
+        <div className="text-center py-16 text-muted-foreground">
           <Megaphone className="h-12 w-12 mx-auto mb-3 opacity-30" />
           <p className="text-lg font-medium">Belum ada pengumuman</p>
           <p className="text-sm mt-1">Buat pengumuman pertama untuk tim sukses Anda</p>
@@ -261,14 +261,14 @@ export default function AnnouncementsPage() {
         <div className="space-y-4">
           {pinned.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-indigo-400">Disematkan</h2>
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-primary">Disematkan</h2>
               {pinned.map(a => <AnnCard key={a.id} ann={a} />)}
             </div>
           )}
           {regular.length > 0 && (
             <div className="space-y-3">
               {pinned.length > 0 && (
-                <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 pt-2">Terbaru</h2>
+                <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground pt-2">Terbaru</h2>
               )}
               {regular.map(a => <AnnCard key={a.id} ann={a} />)}
             </div>

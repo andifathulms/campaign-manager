@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function AspirasiPage({ params }: { params: { slug: string } }) {
   const candidate = await getCandidate(params.slug);
   if (!candidate) notFound();
-  const primary = candidate.color_primary || '#4F46E5';
+  const primary = candidate.color_primary || '#2456E6';
 
   return (
     <main className="min-h-screen py-12 px-4" style={{ background: `${primary}0a` }}>

@@ -46,7 +46,7 @@ export default function VolunteerSupportersPage() {
           <Card className="border-0 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-indigo-500" />
+                <Users className="w-4 h-4 text-primary" />
                 <span className="text-xs text-muted-foreground">Total Rekrutan</span>
               </div>
               <p className="text-2xl font-bold mt-1">{summary.total}</p>
@@ -73,7 +73,7 @@ export default function VolunteerSupportersPage() {
           <Card className="border-0 shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-violet-500" />
+                <MapPin className="w-4 h-4 text-primary" />
                 <span className="text-xs text-muted-foreground">Kecamatan</span>
               </div>
               <p className="text-2xl font-bold mt-1">{summary.by_kecamatan?.length || 0}</p>

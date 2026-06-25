@@ -66,7 +66,7 @@ function CreatePollModal({ onClose }: { onClose: () => void }) {
                 </div>
               ))}
               {options.length < 5 && (
-                <button type="button" onClick={addOption} className="text-indigo-600 text-xs font-medium hover:underline">
+                <button type="button" onClick={addOption} className="text-primary text-xs font-medium hover:underline">
                   + Tambah pilihan
                 </button>
               )}
@@ -125,7 +125,7 @@ function PollCard({ poll }: { poll: Poll }) {
             </div>
             <div className="w-full bg-secondary rounded-full h-2">
               <div
-                className="h-2 rounded-full bg-indigo-500 transition-all"
+                className="h-2 rounded-full bg-primary transition-all"
                 style={{ width: `${opt.pct}%` }}
               />
             </div>

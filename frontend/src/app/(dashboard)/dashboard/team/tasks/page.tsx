@@ -192,7 +192,7 @@ export default function TasksPage() {
             key={f.value}
             onClick={() => setStatusFilter(f.value)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
-              ${statusFilter === f.value ? 'bg-indigo-600 text-white' : 'bg-white border border-border text-muted-foreground hover:text-foreground'}`}
+              ${statusFilter === f.value ? 'bg-primary text-white' : 'bg-white border border-border text-muted-foreground hover:text-foreground'}`}
           >
             {f.label}
           </button>

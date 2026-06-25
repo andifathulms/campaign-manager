@@ -13,7 +13,7 @@ const TEMA_LABELS: Record<string, string> = {
 const TEMA_COLORS: Record<string, string> = {
   infrastruktur: 'bg-orange-100 text-orange-700', kesehatan: 'bg-red-100 text-red-700',
   pendidikan: 'bg-blue-100 text-blue-700', ekonomi: 'bg-emerald-100 text-emerald-700',
-  lingkungan: 'bg-green-100 text-green-700', sosial: 'bg-violet-100 text-violet-700',
+  lingkungan: 'bg-green-100 text-green-700', sosial: 'bg-accent text-primary',
   lainnya: 'bg-slate-100 text-slate-700',
 };
 const STATUS_COLORS: Record<string, string> = {
@@ -33,7 +33,7 @@ function TagInput({ tags, onChange }: { tags: string[]; onChange: (tags: string[
     <div>
       <div className="flex flex-wrap gap-1 mb-2">
         {tags.map((t) => (
-          <span key={t} className="inline-flex items-center gap-1 text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+          <span key={t} className="inline-flex items-center gap-1 text-xs bg-accent text-primary px-2 py-0.5 rounded-full">
             {t}
             <button type="button" onClick={() => onChange(tags.filter((x) => x !== t))}>
               <X className="w-2.5 h-2.5" />
@@ -48,9 +48,9 @@ function TagInput({ tags, onChange }: { tags: string[]; onChange: (tags: string[
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), add())}
           placeholder="Tambah tag, tekan Enter"
-          className="flex-1 text-xs border border-input rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="flex-1 text-xs border border-input rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary"
         />
-        <button type="button" onClick={add} className="text-xs text-indigo-600 hover:underline">
+        <button type="button" onClick={add} className="text-xs text-primary hover:underline">
           Tambah
         </button>
       </div>
@@ -145,7 +145,7 @@ export default function AspirasiPage() {
           <h1 className="text-2xl font-bold flex items-center gap-3">
             Aspirasi Masuk
             {unreadCount > 0 && (
-              <span className="bg-indigo-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">
                 {unreadCount}
               </span>
             )}
@@ -173,7 +173,7 @@ export default function AspirasiPage() {
             onClick={() => setStatusFilter(f.value)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               statusFilter === f.value
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-primary text-white'
                 : 'bg-white border border-border text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -225,10 +225,10 @@ export default function AspirasiPage() {
               key={a.id}
               className={`bg-white rounded-xl border p-5 shadow-sm transition-opacity ${
                 a.is_archived ? 'opacity-60' : ''
-              } ${a.status === 'unread' ? 'border-indigo-200 bg-indigo-50/30' : 'border-border'}`}
+              } ${a.status === 'unread' ? 'border-accent bg-accent/30' : 'border-border'}`}
             >
               <div className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-primary font-semibold text-sm flex-shrink-0">
                   {a.nama.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -255,7 +255,7 @@ export default function AspirasiPage() {
                       {a.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="inline-flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full"
+                          className="inline-flex items-center gap-1 text-xs text-primary bg-accent px-2 py-0.5 rounded-full"
                         >
                           <Tag className="w-2.5 h-2.5" />
                           {tag}

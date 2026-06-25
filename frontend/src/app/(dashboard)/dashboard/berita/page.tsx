@@ -13,7 +13,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   kegiatan: 'bg-blue-100 text-blue-700',
   program: 'bg-emerald-100 text-emerald-700',
   pengumuman: 'bg-amber-100 text-amber-700',
-  media: 'bg-violet-100 text-violet-700',
+  media: 'bg-accent text-primary',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -43,7 +43,7 @@ export default function BeritaPage() {
             key={c.value}
             onClick={() => setCategory(c.value)}
             className={`px-3 py-1.5 text-xs rounded-full font-medium transition-colors ${
-              category === c.value ? 'bg-indigo-100 text-indigo-700' : 'bg-muted text-muted-foreground hover:bg-secondary'
+              category === c.value ? 'bg-accent text-primary' : 'bg-muted text-muted-foreground hover:bg-secondary'
             }`}
           >
             {c.label}

@@ -21,7 +21,7 @@ const FIELDS = [
   { name: 'kelurahan', label: 'Kelurahan / Desa', required: true },
 ] as const;
 
-export function SupporterJoinForm({ slug, refCode, primary = '#4F46E5' }: Props) {
+export function SupporterJoinForm({ slug, refCode, primary = '#2456E6' }: Props) {
   const [form, setForm] = useState<Record<string, string>>({});
   const [statement, setStatement] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');

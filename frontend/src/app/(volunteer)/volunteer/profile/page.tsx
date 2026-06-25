@@ -27,7 +27,7 @@ export default function VolunteerProfilePage() {
       {/* Profile card */}
       <Card className="border-0 shadow-sm">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
             {session?.user?.name
               ? session.user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
               : 'U'}

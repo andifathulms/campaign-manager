@@ -74,24 +74,24 @@ export default function PledgeWallPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Pledge Wall</h1>
-          <p className="text-slate-400 text-sm mt-1">Moderasi pernyataan dukungan publik dari pendukung</p>
+          <h1 className="text-2xl font-bold text-foreground">Pledge Wall</h1>
+          <p className="text-muted-foreground text-sm mt-1">Moderasi pernyataan dukungan publik dari pendukung</p>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-white">{supporters.filter(s => s.statement).length}</p>
-          <p className="text-slate-400 text-xs mt-1">Total Pernyataan</p>
+        <div className="bg-card border border-border rounded-xl p-4 text-center">
+          <p className="text-2xl font-bold text-foreground">{supporters.filter(s => s.statement).length}</p>
+          <p className="text-muted-foreground text-xs mt-1">Total Pernyataan</p>
         </div>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
+        <div className="bg-card border border-border rounded-xl p-4 text-center">
           <p className="text-2xl font-bold text-amber-400">{pendingCount}</p>
-          <p className="text-slate-400 text-xs mt-1">Menunggu Review</p>
+          <p className="text-muted-foreground text-xs mt-1">Menunggu Review</p>
         </div>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
+        <div className="bg-card border border-border rounded-xl p-4 text-center">
           <p className="text-2xl font-bold text-green-400">{verifiedCount}</p>
-          <p className="text-slate-400 text-xs mt-1">Ditampilkan Publik</p>
+          <p className="text-muted-foreground text-xs mt-1">Ditampilkan Publik</p>
         </div>
       </div>
 
@@ -104,8 +104,8 @@ export default function PledgeWallPage() {
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 filter === f
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               {f === 'all' ? 'Semua' : f === 'pending' ? 'Menunggu' : 'Disetujui'}
@@ -113,12 +113,12 @@ export default function PledgeWallPage() {
           ))}
         </div>
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Cari nama, pernyataan, atau kecamatan..."
-            className="w-full bg-slate-800 border border-slate-700 text-white text-sm rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-muted border border-border text-foreground text-sm rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-primary"
           />
         </div>
       </div>
@@ -127,11 +127,11 @@ export default function PledgeWallPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-24 bg-slate-800/50 border border-slate-700 rounded-xl animate-pulse" />
+            <div key={i} className="h-24 bg-card border border-border rounded-xl animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-slate-500">
+        <div className="text-center py-16 text-muted-foreground">
           <Shield className="h-12 w-12 mx-auto mb-3 opacity-30" />
           <p className="text-lg font-medium">Belum ada pernyataan</p>
           <p className="text-sm mt-1">Pernyataan akan muncul setelah pendukung mengisi saat mendaftar</p>
@@ -141,16 +141,16 @@ export default function PledgeWallPage() {
           {filtered.map(s => (
             <div
               key={s.id}
-              className={`bg-slate-800/50 border rounded-xl p-4 transition-colors ${
-                s.is_verified ? 'border-green-800/50' : 'border-slate-700'
+              className={`bg-card border rounded-xl p-4 transition-colors ${
+                s.is_verified ? 'border-green-800/50' : 'border-border'
               }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-white font-semibold text-sm">{s.nama}</p>
-                    <span className="text-slate-500 text-xs">·</span>
-                    <p className="text-slate-400 text-xs">{s.kecamatan}, {s.kelurahan}</p>
+                    <p className="text-foreground font-semibold text-sm">{s.nama}</p>
+                    <span className="text-muted-foreground text-xs">·</span>
+                    <p className="text-muted-foreground text-xs">{s.kecamatan}, {s.kelurahan}</p>
                     {s.is_verified ? (
                       <span className="flex items-center gap-1 text-xs text-green-400 bg-green-900/30 px-2 py-0.5 rounded-full">
                         <CheckCircle2 className="h-3 w-3" />
@@ -163,7 +163,7 @@ export default function PledgeWallPage() {
                       </span>
                     )}
                   </div>
-                  <blockquote className="text-slate-300 text-sm italic leading-relaxed border-l-2 border-slate-600 pl-3">
+                  <blockquote className="text-muted-foreground text-sm italic leading-relaxed border-l-2 border-border pl-3">
                     "{s.statement}"
                   </blockquote>
                 </div>
@@ -180,7 +180,7 @@ export default function PledgeWallPage() {
                     <button
                       onClick={() => moderate.mutate({ id: s.id, is_verified: true })}
                       disabled={moderate.isPending}
-                      className="px-3 py-1.5 text-xs rounded-lg bg-green-700 hover:bg-green-600 text-white transition-colors disabled:opacity-50"
+                      className="px-3 py-1.5 text-xs rounded-lg bg-success hover:bg-success/90 text-success-foreground transition-colors disabled:opacity-50"
                     >
                       Setujui
                     </button>
@@ -194,10 +194,10 @@ export default function PledgeWallPage() {
 
       {/* Public preview note */}
       {verifiedCount > 0 && (
-        <div className="bg-indigo-900/20 border border-indigo-800/50 rounded-xl p-4 flex items-center gap-3">
-          <ExternalLink className="h-5 w-5 text-indigo-400 flex-shrink-0" />
-          <p className="text-slate-300 text-sm">
-            <strong className="text-indigo-300">{verifiedCount} pernyataan</strong> saat ini ditampilkan di halaman kampanye publik Anda di bagian Pledge Wall.
+        <div className="bg-primary/20 border border-primary/50 rounded-xl p-4 flex items-center gap-3">
+          <ExternalLink className="h-5 w-5 text-primary flex-shrink-0" />
+          <p className="text-muted-foreground text-sm">
+            <strong className="text-primary">{verifiedCount} pernyataan</strong> saat ini ditampilkan di halaman kampanye publik Anda di bagian Pledge Wall.
           </p>
         </div>
       )}

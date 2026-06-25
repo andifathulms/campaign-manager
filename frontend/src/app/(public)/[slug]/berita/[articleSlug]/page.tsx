@@ -37,13 +37,13 @@ export default function PublicArticleDetailPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <Link href={`/${slug}/berita`} className="text-sm text-indigo-600 hover:underline flex items-center gap-1 mb-6">
+        <Link href={`/${slug}/berita`} className="text-sm text-primary hover:underline flex items-center gap-1 mb-6">
           <ArrowLeft className="w-3.5 h-3.5" /> Semua Berita
         </Link>
 
         {/* Category + date */}
         <div className="flex items-center gap-3 mb-3">
-          <span className="text-xs px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700 font-medium">{article.category_display}</span>
+          <span className="text-xs px-2.5 py-1 rounded-full bg-accent text-primary font-medium">{article.category_display}</span>
           {article.published_at && (
             <span className="text-xs text-slate-500">
               {new Date(article.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
