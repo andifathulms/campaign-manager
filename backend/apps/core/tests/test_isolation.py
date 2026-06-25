@@ -43,6 +43,14 @@ def api_client():
     return APIClient()
 
 
+def rows(resp):
+    """List rows from a response, handling DRF pagination ({results: [...]})."""
+    data = resp.data
+    if isinstance(data, dict) and 'results' in data:
+        return data['results']
+    return data
+
+
 # ── tenant isolation via the API ────────────────────────────────────────────
 
 @pytest.mark.django_db
@@ -56,7 +64,7 @@ class TestTenantIsolation:
         api_client.force_authenticate(user=user_a)
         resp = api_client.get(reverse('supporter-list'))
         assert resp.status_code == 200
-        names = {row['nama'] for row in resp.data}
+        names = {row['nama'] for row in rows(resp)}
         assert names == {'Andi A'}
 
     def test_supporter_detail_cross_tenant_is_404(self, api_client):
@@ -113,10 +121,10 @@ class TestConsultantSwitch:
         api_client.force_authenticate(user=consultant)
 
         resp_a = api_client.get(reverse('supporter-list'))
-        assert {r['nama'] for r in resp_a.data} == {'A Person'}
+        assert {r['nama'] for r in rows(resp_a)} == {'A Person'}
 
         resp_b = api_client.get(reverse('supporter-list'), HTTP_X_TENANT_ID=str(t_b.id))
-        assert {r['nama'] for r in resp_b.data} == {'B Person'}
+        assert {r['nama'] for r in rows(resp_b)} == {'B Person'}
 
 
 # ── wilayah scoping ─────────────────────────────────────────────────────────
@@ -138,7 +146,7 @@ class TestWilayahScoping:
 
         api_client.force_authenticate(user=korcam)
         resp = api_client.get(reverse('supporter-list'))
-        assert {r['nama'] for r in resp.data} == {'In Area'}
+        assert {r['nama'] for r in rows(resp)} == {'In Area'}
 
     def test_scoped_without_wilayah_is_noop(self):
         t = make_tenant('scoped2')
