@@ -17,7 +17,7 @@ from apps.core.mixins import TenantQuerysetMixin
 from apps.core.rbac import IsAdsManager
 from apps.core.tenancy import active_tenant
 from .meta import get_meta_client, is_sandbox, authorize_url
-from .tasks import sync_meta_account
+from .tasks import sync_meta_account, check_budget_alerts
 from .models import AdsAccount, AdsCampaignSnapshot, BudgetAllocation, AdsAuditLog
 from .serializers import (
     AdsAccountSerializer,
@@ -344,6 +344,7 @@ class AdsSyncView(APIView):
         tenant = active_tenant(request)
         accounts = AdsAccount.objects.filter(tenant=tenant, platform='meta', is_active=True)
         synced = sum(sync_meta_account(str(a.id)) for a in accounts)
+        check_budget_alerts()  # surface a threshold crossing right after a refresh
         return Response({'accounts': accounts.count(), 'synced_campaigns': synced})
 
 

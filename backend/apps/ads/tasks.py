@@ -14,9 +14,10 @@ from decimal import Decimal
 from celery import shared_task
 from django.utils import timezone
 
+from apps.accounts.whatsapp import notify_tenant_admins
 from apps.core.crypto import decrypt
 from .meta import get_meta_client
-from .models import AdsAccount, AdsCampaignSnapshot
+from .models import AdsAccount, AdsCampaignSnapshot, BudgetAllocation
 
 logger = logging.getLogger(__name__)
 
@@ -84,3 +85,36 @@ def sync_all_meta_accounts():
     for account_id in ids:
         sync_meta_account.delay(str(account_id))
     return len(ids)
+
+
+def _rp(n):
+    return f"Rp {int(n):,}".replace(',', '.')
+
+
+@shared_task
+def check_budget_alerts():
+    """Alert a tenant's admins once when ad spend crosses the budget threshold.
+
+    Fires a single WhatsApp/in-app notification per crossing; re-arms if spend
+    later drops back below the threshold. Run every 30 min (beat) and after a
+    manual sync. (PRD FR-C-104)
+    """
+    today = timezone.now().date()
+    budgets = BudgetAllocation.objects.filter(period_start__lte=today, period_end__gte=today)
+    fired = 0
+    for budget in budgets:
+        pct = budget.spend_pct()
+        crossed = pct >= budget.alert_threshold_pct
+        if crossed and not budget.alert_sent:
+            notify_tenant_admins(
+                budget.tenant,
+                f"⚠ Anggaran iklan digital telah mencapai {pct:.0f}%. "
+                f"Terpakai {_rp(budget.spent())} dari {_rp(float(budget.total_budget))}.",
+            )
+            budget.alert_sent = True
+            budget.save(update_fields=['alert_sent'])
+            fired += 1
+        elif not crossed and budget.alert_sent:
+            budget.alert_sent = False  # re-arm for the next crossing
+            budget.save(update_fields=['alert_sent'])
+    return fired

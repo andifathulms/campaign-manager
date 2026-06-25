@@ -66,12 +66,29 @@ class BudgetAllocation(BaseModel):
     period_end = models.DateField()
     alert_threshold_pct = models.IntegerField(default=80)
     notes = models.TextField(blank=True)
+    # Tracks whether the threshold alert has fired for the current crossing, so
+    # it fires once (and re-arms if spend drops back below the threshold).
+    alert_sent = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-period_start']
 
     def __str__(self):
         return f"Budget {self.period_start}-{self.period_end}"
+
+    def spent(self):
+        from django.db.models import Sum
+        result = AdsCampaignSnapshot.objects.filter(
+            tenant=self.tenant,
+            snapshot_date__gte=self.period_start,
+            snapshot_date__lte=self.period_end,
+        ).aggregate(total=Sum('spend'))
+        return float(result['total'] or 0)
+
+    def spend_pct(self):
+        if self.total_budget and self.total_budget > 0:
+            return round(self.spent() / float(self.total_budget) * 100, 1)
+        return 0.0
 
 
 class AdsAuditLog(BaseModel):

@@ -197,6 +197,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'apps.ads.tasks.sync_all_meta_accounts',
         'schedule': crontab(minute='*/30'),
     },
+    'check-budget-alerts': {
+        'task': 'apps.ads.tasks.check_budget_alerts',
+        'schedule': crontab(minute='*/30'),
+    },
 }
 
 # Report settings
