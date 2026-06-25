@@ -14,6 +14,8 @@ from drf_spectacular.utils import extend_schema
 from apps.core.feature_flags import FeatureGatedMixin
 from apps.core.mixins import TenantQuerysetMixin
 from apps.core.permissions import IsVolunteer
+from apps.core.rbac import wilayah_filter
+from apps.core.tenancy import active_tenant
 from .models import TeamMember, ReferralLink, ReferralClick, Task, TaskAssignment, Announcement, PointRule, PointTransaction
 from .serializers import (
     TeamMemberSerializer,
@@ -38,8 +40,10 @@ class TeamMemberViewSet(TenantQuerysetMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return TeamMember.objects.filter(
-            tenant=self.request.user.tenant
-        ).prefetch_related('referral_links')
+            tenant=active_tenant(self.request)
+        ).filter(wilayah_filter(
+            self.request.user, fields=('wilayah_name',)
+        )).prefetch_related('referral_links')
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:

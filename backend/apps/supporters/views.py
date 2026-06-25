@@ -36,6 +36,8 @@ from apps.core.feature_flags import FeatureGatedMixin
 from apps.core.mixins import TenantQuerysetMixin
 from apps.core.permissions import IsVolunteer
 from apps.core.public_guard import client_ip, make_ip_hash, throttle, verify_captcha
+from apps.core.rbac import wilayah_filter
+from apps.core.tenancy import active_tenant
 from .models import Supporter
 from .serializers import (
     SupporterSerializer,
@@ -53,8 +55,11 @@ class SupporterListView(TenantQuerysetMixin, generics.ListAPIView):
 
     def get_queryset(self):
         qs = Supporter.objects.filter(
-            tenant=self.request.user.tenant, is_active=True
-        )
+            tenant=active_tenant(self.request), is_active=True
+        ).filter(wilayah_filter(
+            self.request.user,
+            fields=('kelurahan', 'kecamatan', 'kabupaten_kota', 'provinsi'),
+        ))
         search = self.request.query_params.get('search')
         if search:
             qs = qs.filter(nama__icontains=search)
