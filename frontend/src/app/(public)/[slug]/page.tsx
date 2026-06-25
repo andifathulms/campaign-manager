@@ -1,6 +1,10 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import {
+  Instagram, Youtube, Facebook, Twitter, Music2,
+  Heart, MessageSquare, UserPlus, Eye, MapPin, ArrowRight, ChevronDown,
+} from 'lucide-react';
 import { ViewTracker } from '@/components/campaign/ViewTracker';
 
 interface Props {
@@ -74,12 +78,12 @@ const JENIS_LABEL: Record<string, string> = {
 };
 
 const SOSMED_CONFIG = [
-  { key: 'instagram', label: 'Instagram', icon: 'IG' },
-  { key: 'tiktok', label: 'TikTok', icon: 'TT' },
-  { key: 'youtube', label: 'YouTube', icon: 'YT' },
-  { key: 'facebook', label: 'Facebook', icon: 'FB' },
-  { key: 'twitter', label: 'X / Twitter', icon: 'X' },
-];
+  { key: 'instagram', label: 'Instagram', Icon: Instagram },
+  { key: 'tiktok', label: 'TikTok', Icon: Music2 },
+  { key: 'youtube', label: 'YouTube', Icon: Youtube },
+  { key: 'facebook', label: 'Facebook', Icon: Facebook },
+  { key: 'twitter', label: 'X / Twitter', Icon: Twitter },
+] as const;
 
 export default async function CampaignPage({ params }: Props) {
   const candidate = await getCandidate(params.slug);
@@ -89,122 +93,158 @@ export default async function CampaignPage({ params }: Props) {
   const hasMisi = candidate.misi?.length > 0;
   const hasProgram = candidate.program_unggulan?.length > 0;
   const hasSosmed = Object.values(candidate.sosmed || {}).some(v => !!v);
+  const jenisLabel = JENIS_LABEL[candidate.jenis_pemilihan] || candidate.jenis_pemilihan;
+  const views = candidate.campaign_page?.view_count ?? 0;
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="min-h-screen bg-white text-gray-900" style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
       <ViewTracker slug={params.slug} />
 
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section
-        className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${primary}ee 0%, ${primary}99 60%, #14181F 100%)` }}
-      >
-        {/* Decorative circles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl" style={{ background: primary }} />
-          <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full opacity-10 blur-3xl" style={{ background: primary }} />
-        </div>
-
-        {/* Grid pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '32px 32px' }}
-        />
-
-        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto py-24">
-          {/* Photo */}
-          {candidate.foto_url ? (
-            <div className="w-40 h-40 mx-auto mb-8 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl ring-4 ring-white/10">
-              <img src={candidate.foto_url} alt={candidate.nama_lengkap} className="w-full h-full object-cover" />
-            </div>
-          ) : (
-            <div
-              className="w-40 h-40 mx-auto mb-8 rounded-full border-4 border-white/30 flex items-center justify-center text-6xl font-bold shadow-2xl ring-4 ring-white/10"
-              style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', backdropFilter: 'blur(8px)' }}
-            >
-              {candidate.nama_lengkap.charAt(0)}
-            </div>
-          )}
-
-          {/* Tags */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
-            {candidate.nomor_urut && (
-              <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white text-sm font-bold px-4 py-1.5 rounded-full border border-white/30">
-                No. Urut {candidate.nomor_urut}
-              </span>
+      {/* ── Sticky header ────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 border-b border-white/10 backdrop-blur-md" style={{ background: `${primary}f2` }}>
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-5 h-14">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {candidate.foto_url && (
+              <img src={candidate.foto_url} alt="" className="w-8 h-8 rounded-full object-cover border border-white/40 flex-shrink-0" />
             )}
-            <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white/90 text-sm px-4 py-1.5 rounded-full border border-white/20">
-              {JENIS_LABEL[candidate.jenis_pemilihan] || candidate.jenis_pemilihan}
-            </span>
-            {candidate.dapil && (
-              <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white/90 text-sm px-4 py-1.5 rounded-full border border-white/20">
-                {candidate.dapil}
-              </span>
+            <span className="font-display font-bold text-white text-sm truncate">{candidate.nama_lengkap}</span>
+            {candidate.nomor_urut && (
+              <span className="flex-shrink-0 text-[11px] font-bold text-white bg-white/20 rounded-md px-1.5 py-0.5">#{candidate.nomor_urut}</span>
             )}
           </div>
+          <Link
+            href={`/${candidate.tenant_slug}/dukung`}
+            className="flex-shrink-0 text-sm font-semibold rounded-full bg-white px-4 py-1.5 hover:shadow-lg transition-shadow"
+            style={{ color: primary }}
+          >
+            Dukung
+          </Link>
+        </div>
+      </header>
 
-          {/* Name */}
-          <h1 className="font-display text-5xl md:text-7xl font-extrabold text-white mb-4 leading-tight tracking-tight">
-            {candidate.nama_lengkap}
-          </h1>
+      {/* ── HERO ─────────────────────────────────────────────── */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background: `
+            radial-gradient(900px 500px at 85% -10%, ${primary}cc, transparent 60%),
+            radial-gradient(700px 500px at 0% 110%, ${primary}66, transparent 55%),
+            linear-gradient(160deg, ${primary} 0%, ${primary}d9 45%, #14181F 130%)`,
+        }}
+      >
+        {/* dotted texture */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
 
-          {/* Partai */}
-          {candidate.partai && (
-            <p className="text-white/70 text-lg mb-8 font-medium">{candidate.partai}</p>
-          )}
+        <div className="relative max-w-5xl mx-auto px-6 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
+          {/* Text */}
+          <div className="text-center md:text-left order-2 md:order-1">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-5">
+              <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full border border-white/25">
+                {jenisLabel}
+              </span>
+              {candidate.dapil && (
+                <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white/90 text-xs px-3 py-1 rounded-full border border-white/20">
+                  <MapPin className="w-3 h-3" /> {candidate.dapil}
+                </span>
+              )}
+            </div>
 
-          {/* Tagline */}
-          {candidate.tagline && (
-            <div className="inline-block bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-8 py-4">
-              <p className="text-2xl md:text-3xl font-light text-white/95 italic leading-relaxed">
+            <h1 className="font-display text-4xl md:text-6xl font-extrabold text-white leading-[1.05] tracking-tight mb-4">
+              {candidate.nama_lengkap}
+            </h1>
+
+            {candidate.partai && (
+              <p className="text-white/75 text-base md:text-lg font-medium mb-6">{candidate.partai}</p>
+            )}
+
+            {candidate.tagline && (
+              <p className="text-lg md:text-xl text-white/95 font-light italic leading-relaxed mb-8 max-w-md mx-auto md:mx-0">
                 &ldquo;{candidate.tagline}&rdquo;
               </p>
+            )}
+
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+              <Link
+                href={`/${candidate.tenant_slug}/dukung`}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white font-semibold shadow-xl hover:scale-[1.03] transition-transform"
+                style={{ color: primary }}
+              >
+                <Heart className="w-4 h-4" /> Daftar Jadi Pendukung
+              </Link>
+              <Link
+                href={`/${candidate.tenant_slug}/aspirasi`}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 text-white font-semibold hover:bg-white/25 transition-colors"
+              >
+                <MessageSquare className="w-4 h-4" /> Kirim Aspirasi
+              </Link>
             </div>
-          )}
-
-          {/* CTA buttons */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href={`/${candidate.tenant_slug}/dukung`}
-              className="px-7 py-3 rounded-full bg-white font-semibold shadow-lg hover:shadow-xl transition-shadow"
-              style={{ color: candidate.color_primary || '#2456E6' }}
-            >
-              Daftar Jadi Pendukung
-            </Link>
-            <Link
-              href={`/${candidate.tenant_slug}/aspirasi`}
-              className="px-7 py-3 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 text-white font-semibold hover:bg-white/25 transition-colors"
-            >
-              Kirim Aspirasi
-            </Link>
           </div>
 
-          {/* Scroll hint */}
-          <div className="mt-16 flex flex-col items-center gap-2 text-white/50 text-xs">
-            <span>Gulir untuk selengkapnya</span>
-            <svg className="w-5 h-5 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+          {/* Photo */}
+          <div className="relative flex justify-center order-1 md:order-2">
+            <div className="relative">
+              {/* glow ring */}
+              <div className="absolute -inset-4 rounded-full bg-white/10 blur-2xl" />
+              {candidate.nomor_urut && (
+                <div className="absolute -top-2 -right-2 z-20 w-16 h-16 rounded-2xl bg-white shadow-xl flex flex-col items-center justify-center rotate-6">
+                  <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color: primary }}>No. Urut</span>
+                  <span className="font-display text-2xl font-extrabold leading-none" style={{ color: primary }}>{candidate.nomor_urut}</span>
+                </div>
+              )}
+              {candidate.foto_url ? (
+                <div className="relative w-56 h-56 md:w-72 md:h-72 rounded-full overflow-hidden border-4 border-white/40 shadow-2xl ring-8 ring-white/10">
+                  <img src={candidate.foto_url} alt={candidate.nama_lengkap} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-56 h-56 md:w-72 md:h-72 rounded-full border-4 border-white/40 flex items-center justify-center text-7xl font-bold text-white shadow-2xl ring-8 ring-white/10"
+                  style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
+                  {candidate.nama_lengkap.charAt(0)}
+                </div>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* scroll hint */}
+        <div className="relative flex justify-center pb-6 text-white/50">
+          <ChevronDown className="w-6 h-6 animate-bounce" />
         </div>
       </section>
 
-      {/* ── VISI ─────────────────────────────────────────────────────────── */}
+      {/* ── Stat strip ───────────────────────────────────────── */}
+      <section className="bg-white border-b border-gray-100">
+        <div className="max-w-5xl mx-auto grid grid-cols-3 divide-x divide-gray-100">
+          {[
+            { label: 'Daerah Pemilihan', value: candidate.dapil || '—' },
+            { label: 'Maju Sebagai', value: jenisLabel },
+            { label: 'Kunjungan Halaman', value: views.toLocaleString('id-ID'), icon: true },
+          ].map((s, i) => (
+            <div key={i} className="px-4 py-6 text-center">
+              <p className="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1.5">{s.label}</p>
+              <p className="font-display font-bold text-gray-900 text-sm md:text-lg flex items-center justify-center gap-1.5 leading-tight">
+                {s.icon && <Eye className="w-4 h-4 flex-shrink-0" style={{ color: primary }} />}
+                <span className="truncate">{s.value}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── VISI ─────────────────────────────────────────────── */}
       {candidate.visi && (
-        <section className="py-24 px-6 bg-white">
+        <section className="py-20 md:py-24 px-6 bg-white">
           <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-12">
-              <span className="inline-block text-sm font-bold tracking-widest uppercase mb-3 px-4 py-1 rounded-full" style={{ background: `${primary}15`, color: primary }}>
+            <div className="text-center mb-10">
+              <span className="inline-block text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full" style={{ background: `${primary}15`, color: primary }}>
                 Visi
               </span>
-              <h2 className="text-4xl font-extrabold text-gray-900">Arah Perubahan</h2>
+              <h2 className="font-display text-3xl md:text-4xl font-extrabold text-gray-900">Arah Perubahan</h2>
             </div>
-            <div
-              className="relative rounded-3xl p-8 md:p-12"
-              style={{ background: `linear-gradient(135deg, ${primary}08, ${primary}15)`, border: `1.5px solid ${primary}25` }}
-            >
-              <div className="absolute top-6 left-8 text-8xl leading-none opacity-20 font-serif" style={{ color: primary }}>"</div>
-              <p className="text-xl md:text-2xl text-gray-700 leading-relaxed font-medium relative z-10 pt-6">
+            <div className="relative rounded-3xl p-8 md:p-12 overflow-hidden"
+              style={{ background: `linear-gradient(135deg, ${primary}0a, ${primary}1a)`, border: `1.5px solid ${primary}25` }}>
+              <div className="absolute -top-4 left-6 text-9xl leading-none opacity-[0.12] font-serif select-none" style={{ color: primary }}>&ldquo;</div>
+              <p className="text-xl md:text-2xl text-gray-700 leading-relaxed font-medium relative z-10 pt-8">
                 {candidate.visi}
               </p>
             </div>
@@ -212,58 +252,54 @@ export default async function CampaignPage({ params }: Props) {
         </section>
       )}
 
-      {/* ── MISI ─────────────────────────────────────────────────────────── */}
+      {/* ── MISI ─────────────────────────────────────────────── */}
       {hasMisi && (
-        <section className="py-24 px-6" style={{ background: `${primary}06` }}>
-          <div className="max-w-3xl mx-auto">
+        <section className="py-20 md:py-24 px-6" style={{ background: `${primary}06` }}>
+          <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <span className="inline-block text-sm font-bold tracking-widest uppercase mb-3 px-4 py-1 rounded-full" style={{ background: `${primary}15`, color: primary }}>
+              <span className="inline-block text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full" style={{ background: `${primary}15`, color: primary }}>
                 Misi
               </span>
-              <h2 className="text-4xl font-extrabold text-gray-900">Langkah Nyata</h2>
+              <h2 className="font-display text-3xl md:text-4xl font-extrabold text-gray-900">Langkah Nyata</h2>
             </div>
-            <ol className="space-y-4">
+            <div className="grid sm:grid-cols-2 gap-4">
               {candidate.misi.map((item, i) => (
-                <li key={i} className="flex gap-5 items-start bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                  <span
-                    className="flex-shrink-0 w-10 h-10 rounded-xl text-white text-base font-bold flex items-center justify-center shadow-sm"
-                    style={{ background: primary }}
-                  >
+                <div key={i} className="flex gap-4 items-start bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                  <span className="flex-shrink-0 w-10 h-10 rounded-xl text-white text-base font-bold flex items-center justify-center shadow-sm"
+                    style={{ background: primary }}>
                     {i + 1}
                   </span>
-                  <p className="text-gray-700 leading-relaxed text-lg pt-1.5">{item}</p>
-                </li>
+                  <p className="text-gray-700 leading-relaxed pt-1.5">{item}</p>
+                </div>
               ))}
-            </ol>
+            </div>
           </div>
         </section>
       )}
 
-      {/* ── PROGRAM UNGGULAN ─────────────────────────────────────────────── */}
+      {/* ── PROGRAM UNGGULAN ─────────────────────────────────── */}
       {hasProgram && (
-        <section className="py-24 px-6 bg-white">
+        <section className="py-20 md:py-24 px-6 bg-white">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <span className="inline-block text-sm font-bold tracking-widest uppercase mb-3 px-4 py-1 rounded-full" style={{ background: `${primary}15`, color: primary }}>
+              <span className="inline-block text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full" style={{ background: `${primary}15`, color: primary }}>
                 Program Unggulan
               </span>
-              <h2 className="text-4xl font-extrabold text-gray-900">Untuk Masyarakat</h2>
+              <h2 className="font-display text-3xl md:text-4xl font-extrabold text-gray-900">Untuk Masyarakat</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {candidate.program_unggulan.map((p, i) => (
-                <div
-                  key={i}
-                  className="group rounded-2xl p-6 border border-gray-100 bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  {p.icon && (
-                    <div
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl mb-5 shadow-sm"
-                      style={{ background: `${primary}12` }}
-                    >
-                      {p.icon}
+                <div key={i}
+                  className="group relative rounded-2xl p-6 border border-gray-100 bg-white shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: primary }} />
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-sm flex-shrink-0"
+                      style={{ background: `${primary}12` }}>
+                      {p.icon || '✦'}
                     </div>
-                  )}
-                  <h3 className="font-bold text-gray-900 text-lg mb-2 group-hover:text-primary transition-colors">{p.title}</h3>
+                    <span className="font-display text-3xl font-extrabold opacity-10" style={{ color: primary }}>{String(i + 1).padStart(2, '0')}</span>
+                  </div>
+                  <h3 className="font-display font-bold text-gray-900 text-lg mb-2">{p.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{p.desc}</p>
                 </div>
               ))}
@@ -272,25 +308,51 @@ export default async function CampaignPage({ params }: Props) {
         </section>
       )}
 
-      {/* ── SOSMED ───────────────────────────────────────────────────────── */}
+      {/* ── MARI BERGABUNG (engagement) ──────────────────────── */}
+      <section className="py-20 md:py-24 px-6" style={{ background: `${primary}06` }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="inline-block text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full" style={{ background: `${primary}15`, color: primary }}>
+              Mari Bergabung
+            </span>
+            <h2 className="font-display text-3xl md:text-4xl font-extrabold text-gray-900">Jadilah Bagian dari Perubahan</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { Icon: Heart, title: 'Jadi Pendukung', desc: 'Daftar sebagai pendukung dan dapatkan kartu anggota digital.', href: `/${candidate.tenant_slug}/dukung`, cta: 'Daftar Sekarang' },
+              { Icon: UserPlus, title: 'Jadi Relawan', desc: 'Bergabung dengan tim sukses dan bantu menangkan kampanye.', href: `/${candidate.tenant_slug}/relawan`, cta: 'Gabung Relawan' },
+              { Icon: MessageSquare, title: 'Kirim Aspirasi', desc: 'Sampaikan harapan dan masukan Anda langsung ke kandidat.', href: `/${candidate.tenant_slug}/aspirasi`, cta: 'Sampaikan' },
+            ].map(({ Icon, title, desc, href, cta }) => (
+              <Link key={title} href={href}
+                className="group bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-white shadow-sm" style={{ background: primary }}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-display font-bold text-gray-900 text-lg mb-1.5">{title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed mb-5 flex-1">{desc}</p>
+                <span className="inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all" style={{ color: primary }}>
+                  {cta} <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SOSMED ───────────────────────────────────────────── */}
       {hasSosmed && (
-        <section className="py-20 px-6" style={{ background: `linear-gradient(135deg, ${primary}ee, ${primary}bb)` }}>
+        <section className="py-16 md:py-20 px-6" style={{ background: `linear-gradient(135deg, ${primary}, ${primary}cc)` }}>
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-extrabold text-white mb-3">Ikuti Perjalanan Kami</h2>
-            <p className="text-white/70 mb-10">Dapatkan update terbaru kampanye di media sosial</p>
-            <div className="flex flex-wrap justify-center gap-4">
-              {SOSMED_CONFIG.map(({ key, label, icon }) => {
+            <h2 className="font-display text-2xl md:text-3xl font-extrabold text-white mb-3">Ikuti Perjalanan Kami</h2>
+            <p className="text-white/75 mb-10">Dapatkan update terbaru kampanye di media sosial</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {SOSMED_CONFIG.map(({ key, label, Icon }) => {
                 const url = candidate.sosmed[key as keyof typeof candidate.sosmed];
                 if (!url) return null;
                 return (
-                  <a
-                    key={key}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/20 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:scale-105"
-                  >
-                    <span className="text-xs font-black bg-white/20 rounded px-1.5 py-0.5">{icon}</span>
+                  <a key={key} href={url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/20 text-white font-medium px-5 py-3 rounded-xl transition-all duration-200 hover:scale-105">
+                    <Icon className="w-5 h-5" />
                     {label}
                   </a>
                 );
@@ -300,16 +362,14 @@ export default async function CampaignPage({ params }: Props) {
         </section>
       )}
 
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
+      {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer className="py-10 px-6 bg-gray-950 text-center">
         <p className="text-gray-400 text-sm mb-2">
           Halaman kampanye resmi <span className="text-white font-semibold">{candidate.nama_lengkap}</span>
         </p>
         <p className="text-gray-600 text-xs">
           Dibuat dengan{' '}
-          <Link href="/" className="text-primary hover:text-primary transition-colors">
-            KampanyeKit
-          </Link>
+          <Link href="/" className="text-gray-300 hover:text-white transition-colors font-medium">KampanyeKit</Link>
           {' '}— Platform Kampanye Digital Indonesia
         </p>
       </footer>
