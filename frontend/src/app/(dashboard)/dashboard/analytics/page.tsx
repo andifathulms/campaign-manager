@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { ElectabilitySurvey } from '@/hooks/useAnalytics';
+import { CHART } from '@/lib/chartColors';
 
 function AddEntryModal({ onClose }: { onClose: () => void }) {
   const add = useAddElectabilityEntry();
@@ -121,7 +122,7 @@ export default function AnalyticsPage() {
         <Card>
           <CardContent className="p-5">
             <p className="text-xs text-muted-foreground mb-1">Elektabilitas Terkini</p>
-            <p className="text-3xl font-bold text-indigo-600">
+            <p className="text-3xl font-bold text-primary">
               {latest ? `${parseFloat(String(latest.elektabilitas_pct)).toFixed(1)}%` : '–'}
             </p>
             {latest && <p className="text-xs text-muted-foreground mt-1">{latest.sumber}</p>}
@@ -166,15 +167,15 @@ export default function AnalyticsPage() {
               <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="electGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                    <stop offset="5%" stopColor={CHART.primary} stopOpacity={0.25} />
+                    <stop offset="95%" stopColor={CHART.primary} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                 <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={42} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="elektabilitas_pct" name="Elektabilitas" stroke="#6366F1" fill="url(#electGrad)" strokeWidth={2.5} dot={{ r: 4, fill: '#6366F1' }} />
+                <Area type="monotone" dataKey="elektabilitas_pct" name="Elektabilitas" stroke={CHART.primary} fill="url(#electGrad)" strokeWidth={2.5} dot={{ r: 4, fill: CHART.primary }} />
               </AreaChart>
             </ResponsiveContainer>
           )}
@@ -204,7 +205,7 @@ export default function AnalyticsPage() {
                   {[...(surveys ?? [])].reverse().map(s => (
                     <tr key={s.id} className="hover:bg-slate-50 transition-colors">
                       <td className="px-4 py-3 font-medium">{s.tanggal}</td>
-                      <td className="px-4 py-3 text-right font-bold text-indigo-600">{parseFloat(String(s.elektabilitas_pct)).toFixed(1)}%</td>
+                      <td className="px-4 py-3 text-right font-bold text-primary">{parseFloat(String(s.elektabilitas_pct)).toFixed(1)}%</td>
                       <td className="px-4 py-3 text-muted-foreground">{s.sumber}</td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{s.sample_size ?? '–'}</td>
                       <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">{s.catatan || '–'}</td>

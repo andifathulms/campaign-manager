@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { CHART, CHART_SERIES } from '@/lib/chartColors';
 
 const PLATFORM_COLORS: Record<string, string> = {
   meta: 'bg-blue-100 text-blue-700',
@@ -34,7 +35,7 @@ const CHART_COLORS: Record<string, string> = {
   tiktok: '#EC4899',
   google: '#22C55E',
 };
-const PIE_FALLBACK = ['#6366F1', '#8B5CF6', '#EC4899'];
+const PIE_FALLBACK = CHART_SERIES;
 
 function formatRp(n: number) {
   return `Rp ${Math.round(n).toLocaleString('id-ID')}`;
@@ -141,8 +142,8 @@ export default function AdsPage() {
 
   const statCards = [
     { label: 'Total Belanja Iklan', value: formatRp(dashboard?.total_spend ?? 0), icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
-    { label: 'Total Jangkauan', value: formatNum(dashboard?.total_reach ?? 0), icon: Eye, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' },
-    { label: 'Total Impresi', value: formatNum(dashboard?.total_impressions ?? 0), icon: TrendingUp, color: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-100' },
+    { label: 'Total Jangkauan', value: formatNum(dashboard?.total_reach ?? 0), icon: Eye, color: 'text-primary', bg: 'bg-accent', border: 'border-accent' },
+    { label: 'Total Impresi', value: formatNum(dashboard?.total_impressions ?? 0), icon: TrendingUp, color: 'text-primary', bg: 'bg-accent', border: 'border-accent' },
     { label: 'Total Klik', value: formatNum(dashboard?.total_clicks ?? 0), icon: MousePointer, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100' },
   ];
 
@@ -257,8 +258,8 @@ export default function AdsPage() {
                   ))}
                   {activePlatforms.length === 0 && (
                     <linearGradient id="grad-total" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                      <stop offset="5%" stopColor={CHART.primary} stopOpacity={0.25} />
+                      <stop offset="95%" stopColor={CHART.primary} stopOpacity={0} />
                     </linearGradient>
                   )}
                 </defs>
@@ -280,7 +281,7 @@ export default function AdsPage() {
                     />
                   ))
                 ) : (
-                  <Area type="monotone" dataKey="total" name="Total" stroke="#6366F1" fill="url(#grad-total)" strokeWidth={2} dot={false} />
+                  <Area type="monotone" dataKey="total" name="Total" stroke={CHART.primary} fill="url(#grad-total)" strokeWidth={2} dot={false} />
                 )}
               </AreaChart>
             </ResponsiveContainer>
@@ -441,7 +442,7 @@ export default function AdsPage() {
                   </div>
                   <div className="w-full bg-secondary rounded-full h-2">
                     <div
-                      className={`h-2 rounded-full transition-all ${overBudget ? 'bg-amber-500' : 'bg-indigo-500'}`}
+                      className={`h-2 rounded-full transition-all ${overBudget ? 'bg-amber-500' : 'bg-primary'}`}
                       style={{ width: `${Math.min(spendPct, 100)}%` }}
                     />
                   </div>
