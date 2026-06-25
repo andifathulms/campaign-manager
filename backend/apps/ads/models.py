@@ -72,3 +72,40 @@ class BudgetAllocation(BaseModel):
 
     def __str__(self):
         return f"Budget {self.period_start}-{self.period_end}"
+
+
+class AdsAuditLog(BaseModel):
+    """Immutable record of every ad write action (connect, disconnect, pause,
+    resume, budget change, duplicate). Required for the write-control guardrail
+    (PRD §18.1) — answers "who paused which campaign, when, and did it work."
+    """
+    ACTION_CHOICES = [
+        ('connect', 'Connect Account'),
+        ('disconnect', 'Disconnect Account'),
+        ('pause', 'Pause'),
+        ('resume', 'Resume'),
+        ('update_budget', 'Update Budget'),
+        ('duplicate', 'Duplicate'),
+    ]
+    tenant = models.ForeignKey(
+        'accounts.Tenant', on_delete=models.CASCADE, related_name='ads_audit_logs'
+    )
+    user = models.ForeignKey(
+        'accounts.User', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='ads_audit_logs'
+    )
+    ads_account = models.ForeignKey(
+        AdsAccount, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='audit_logs'
+    )
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    target_type = models.CharField(max_length=20, blank=True)  # campaign/adset/ad/account
+    target_id = models.CharField(max_length=100, blank=True)
+    detail = models.JSONField(default=dict)
+    success = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.action} {self.target_type}:{self.target_id} ({'ok' if self.success else 'fail'})"

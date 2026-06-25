@@ -232,3 +232,8 @@ ANTHROPIC_API_KEY = env('ANTHROPIC_API_KEY', default='')
 # 'turnstile' (Cloudflare, default) or 'recaptcha' (Google).
 CAPTCHA_PROVIDER = env('CAPTCHA_PROVIDER', default='turnstile')
 CAPTCHA_SECRET = env('CAPTCHA_SECRET', default='')
+
+# Fernet key for encrypting secrets at rest (ad/WhatsApp tokens). Generate with
+# `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+# If blank, a key is derived from SECRET_KEY (dev only — set this in prod).
+FERNET_KEY = env('FERNET_KEY', default='')

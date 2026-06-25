@@ -8,8 +8,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
+from apps.core.crypto import encrypt
 from apps.core.mixins import TenantQuerysetMixin
-from .models import AdsAccount, AdsCampaignSnapshot, BudgetAllocation
+from apps.core.rbac import IsAdsManager
+from apps.core.tenancy import active_tenant
+from .models import AdsAccount, AdsCampaignSnapshot, BudgetAllocation, AdsAuditLog
 from .serializers import (
     AdsAccountSerializer,
     ConnectAdsAccountSerializer,
@@ -32,26 +35,33 @@ class AdsAccountListView(TenantQuerysetMixin, generics.ListAPIView):
 class ConnectAdsAccountView(APIView):
     """
     Connect a Meta or TikTok ads account.
-    In production this would complete an OAuth flow; here we accept
-    the credentials directly (useful for manual/API-key connections).
+    In production the OAuth flow supplies these credentials; here we accept
+    them directly (useful for manual/API-key connections). Tokens are
+    encrypted at rest (Fernet). Gated to ads managers (PRD §18.1).
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdsManager]
 
     def post(self, request):
         serializer = ConnectAdsAccountSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
+        tenant = active_tenant(request)
 
         account, created = AdsAccount.objects.update_or_create(
-            tenant=request.user.tenant,
+            tenant=tenant,
             platform=d['platform'],
             account_id=d['account_id'],
             defaults={
                 'account_name': d['account_name'],
-                'access_token': d.get('access_token', ''),
-                'refresh_token': d.get('refresh_token', ''),
+                'access_token': encrypt(d.get('access_token', '')),
+                'refresh_token': encrypt(d.get('refresh_token', '')),
                 'is_active': True,
             },
+        )
+        AdsAuditLog.objects.create(
+            tenant=tenant, user=request.user, ads_account=account,
+            action='connect', target_type='account', target_id=d['account_id'],
+            detail={'platform': d['platform']},
         )
         return Response(
             AdsAccountSerializer(account).data,
@@ -61,13 +71,18 @@ class ConnectAdsAccountView(APIView):
 
 @extend_schema(tags=['ads'])
 class DisconnectAdsAccountView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdsManager]
 
     def delete(self, request, pk):
+        tenant = active_tenant(request)
         try:
-            account = AdsAccount.objects.get(pk=pk, tenant=request.user.tenant)
+            account = AdsAccount.objects.get(pk=pk, tenant=tenant)
             account.is_active = False
             account.save(update_fields=['is_active'])
+            AdsAuditLog.objects.create(
+                tenant=tenant, user=request.user, ads_account=account,
+                action='disconnect', target_type='account', target_id=account.account_id,
+            )
             return Response(status=status.HTTP_204_NO_CONTENT)
         except AdsAccount.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
