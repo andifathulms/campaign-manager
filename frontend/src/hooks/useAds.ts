@@ -128,3 +128,62 @@ export function useAdsDailySpend(days = 30) {
     retry: false,
   });
 }
+
+// ── Meta integration ─────────────────────────────────────────────────────────
+
+/** Connect Meta. In sandbox mode (no credentials) this links a placeholder
+ *  account directly; otherwise it redirects to Meta's OAuth dialog. */
+export function useConnectMeta() {
+  const { token } = useToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const start = await axios
+        .get<{ sandbox: boolean; auth_url: string | null }>(`${apiBase}/ads/meta/oauth/start/`, { headers: auth(token!) })
+        .then(r => r.data);
+      if (!start.sandbox && start.auth_url) {
+        window.location.href = start.auth_url; // real OAuth — leave the app
+        return null;
+      }
+      // Sandbox: link placeholder account + first sync.
+      return axios.post(`${apiBase}/ads/meta/connect/`, {}, { headers: auth(token!) }).then(r => r.data);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['ads-accounts'] });
+      qc.invalidateQueries({ queryKey: ['ads-dashboard'] });
+      qc.invalidateQueries({ queryKey: ['ads-daily-spend'] });
+    },
+  });
+}
+
+/** Manual "Refresh Now" — re-sync the tenant's Meta accounts. */
+export function useSyncAds() {
+  const { token } = useToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => axios.post(`${apiBase}/ads/sync/`, {}, { headers: auth(token!) }).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['ads-dashboard'] });
+      qc.invalidateQueries({ queryKey: ['ads-daily-spend'] });
+    },
+  });
+}
+
+/** Pause/resume a campaign or update its daily budget (ads managers only). */
+export function useCampaignControl() {
+  const { token } = useToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { campaignId: string; action: 'pause' | 'resume' | 'update_budget'; daily_budget?: number }) =>
+      axios
+        .post(
+          `${apiBase}/ads/campaigns/${vars.campaignId}/control/`,
+          { action: vars.action, daily_budget: vars.daily_budget },
+          { headers: auth(token!) },
+        )
+        .then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['ads-dashboard'] });
+    },
+  });
+}

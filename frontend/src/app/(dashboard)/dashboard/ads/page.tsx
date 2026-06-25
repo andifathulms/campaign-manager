@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import {
   TrendingUp, Wallet, Eye, MousePointer, Plus, Trash2, Link2, AlertTriangle, Calendar,
+  RefreshCw, Pause, Play,
 } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -11,6 +12,7 @@ import {
 import {
   useAdsDashboard, useAdsAccounts, useConnectAdsAccount,
   useDisconnectAdsAccount, useAdsDailySpend,
+  useConnectMeta, useSyncAds, useCampaignControl,
 } from '@/hooks/useAds';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -118,6 +120,9 @@ export default function AdsPage() {
   const { data: accounts } = useAdsAccounts();
   const { data: dailySpend } = useAdsDailySpend(days);
   const disconnect = useDisconnectAdsAccount();
+  const connectMeta = useConnectMeta();
+  const syncAds = useSyncAds();
+  const campaignControl = useCampaignControl();
   const [showConnect, setShowConnect] = useState(false);
 
   const budget = dashboard?.budget;
@@ -150,9 +155,18 @@ export default function AdsPage() {
           <h1 className="text-2xl font-bold">Dashboard Iklan</h1>
           <p className="text-muted-foreground text-sm mt-1">Pantau performa Meta & TikTok Ads dalam satu tempat.</p>
         </div>
-        <Button onClick={() => setShowConnect(true)} className="gap-2">
-          <Plus className="w-4 h-4" /> Hubungkan Akun
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => syncAds.mutate()} disabled={syncAds.isPending} className="gap-2">
+            <RefreshCw className={`w-4 h-4 ${syncAds.isPending ? 'animate-spin' : ''}`} />
+            {syncAds.isPending ? 'Menyinkronkan...' : 'Refresh'}
+          </Button>
+          <Button onClick={() => connectMeta.mutate()} disabled={connectMeta.isPending} className="gap-2">
+            <Plus className="w-4 h-4" /> {connectMeta.isPending ? 'Menghubungkan...' : 'Hubungkan Meta'}
+          </Button>
+          <Button variant="outline" onClick={() => setShowConnect(true)} className="gap-2">
+            Manual
+          </Button>
+        </div>
       </div>
 
       {/* Connected accounts */}
@@ -298,10 +312,15 @@ export default function AdsPage() {
                         <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Jangkauan</th>
                         <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Klik</th>
                         <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground">Belanja</th>
+                        <th className="text-center px-4 py-3 text-xs font-semibold text-muted-foreground">Aksi</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {dashboard.recent_campaigns.map(c => (
+                      {dashboard.recent_campaigns.map(c => {
+                        const paused = c.status === 'PAUSED';
+                        const controllable = c.platform === 'meta';
+                        const busy = campaignControl.isPending && campaignControl.variables?.campaignId === c.campaign_id;
+                        return (
                         <tr key={c.id} className="hover:bg-slate-50 transition-colors">
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
@@ -309,13 +328,33 @@ export default function AdsPage() {
                                 {c.platform_label}
                               </span>
                               <span className="font-medium truncate max-w-[180px]">{c.campaign_name}</span>
+                              {paused && <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">Dijeda</span>}
                             </div>
                           </td>
                           <td className="px-4 py-3 text-right text-muted-foreground">{formatNum(c.reach)}</td>
                           <td className="px-4 py-3 text-right text-muted-foreground">{formatNum(c.clicks)}</td>
                           <td className="px-4 py-3 text-right font-semibold">{c.spend_display}</td>
+                          <td className="px-4 py-3 text-center">
+                            {controllable ? (
+                              <button
+                                onClick={() => {
+                                  const action = paused ? 'resume' : 'pause';
+                                  if (!paused && !window.confirm(`Jeda kampanye "${c.campaign_name}"? Iklan tidak akan tayang.`)) return;
+                                  campaignControl.mutate({ campaignId: c.campaign_id, action });
+                                }}
+                                disabled={busy}
+                                title={paused ? 'Lanjutkan' : 'Jeda'}
+                                className="inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                              >
+                                {paused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+                              </button>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
+                          </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
