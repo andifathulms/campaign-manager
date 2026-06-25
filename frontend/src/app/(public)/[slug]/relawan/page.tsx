@@ -1,10 +1,10 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Users, Star, ClipboardList, Trophy, UserPlus, ArrowRight, CheckCircle } from 'lucide-react';
+import { RelawanRegisterForm } from '@/components/public/RelawanRegisterForm';
 
 const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
@@ -34,6 +34,8 @@ const STEPS = [
 
 export default function RelawanHubPage() {
   const { slug } = useParams() as { slug: string };
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get('ref') || undefined;
   const { data: stats } = useVolunteerStats(slug);
 
   return (
@@ -46,12 +48,12 @@ export default function RelawanHubPage() {
             Jadilah bagian dari perubahan. Dukung kandidat pilihan Anda dengan aksi nyata dan dapatkan pengakuan atas kontribusi Anda.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href={`/${slug}?join=relawan`}
+            <a
+              href="#daftar"
               className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-700 rounded-xl font-semibold hover:bg-indigo-50 transition-colors"
             >
               <UserPlus className="w-5 h-5" /> Daftar Sekarang
-            </Link>
+            </a>
             {stats && (
               <div className="flex items-center gap-2 text-indigo-200">
                 <Users className="w-5 h-5" />
@@ -123,18 +125,17 @@ export default function RelawanHubPage() {
         </section>
       )}
 
-      {/* CTA */}
-      <section className="py-16">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-3">Siap Bergabung?</h2>
-          <p className="text-slate-600 mb-6">Daftar sekarang dan mulai berkontribusi untuk kampanye yang Anda percayai.</p>
-          <Link
-            href={`/${slug}?join=relawan`}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
-          >
-            <UserPlus className="w-5 h-5" /> Daftar Jadi Relawan
-          </Link>
+      {/* Registration form */}
+      <section id="daftar" className="py-16 scroll-mt-8">
+        <div className="max-w-2xl mx-auto px-4">
+          <div className="text-center mb-8">
+            <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Formulir Pendaftaran Relawan</h2>
+            <p className="text-slate-600">Isi data Anda untuk bergabung dengan tim kampanye.</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
+            <RelawanRegisterForm slug={slug} refCode={refCode} />
+          </div>
         </div>
       </section>
     </div>
