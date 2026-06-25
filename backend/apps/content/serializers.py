@@ -42,6 +42,7 @@ class ContentItemSerializer(serializers.ModelSerializer):
             'jenis', 'jenis_display', 'status', 'status_display',
             'scheduled_at', 'published_at', 'tags', 'notes',
             'creative', 'creative_detail', 'created_at',
+            'is_daily_content', 'reward_per_100_views', 'reward_max_cap',
         ]
         read_only_fields = ['id', 'created_at']
 

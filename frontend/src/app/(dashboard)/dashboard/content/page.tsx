@@ -27,6 +27,7 @@ function CreateItemModal({ onClose, defaultDate }: { onClose: () => void; defaul
   const [form, setForm] = useState({
     judul: '', platform: 'instagram', jenis: 'post', status: 'draft',
     scheduled_at: defaultDate ? `${defaultDate}T09:00` : '', caption: '', notes: '',
+    is_daily_content: false, reward_per_100_views: 5, reward_max_cap: 100,
   });
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -89,6 +90,34 @@ function CreateItemModal({ onClose, defaultDate }: { onClose: () => void; defaul
               placeholder="Teks caption untuk postingan ini..."
             />
           </div>
+
+          {/* Daily content for relawan */}
+          <div className="rounded-lg border border-indigo-100 bg-indigo-50/50 p-3 space-y-3">
+            <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.is_daily_content}
+                onChange={e => setForm(f => ({ ...f, is_daily_content: e.target.checked }))}
+                className="rounded border-gray-300"
+              />
+              Jadikan Konten Harian (bisa dibagikan relawan)
+            </label>
+            {form.is_daily_content && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Poin / 100 views</Label>
+                  <Input type="number" min={0} value={form.reward_per_100_views}
+                    onChange={e => setForm(f => ({ ...f, reward_per_100_views: Number(e.target.value) }))} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Maks. poin / relawan</Label>
+                  <Input type="number" min={0} value={form.reward_max_cap}
+                    onChange={e => setForm(f => ({ ...f, reward_max_cap: Number(e.target.value) }))} />
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="flex gap-3 pt-2">
             <Button type="submit" disabled={create.isPending} className="flex-1">
               {create.isPending ? 'Menyimpan...' : 'Tambah'}

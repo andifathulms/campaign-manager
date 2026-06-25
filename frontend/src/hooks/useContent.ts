@@ -15,6 +15,35 @@ export interface AdCreative {
   platform_tags: string[]; is_active: boolean; created_at: string;
 }
 
+export interface ContentShare {
+  id: string; content: string; content_judul: string; content_caption: string;
+  volunteer: string; volunteer_nama: string; tracking_code: string;
+  proof_url: string | null; view_count: number; points_earned: number;
+  status: string; status_display: string; created_at: string;
+}
+
+export function useAdminContentShares(statusFilter?: string) {
+  const { token } = useToken();
+  const params = statusFilter ? `?status=${statusFilter}` : '';
+  return useQuery({
+    queryKey: ['admin-content-shares', token, statusFilter],
+    queryFn: () => axios.get<ContentShare[]>(`${apiBase}/content/shares/${params}`, { headers: auth(token!) }).then(r => r.data),
+    enabled: !!token,
+    staleTime: 15_000,
+    retry: false,
+  });
+}
+
+export function useVerifyShare() {
+  const { token } = useToken();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { id: string; action: 'approve' | 'reject' }) =>
+      axios.patch(`${apiBase}/content/shares/${vars.id}/verify/`, { action: vars.action }, { headers: auth(token!) }).then(r => r.data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-content-shares'] }),
+  });
+}
+
 export interface ContentItem {
   id: string; judul: string; caption: string;
   platform: string; platform_display: string;
@@ -24,6 +53,9 @@ export interface ContentItem {
   tags: string[]; notes: string;
   creative: string | null; creative_detail: AdCreative | null;
   created_at: string;
+  is_daily_content?: boolean;
+  reward_per_100_views?: number;
+  reward_max_cap?: number;
 }
 
 // ── Content Calendar ──────────────────────────────────────────────────────────

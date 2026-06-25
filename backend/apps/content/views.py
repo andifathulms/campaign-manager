@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
 from apps.core.permissions import IsVolunteer
+from apps.core.tenancy import active_tenant
 from .models import ContentItem, AdCreative, ContentShare, Article
 from .serializers import (
     ContentItemSerializer,
@@ -218,7 +219,7 @@ class AdminContentShareListView(APIView):
 
     def get(self, request):
         qs = ContentShare.objects.filter(
-            content__tenant=request.user.tenant
+            content__tenant=active_tenant(request)
         ).select_related('content', 'volunteer')
         status_filter = request.query_params.get('status')
         if status_filter:
@@ -233,7 +234,7 @@ class AdminVerifyShareView(APIView):
 
     def patch(self, request, pk):
         share = get_object_or_404(
-            ContentShare, pk=pk, content__tenant=request.user.tenant
+            ContentShare, pk=pk, content__tenant=active_tenant(request)
         )
         action = request.data.get('action', 'approve')
 

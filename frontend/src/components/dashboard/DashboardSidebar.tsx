@@ -29,6 +29,7 @@ import {
   Shield,
   Map,
   UserCheck,
+  Share2,
 } from 'lucide-react';
 
 // `flag` items are Phase-2 surfaces hidden unless the tenant has the matching
@@ -58,6 +59,7 @@ const navItems: Array<{
   { href: '/dashboard/polls', label: 'Survey & Poll', icon: BarChart3, group: 'Engagement', flag: 'polls' },
   // Konten
   { href: '/dashboard/content', label: 'Kalender Konten', icon: CalendarDays, group: 'Konten' },
+  { href: '/dashboard/content/performance', label: 'Performa Konten', icon: Share2, group: 'Konten' },
   { href: '/dashboard/content/library', label: 'Library Kreatif', icon: Image, group: 'Konten' },
   { href: '/dashboard/berita', label: 'Berita', icon: Globe, group: 'Konten' },
   // Analitik
