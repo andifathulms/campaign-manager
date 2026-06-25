@@ -37,7 +37,7 @@ export function TenantSwitcher() {
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 h-9 px-3 rounded-lg border border-border bg-white hover:bg-secondary text-sm font-medium transition-colors"
       >
-        <Building2 className="w-4 h-4 text-indigo-600" />
+        <Building2 className="w-4 h-4 text-primary" />
         <span className="max-w-[160px] truncate">{current?.name}</span>
         <ChevronsUpDown className="w-3.5 h-3.5 text-muted-foreground" />
       </button>
@@ -59,7 +59,7 @@ export function TenantSwitcher() {
                   {t.name}
                   <span className="ml-1 text-xs text-muted-foreground">/{t.slug}</span>
                 </span>
-                {current?.id === t.id && <Check className={cn('w-4 h-4 text-indigo-600 flex-shrink-0')} />}
+                {current?.id === t.id && <Check className={cn('w-4 h-4 text-primary flex-shrink-0')} />}
               </button>
             ))}
           </div>

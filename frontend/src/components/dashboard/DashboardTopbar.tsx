@@ -13,7 +13,7 @@ export function DashboardTopbar({ user }: Props) {
     : 'U';
 
   return (
-    <header className="h-14 border-b border-border bg-white flex items-center justify-end px-6 gap-3 flex-shrink-0">
+    <header className="h-14 border-b border-border bg-card flex items-center justify-end px-6 gap-3 flex-shrink-0">
       <TenantSwitcher />
       <button className="w-8 h-8 rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground flex items-center justify-center transition-colors relative">
         <Bell className="w-4 h-4" />
@@ -23,7 +23,7 @@ export function DashboardTopbar({ user }: Props) {
           <p className="text-sm font-medium text-foreground leading-tight">{user?.name || 'Kandidat'}</p>
           <p className="text-xs text-muted-foreground leading-tight">{user?.email || ''}</p>
         </div>
-        <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold flex-shrink-0">
           {initials}
         </div>
       </div>
