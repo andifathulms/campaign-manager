@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     LoginView, LogoutView, RegisterView, MeView, ChangePasswordView,
-    TenantSettingsView, OTPRequestView, OTPVerifyView,
+    TenantSettingsView, OTPRequestView, OTPVerifyView, AgencyTenantsView,
 )
 
 urlpatterns = [
@@ -11,6 +11,7 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='auth-register'),
     path('refresh/', TokenRefreshView.as_view(), name='auth-refresh'),
     path('me/', MeView.as_view(), name='auth-me'),
+    path('agency/tenants/', AgencyTenantsView.as_view(), name='auth-agency-tenants'),
     path('me/change-password/', ChangePasswordView.as_view(), name='auth-change-password'),
     path('tenant/', TenantSettingsView.as_view(), name='auth-tenant'),
     # WhatsApp OTP

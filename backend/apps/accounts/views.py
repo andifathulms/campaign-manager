@@ -5,7 +5,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from drf_spectacular.utils import extend_schema
-from .serializers import LoginSerializer, RegisterSerializer, UserSerializer, TokenResponseSerializer
+from .serializers import (
+    LoginSerializer, RegisterSerializer, UserSerializer, TokenResponseSerializer,
+    TenantSerializer,
+)
 
 
 class LoginView(APIView):
@@ -68,6 +71,23 @@ class MeView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class AgencyTenantsView(APIView):
+    """List the tenants the current user can switch between (their agency's
+    active tenants, or just their home tenant). The frontend sends the chosen
+    tenant's id in the ``X-Tenant-ID`` header on subsequent requests."""
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(responses={200: TenantSerializer(many=True)})
+    def get(self, request):
+        from apps.core.tenancy import switchable_tenants, active_tenant
+        tenants = switchable_tenants(request.user)
+        current = active_tenant(request)
+        return Response({
+            'active_tenant_id': str(current.id) if current else None,
+            'tenants': TenantSerializer(tenants, many=True).data,
+        })
 
 
 class ChangePasswordView(APIView):

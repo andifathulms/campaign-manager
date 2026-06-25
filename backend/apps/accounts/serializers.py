@@ -2,7 +2,13 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.core.feature_flags import enabled_features
-from .models import User, Tenant
+from .models import User, Tenant, Agency
+
+
+class AgencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Agency
+        fields = ['id', 'name', 'slug', 'is_active']
 
 
 class TenantSerializer(serializers.ModelSerializer):
@@ -18,11 +24,12 @@ class TenantSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     tenant = TenantSerializer(read_only=True)
+    agency = AgencySerializer(read_only=True)
 
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name',
-                  'role', 'phone', 'wilayah', 'referral_code', 'tenant']
+                  'role', 'phone', 'wilayah', 'referral_code', 'tenant', 'agency']
         read_only_fields = ['id', 'referral_code']
 
 
@@ -61,13 +68,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        tenant = Tenant.objects.create(
-            name=validated_data.pop('tenant_name'),
-            slug=validated_data.pop('tenant_slug'),
-        )
+        tenant_name = validated_data.pop('tenant_name')
+        tenant_slug = validated_data.pop('tenant_slug')
+        # Direct candidate = agency of one (single code path with consultants).
+        agency = Agency.objects.create(name=tenant_name, slug=tenant_slug)
+        tenant = Tenant.objects.create(name=tenant_name, slug=tenant_slug, agency=agency)
         password = validated_data.pop('password')
         user = User(**validated_data)
         user.tenant = tenant
+        user.agency = agency
         user.role = 'candidate'
         user.set_password(password)
         user.save()
