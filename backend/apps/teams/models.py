@@ -16,6 +16,16 @@ class TeamMember(BaseModel):
         ('kecamatan', 'Kecamatan'),
         ('kelurahan', 'Kelurahan'),
     ]
+    STATUS_CHOICES = [
+        ('pending', 'Menunggu Persetujuan'),
+        ('active', 'Aktif'),
+        ('rejected', 'Ditolak'),
+        ('inactive', 'Nonaktif'),
+    ]
+    SOURCE_CHOICES = [
+        ('manual_add', 'Ditambah Admin'),
+        ('self_registration', 'Registrasi Mandiri'),
+    ]
 
     tenant = models.ForeignKey(
         'accounts.Tenant', on_delete=models.CASCADE, related_name='team_members'
@@ -30,8 +40,17 @@ class TeamMember(BaseModel):
     level = models.IntegerField(choices=LEVEL_CHOICES, default=4)
     nama = models.CharField(max_length=200)
     phone = models.CharField(max_length=20)
+    email = models.CharField(max_length=254, null=True, blank=True)
     wilayah_name = models.CharField(max_length=200)
     wilayah_level = models.CharField(max_length=20, choices=WILAYAH_LEVEL_CHOICES, default='kelurahan')
+    # Richer geo for registration + wilayah scoping (relawan = level 4).
+    kecamatan = models.CharField(max_length=200, blank=True)
+    kabupaten_kota = models.CharField(max_length=200, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    source = models.CharField(max_length=30, choices=SOURCE_CHOICES, default='manual_add')
+    alasan_bergabung = models.TextField(blank=True)
+    rejection_reason = models.TextField(blank=True)
+    referred_by_code = models.CharField(max_length=40, blank=True)
     is_active = models.BooleanField(default=True)
     total_points = models.IntegerField(default=0)
 

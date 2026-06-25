@@ -11,12 +11,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 
+from apps.accounts.models import Tenant, User
+from apps.accounts.whatsapp import normalize_phone
 from apps.core.feature_flags import FeatureGatedMixin
 from apps.core.mixins import TenantQuerysetMixin
 from apps.core.permissions import IsVolunteer
-from apps.core.rbac import wilayah_filter
+from apps.core.public_guard import client_ip, make_ip_hash, throttle, verify_captcha
+from apps.core.rbac import wilayah_filter, IsTimsesStaff
 from apps.core.tenancy import active_tenant
 from .models import TeamMember, ReferralLink, ReferralClick, Task, TaskAssignment, Announcement, PointRule, PointTransaction
+from .points import award_points
 from .serializers import (
     TeamMemberSerializer,
     TeamMemberCreateSerializer,
@@ -31,7 +35,119 @@ from .serializers import (
     AnnouncementSerializer,
     PointRuleSerializer,
     PointTransactionSerializer,
+    RelawanRegisterSerializer,
+    RelawanRequestSerializer,
 )
+
+
+# ── Relawan onboarding + approval queue ───────────────────────────────────────
+
+@extend_schema(tags=['public'])
+class PublicRelawanRegisterView(APIView):
+    """Public: self-register as a relawan on a candidate's web profile.
+
+    Creates the relawan's User (role=relawan, scoped to the tenant) and a
+    level-4 TeamMember. Honours the tenant's relawan_auto_approve setting —
+    pending (default) or active. Rate-limited + CAPTCHA-guarded.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request, slug):
+        tenant = get_object_or_404(Tenant, slug=slug, is_active=True)
+
+        ip = client_ip(request)
+        if throttle('relawan-register', f"{tenant.id}:{make_ip_hash(ip)}", limit=5, window_seconds=3600):
+            return Response({'detail': 'Terlalu banyak pendaftaran. Coba lagi dalam 1 jam.'},
+                            status=status.HTTP_429_TOO_MANY_REQUESTS)
+        if not verify_captcha(request.data.get('captcha_token', ''), ip):
+            return Response({'detail': 'Verifikasi CAPTCHA gagal.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = RelawanRegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        d = serializer.validated_data
+        phone = normalize_phone(d['phone'])
+
+        if TeamMember.objects.filter(tenant=tenant, phone=phone).exists():
+            return Response(
+                {'detail': 'Nomor HP sudah terdaftar. Silakan login atau hubungi tim kampanye.'},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        auto = tenant.relawan_auto_approve
+        username = f'relawan_{tenant.slug}_{phone}'[:150]
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            import secrets
+            user = User.objects.create_user(
+                username=username, phone=phone, role='relawan',
+                tenant=tenant, agency=tenant.agency,
+                is_active=auto, password=secrets.token_urlsafe(16),
+            )
+
+        member = TeamMember.objects.create(
+            tenant=tenant, user=user, level=4, nama=d['nama'], phone=phone,
+            email=d.get('email', ''), wilayah_name=d['kelurahan'], wilayah_level='kelurahan',
+            kecamatan=d['kecamatan'], kabupaten_kota=d.get('kabupaten_kota', ''),
+            alasan_bergabung=d.get('alasan_bergabung', ''),
+            referred_by_code=d.get('referral_code', ''),
+            source='self_registration',
+            status='active' if auto else 'pending', is_active=auto,
+        )
+        if auto:
+            award_points(member, 'register', description='Registrasi relawan')
+
+        msg = ('Pendaftaran berhasil! Akun Anda telah aktif.' if auto
+               else 'Pendaftaran berhasil! Menunggu persetujuan tim kampanye.')
+        return Response({'detail': msg, 'status': member.status}, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(tags=['teams'])
+class RelawanRequestListView(APIView):
+    """Admin: list pending relawan registrations (wilayah-scoped)."""
+    permission_classes = [IsAuthenticated, IsTimsesStaff]
+
+    def get(self, request):
+        tenant = active_tenant(request)
+        qs = TeamMember.objects.filter(tenant=tenant, status='pending').filter(
+            wilayah_filter(request.user, fields=('wilayah_name', 'kecamatan', 'kabupaten_kota'))
+        )
+        return Response(RelawanRequestSerializer(qs, many=True).data)
+
+
+@extend_schema(tags=['teams'])
+class RelawanRequestApproveView(APIView):
+    """Admin: approve a pending relawan → active + login enabled + points."""
+    permission_classes = [IsAuthenticated, IsTimsesStaff]
+
+    def post(self, request, pk):
+        tenant = active_tenant(request)
+        member = get_object_or_404(TeamMember, pk=pk, tenant=tenant)
+        member.status = 'active'
+        member.is_active = True
+        member.save(update_fields=['status', 'is_active'])
+        if member.user:
+            member.user.is_active = True
+            member.user.save(update_fields=['is_active'])
+        award_points(member, 'register', description='Registrasi relawan (disetujui)')
+        return Response(RelawanRequestSerializer(member).data)
+
+
+@extend_schema(tags=['teams'])
+class RelawanRequestRejectView(APIView):
+    """Admin: reject a pending relawan registration."""
+    permission_classes = [IsAuthenticated, IsTimsesStaff]
+
+    def post(self, request, pk):
+        tenant = active_tenant(request)
+        member = get_object_or_404(TeamMember, pk=pk, tenant=tenant)
+        member.status = 'rejected'
+        member.is_active = False
+        member.rejection_reason = request.data.get('rejection_reason', '')
+        member.save(update_fields=['status', 'is_active', 'rejection_reason'])
+        if member.user:
+            member.user.is_active = False
+            member.user.save(update_fields=['is_active'])
+        return Response(RelawanRequestSerializer(member).data)
 
 
 @extend_schema(tags=['teams'])

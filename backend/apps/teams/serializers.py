@@ -2,6 +2,38 @@ from rest_framework import serializers
 from .models import TeamMember, ReferralLink, ReferralClick, Task, TaskAssignment, Announcement, PointRule, PointTransaction
 
 
+class RelawanRegisterSerializer(serializers.Serializer):
+    """Public relawan self-registration (on the candidate's web profile)."""
+    nama = serializers.CharField(max_length=200)
+    phone = serializers.CharField(max_length=20)
+    email = serializers.EmailField(required=False, allow_blank=True, default='')
+    kelurahan = serializers.CharField(max_length=200)
+    kecamatan = serializers.CharField(max_length=200)
+    kabupaten_kota = serializers.CharField(max_length=200, required=False, allow_blank=True, default='')
+    alasan_bergabung = serializers.CharField(max_length=200, required=False, allow_blank=True, default='')
+    referral_code = serializers.CharField(max_length=40, required=False, allow_blank=True, default='')
+
+
+class RelawanRequestSerializer(serializers.ModelSerializer):
+    """A pending/processed relawan registration shown in the approval queue."""
+    referred_by_nama = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TeamMember
+        fields = [
+            'id', 'nama', 'phone', 'email', 'wilayah_name', 'kecamatan', 'kabupaten_kota',
+            'alasan_bergabung', 'referred_by_code', 'referred_by_nama', 'status',
+            'source', 'rejection_reason', 'created_at',
+        ]
+        read_only_fields = fields
+
+    def get_referred_by_nama(self, obj):
+        if not obj.referred_by_code:
+            return None
+        link = ReferralLink.objects.filter(code=obj.referred_by_code).select_related('team_member').first()
+        return link.team_member.nama if link else None
+
+
 class ReferralLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReferralLink

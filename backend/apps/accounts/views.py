@@ -209,6 +209,11 @@ class OTPVerifyView(APIView):
 
         # Find or create user
         user = User.objects.filter(phone=phone).first()
+        if user and not user.is_active:
+            return Response(
+                {'detail': 'Akun Anda belum aktif. Menunggu persetujuan tim kampanye.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         if not user:
             import secrets
             user = User.objects.create_user(

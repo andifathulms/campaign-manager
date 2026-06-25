@@ -16,7 +16,8 @@ class TenantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tenant
-        fields = ['id', 'name', 'slug', 'plan', 'is_active', 'feature_flags', 'enabled_features']
+        fields = ['id', 'name', 'slug', 'plan', 'is_active', 'feature_flags',
+                  'enabled_features', 'relawan_auto_approve']
 
     def get_enabled_features(self, obj):
         return enabled_features(obj)

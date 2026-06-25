@@ -21,6 +21,10 @@ from .views import (
     AdminTaskAssignmentApproveView,
     VolunteerOverviewView,
     PublicVolunteerStatsView,
+    PublicRelawanRegisterView,
+    RelawanRequestListView,
+    RelawanRequestApproveView,
+    RelawanRequestRejectView,
 )
 
 router = DefaultRouter()
@@ -51,4 +55,9 @@ urlpatterns = [
     path('volunteer/overview/', VolunteerOverviewView.as_view(), name='volunteer-overview'),
     # Public volunteer stats
     path('public/<slug:slug>/volunteer-stats/', PublicVolunteerStatsView.as_view(), name='public-volunteer-stats'),
+    # Relawan registration + approval queue
+    path('public/<slug:slug>/relawan/register/', PublicRelawanRegisterView.as_view(), name='public-relawan-register'),
+    path('teams/relawan/requests/', RelawanRequestListView.as_view(), name='relawan-requests'),
+    path('teams/relawan/requests/<uuid:pk>/approve/', RelawanRequestApproveView.as_view(), name='relawan-approve'),
+    path('teams/relawan/requests/<uuid:pk>/reject/', RelawanRequestRejectView.as_view(), name='relawan-reject'),
 ]

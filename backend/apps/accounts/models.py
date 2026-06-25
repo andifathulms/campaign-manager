@@ -37,6 +37,9 @@ class Tenant(BaseModel):
     )
     is_active = models.BooleanField(default=True)
     feature_flags = models.JSONField(default=dict)
+    # When False (default), self-registered relawan land in a pending approval
+    # queue; when True they activate immediately after OTP. (PRD §18.4)
+    relawan_auto_approve = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
