@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { portalForRole, roleAllowedInPortal } from '@/lib/portals';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,13 +46,18 @@ export function OTPLoginForm() {
         redirect: false,
       });
       if (result?.error) {
-        // Fallback: direct sign in with returned tokens
-        // Store tokens and redirect
         setError('Login berhasil tapi sesi gagal. Coba login ulang.');
-      } else {
-        router.push(data.user?.role === 'relawan' ? '/volunteer' : '/dashboard/overview');
-        router.refresh();
+        return;
       }
+      const session = await getSession();
+      const role = (session as any)?.role as string | undefined;
+      if (!roleAllowedInPortal(role, 'volunteer')) {
+        await signOut({ redirect: false });
+        setError('Akun ini bukan akun relawan.');
+        return;
+      }
+      router.push(portalForRole(role));
+      router.refresh();
     } catch (err: any) {
       setError(err.response?.data?.detail || 'OTP tidak valid.');
     } finally {

@@ -2,7 +2,7 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  role: 'platform_admin' | 'candidate' | 'koordinator_wilayah' | 'koordinator_kecamatan' | 'koordinator_kelurahan' | 'relawan';
+  role: 'superadmin' | 'admin' | 'candidate' | 'volunteer';
   tenant_id: string | null;
 }
 
