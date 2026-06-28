@@ -9,17 +9,22 @@ Kept in sync with the frontend `src/lib/portals.ts`. One role per portal:
 SUPERADMIN = 'superadmin'
 ADMIN = 'admin'
 CANDIDATE = 'candidate'
+COORDINATOR = 'coordinator'  # campaign staff with candidate-portal access (not the owner)
 VOLUNTEER = 'volunteer'
 
-ALL_ROLES = (SUPERADMIN, ADMIN, CANDIDATE, VOLUNTEER)
+ALL_ROLES = (SUPERADMIN, ADMIN, CANDIDATE, COORDINATOR, VOLUNTEER)
 
 # Platform (KampanyeKit staff) roles — allowed into the Admin Portal + /platform API.
 PLATFORM_ROLES = {SUPERADMIN, ADMIN}
+
+# Roles that use the candidate command-center (/dashboard).
+CANDIDATE_PORTAL_ROLES = {CANDIDATE, COORDINATOR}
 
 ROLE_PORTAL = {
     SUPERADMIN: 'admin',
     ADMIN: 'admin',
     CANDIDATE: 'dashboard',
+    COORDINATOR: 'dashboard',
     VOLUNTEER: 'volunteer',
 }
 

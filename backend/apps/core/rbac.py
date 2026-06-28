@@ -25,10 +25,10 @@ from rest_framework.permissions import BasePermission
 # (`superadmin`/`admin`) are full-access too. Wilayah-scoped coordinator roles
 # were removed in the role collapse, so WILAYAH_SCOPED_ROLES is now empty and
 # `wilayah_filter` is a no-op (kept for call-site compatibility).
-FULL_ACCESS_ROLES = {'superadmin', 'admin', 'candidate'}
+FULL_ACCESS_ROLES = {'superadmin', 'admin', 'candidate', 'coordinator'}
 WILAYAH_SCOPED_ROLES: set[str] = set()
-ADS_MANAGER_ROLES = {'superadmin', 'admin', 'candidate'}
-TIMSES_ROLES = {'superadmin', 'admin', 'candidate'}
+ADS_MANAGER_ROLES = {'superadmin', 'admin', 'candidate', 'coordinator'}
+TIMSES_ROLES = {'superadmin', 'admin', 'candidate', 'coordinator'}
 
 def _role(user):
     return getattr(user, 'role', None)

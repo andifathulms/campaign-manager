@@ -67,6 +67,7 @@ class User(AbstractUser):
             ('superadmin', 'Super Admin'),
             ('admin', 'Admin'),
             ('candidate', 'Candidate'),
+            ('coordinator', 'Koordinator'),
             ('volunteer', 'Volunteer'),
         ],
         default='candidate'

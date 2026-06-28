@@ -188,7 +188,7 @@ class TeamMemberViewSet(TenantQuerysetMixin, viewsets.ModelViewSet):
         links = member.referral_links.all()
         return Response(ReferralLinkSerializer(links, many=True).data)
 
-    @extend_schema(summary="Set/reset a relawan's login password (admin-issued, replaces OTP)")
+    @extend_schema(summary="Set/reset a team member's login password (admin-issued, replaces OTP)")
     @action(detail=True, methods=['post'], url_path='set-password')
     def set_password(self, request, pk=None):
         if request.user.role not in ('candidate', 'admin', 'superadmin'):
@@ -196,17 +196,23 @@ class TeamMemberViewSet(TenantQuerysetMixin, viewsets.ModelViewSet):
         import secrets
         from apps.accounts.models import User
 
+        # 'coordinator' -> candidate portal (/dashboard); 'volunteer' -> volunteer portal.
+        access = request.data.get('access', 'volunteer')
+        if access not in ('coordinator', 'volunteer'):
+            return Response({'detail': 'access harus coordinator atau volunteer.'}, status=status.HTTP_400_BAD_REQUEST)
+
         member = self.get_object()
         tenant = active_tenant(request)
         password = (request.data.get('password') or '').strip() or secrets.token_urlsafe(6)
 
         user = member.user
         if user is None:
-            username = f'relawan_{tenant.slug}_{member.phone}'[:150]
+            prefix = 'tim' if access == 'coordinator' else 'relawan'
+            username = f'{prefix}_{tenant.slug}_{member.phone}'[:150]
             user = User.objects.filter(username=username).first()
             if user is None:
                 user = User.objects.create_user(
-                    username=username, phone=member.phone, role='volunteer',
+                    username=username, phone=member.phone, role=access,
                     tenant=tenant, agency=tenant.agency, is_active=True,
                 )
             member.user = user
@@ -216,10 +222,15 @@ class TeamMemberViewSet(TenantQuerysetMixin, viewsets.ModelViewSet):
 
         user.set_password(password)
         user.is_active = True
-        user.role = 'volunteer'
+        user.role = access
+        if user.tenant_id is None:
+            user.tenant = tenant
+            user.agency = tenant.agency
         user.save()
+        portal = 'dashboard' if access == 'coordinator' else 'volunteer'
         # Returned once so the admin/candidate can hand the credentials over.
-        return Response({'username': user.username, 'phone': member.phone, 'password': password})
+        return Response({'username': user.username, 'phone': member.phone, 'password': password,
+                         'access': access, 'portal': portal})
 
 
 @extend_schema(tags=['teams'])

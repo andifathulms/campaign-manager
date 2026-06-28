@@ -228,7 +228,7 @@ class Command(BaseCommand):
             Tenant.objects.filter(slug__in=slugs).delete()
             Agency.objects.filter(slug__in=slugs).delete()
             User.objects.filter(
-                username__in=[c['username'] for c in CAMPAIGNS] + ['super', 'admin', 'relawan']
+                username__in=[c['username'] for c in CAMPAIGNS] + ['super', 'admin', 'relawan', 'korwil']
             ).delete()
             self.stdout.write(self.style.WARNING(f'Wiped demo tenants: {", ".join(slugs)}'))
 
@@ -266,8 +266,31 @@ class Command(BaseCommand):
         member.is_active = True
         member.status = 'active'
         member.save()
-        self.stdout.write(self.style.HTTP_INFO('\n── Demo relawan ───────────────'))
-        self.stdout.write('  ✓ relawan (username "relawan" / No. HP 08120000001)')
+
+        # Demo coordinator — candidate-portal access, distinct from field relawan.
+        kphone = '628120000002'
+        koor, _ = User.objects.get_or_create(username='korwil', defaults={'phone': kphone})
+        koor.first_name, koor.last_name = 'Koordinator', 'Wilayah'
+        koor.role = 'coordinator'
+        koor.tenant = tenant
+        koor.agency = tenant.agency
+        koor.phone = kphone
+        koor.is_active = True
+        koor.set_password(DEV_PASSWORD)
+        koor.save()
+        kmember, _ = TeamMember.objects.get_or_create(
+            tenant=tenant, nama='Koordinator Wilayah Demo',
+            defaults={'phone': kphone, 'level': 2, 'wilayah_name': 'Coblong',
+                      'wilayah_level': 'kecamatan', 'kecamatan': 'Coblong', 'kabupaten_kota': 'Kota Bandung'},
+        )
+        kmember.user = koor
+        kmember.is_active = True
+        kmember.status = 'active'
+        kmember.save()
+
+        self.stdout.write(self.style.HTTP_INFO('\n── Demo team logins ───────────────'))
+        self.stdout.write('  ✓ coordinator (username "korwil" / No. HP 08120000002) -> /dashboard')
+        self.stdout.write('  ✓ relawan     (username "relawan" / No. HP 08120000001) -> /volunteer')
 
     def _seed_staff(self):
         """Platform staff (Admin Portal): one superadmin + one admin, no tenant."""
@@ -524,6 +547,7 @@ class Command(BaseCommand):
         self.stdout.write('  ' + '-' * 74)
         for c in CAMPAIGNS:
             self.stdout.write(f'  {c["username"]:<10}  {c["nama"]:<36}  /{c["slug"]}')
+        self.stdout.write('  korwil      Koordinator Wilayah Demo (afms)       (coordinator)')
 
         self.stdout.write(self.style.SUCCESS('\nVOLUNTEER PORTAL — login at /login (password, no OTP):'))
         self.stdout.write('  relawan    Relawan Demo (afms)  ·  or No. HP 08120000001')
