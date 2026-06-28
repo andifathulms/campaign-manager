@@ -26,10 +26,8 @@ export function rolesForPortal(portal: Portal): Role[] {
   return ['candidate'];
 }
 
-/** The login page for a given portal. */
-export function loginPathForPortal(portal: Portal): string {
-  if (portal === 'admin') return '/admin/login';
-  if (portal === 'volunteer') return '/volunteer/login';
+/** Unified login page — one smart form for every portal. */
+export function loginPathForPortal(_portal: Portal): string {
   return '/login';
 }
 

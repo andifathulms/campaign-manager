@@ -51,7 +51,7 @@ export function AdminSidebar({ role }: { role?: string }) {
 
       <div className="px-2 py-3 border-t border-border">
         <button
-          onClick={() => signOut({ callbackUrl: '/admin/login' })}
+          onClick={() => signOut({ callbackUrl: '/login' })}
           className="flex items-center gap-3 px-2.5 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted w-full transition-all"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />

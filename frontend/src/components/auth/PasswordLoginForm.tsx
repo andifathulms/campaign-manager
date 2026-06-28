@@ -19,8 +19,11 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 interface Props {
-  /** Which portal this login belongs to; rejects users whose role doesn't match. */
-  portal: Portal;
+  /**
+   * Optional portal lock. When omitted (unified login), any valid role is
+   * accepted and routed to its own portal. When set, rejects mismatched roles.
+   */
+  portal?: Portal;
 }
 
 export function PasswordLoginForm({ portal }: Props) {
@@ -47,7 +50,12 @@ export function PasswordLoginForm({ portal }: Props) {
       }
       const session = await getSession();
       const role = (session as any)?.role as string | undefined;
-      if (!roleAllowedInPortal(role, portal)) {
+      if (!role) {
+        await signOut({ redirect: false });
+        setError('Akun tidak valid. Hubungi admin.');
+        return;
+      }
+      if (portal && !roleAllowedInPortal(role, portal)) {
         await signOut({ redirect: false });
         setError('Akun ini tidak memiliki akses ke portal ini.');
         return;
@@ -73,8 +81,8 @@ export function PasswordLoginForm({ portal }: Props) {
       )}
 
       <div className="space-y-1.5">
-        <Label htmlFor="username" className="text-sm font-medium">Username</Label>
-        <Input id="username" placeholder="Masukkan username" autoComplete="username" className="h-11" {...register('username')} />
+        <Label htmlFor="username" className="text-sm font-medium">Username atau No. HP</Label>
+        <Input id="username" placeholder="username atau 08xxxxxxxxxx" autoComplete="username" className="h-11" {...register('username')} />
         {errors.username && <p className="text-xs text-destructive">{errors.username.message}</p>}
       </div>
 

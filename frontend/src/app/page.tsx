@@ -363,7 +363,7 @@ export default function HomePage() {
             <span className="font-display font-semibold text-sm">KampanyeKit</span>
           </div>
           <div className="flex items-center gap-5 text-xs">
-            <Link href="/admin/login" className="text-white/40 hover:text-white/80 transition-colors">Admin Portal</Link>
+            <Link href="/login" className="text-white/40 hover:text-white/80 transition-colors">Masuk</Link>
             <p className="text-white/40">© {new Date().getFullYear()} KampanyeKit — Platform Kampanye Digital Indonesia</p>
           </div>
         </div>

@@ -7,7 +7,7 @@ import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
-  if (!session) redirect('/admin/login');
+  if (!session) redirect('/login');
   const role = (session as any).role;
   if (!roleAllowedInPortal(role, 'admin')) redirect(portalForRole(role));
 

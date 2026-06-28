@@ -12,6 +12,14 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    // Login is unified at /login — old per-portal login URLs redirect there.
+    return [
+      { source: '/admin/login', destination: '/login', permanent: true },
+      { source: '/volunteer/login', destination: '/login', permanent: true },
+      { source: '/register', destination: '/login', permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

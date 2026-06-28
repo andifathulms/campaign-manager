@@ -15,7 +15,7 @@ export function ImpersonationBanner() {
         Mode admin — Anda melihat sebagai <strong>{(session?.user?.name) || 'kandidat'}</strong>
       </span>
       <button
-        onClick={() => signOut({ callbackUrl: '/admin/login' })}
+        onClick={() => signOut({ callbackUrl: '/login' })}
         className="ml-2 rounded-full bg-gold-foreground/10 hover:bg-gold-foreground/20 px-3 py-0.5 text-xs font-semibold transition-colors"
       >
         Kembali ke Admin

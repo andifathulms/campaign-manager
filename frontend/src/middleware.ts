@@ -2,7 +2,7 @@ import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 import { portalForPath, roleAllowedInPortal, loginPathForPortal, portalForRole } from '@/lib/portals';
 
-const LOGIN_PATHS = new Set(['/login', '/admin/login', '/volunteer/login']);
+const LOGIN_PATHS = new Set(['/login']);
 
 export default withAuth(
   function middleware(req) {

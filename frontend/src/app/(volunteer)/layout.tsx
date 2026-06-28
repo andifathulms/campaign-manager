@@ -7,7 +7,7 @@ import { DashboardTopbar } from '@/components/dashboard/DashboardTopbar';
 
 export default async function VolunteerLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
-  if (!session) redirect('/volunteer/login');
+  if (!session) redirect('/login');
   const role = (session as any).role;
   if (!roleAllowedInPortal(role, 'volunteer')) redirect(portalForRole(role));
 
