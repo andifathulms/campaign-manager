@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from drf_spectacular.utils import extend_schema
 from .serializers import (
-    LoginSerializer, RegisterSerializer, UserSerializer, TokenResponseSerializer,
+    LoginSerializer, UserSerializer, TokenResponseSerializer,
     TenantSerializer,
 )
 
@@ -40,22 +40,6 @@ class LogoutView(APIView):
         except TokenError:
             pass
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class RegisterView(APIView):
-    permission_classes = [AllowAny]
-
-    @extend_schema(request=RegisterSerializer, responses={201: TokenResponseSerializer})
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'user': UserSerializer(user).data,
-        }, status=status.HTTP_201_CREATED)
 
 
 class MeView(APIView):

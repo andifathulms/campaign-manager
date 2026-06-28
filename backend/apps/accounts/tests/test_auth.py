@@ -57,27 +57,22 @@ class TestLogin:
 
 
 @pytest.mark.django_db
-class TestRegister:
-    def test_register_creates_tenant_and_user(self, api_client):
-        response = api_client.post(reverse('auth-register'), {
-            'username': 'newcandidate',
-            'email': 'new@example.com',
-            'password': 'securepass123',
-            'first_name': 'Budi',
-            'last_name': 'Santoso',
-            'tenant_name': 'Budi for Mayor',
-            'tenant_slug': 'budi-for-mayor',
+class TestLoginByPhone:
+    def test_login_with_phone_number(self, api_client, tenant):
+        User.objects.create_user(
+            username='relawan_x', password='kampanye123', tenant=tenant,
+            role='volunteer', phone='628111222333',
+        )
+        # Relawan logs in with their phone (entered as 0811...) + password.
+        response = api_client.post(reverse('auth-login'), {
+            'username': '08111222333',
+            'password': 'kampanye123',
         })
-        assert response.status_code == 201
-        assert Tenant.objects.filter(slug='budi-for-mayor').exists()
-        assert User.objects.filter(username='newcandidate').exists()
+        assert response.status_code == 200
+        assert response.data['user']['username'] == 'relawan_x'
 
-    def test_register_duplicate_slug(self, api_client, tenant):
-        response = api_client.post(reverse('auth-register'), {
-            'username': 'another',
-            'email': 'another@example.com',
-            'password': 'securepass123',
-            'tenant_name': 'Another',
-            'tenant_slug': 'test-candidate',  # already taken
-        })
-        assert response.status_code == 400
+    def test_registration_endpoint_removed(self, api_client):
+        # Self-registration is disabled — accounts are provisioned by admin.
+        from django.urls import NoReverseMatch
+        with pytest.raises(NoReverseMatch):
+            reverse('auth-register')

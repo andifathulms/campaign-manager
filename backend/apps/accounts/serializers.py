@@ -35,53 +35,33 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    # Accepts a username OR a phone number (relawan often know only their phone).
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        user = authenticate(username=data['username'], password=data['password'])
+        identifier = (data['username'] or '').strip()
+
+        # Resolve a phone-number identifier to its account's username.
+        user_obj = User.objects.filter(username=identifier).first()
+        if user_obj is None:
+            digits = ''.join(ch for ch in identifier if ch.isdigit())
+            if digits:
+                variants = {digits}
+                if digits.startswith('0'):
+                    variants.add('62' + digits[1:])
+                if digits.startswith('62'):
+                    variants.add('0' + digits[2:])
+                user_obj = User.objects.filter(phone__in=variants).first()
+
+        username = user_obj.username if user_obj else identifier
+        user = authenticate(username=username, password=data['password'])
         if not user:
-            raise serializers.ValidationError('Invalid credentials.')
+            raise serializers.ValidationError('Username/nomor atau password salah.')
         if not user.is_active:
-            raise serializers.ValidationError('Account is disabled.')
+            raise serializers.ValidationError('Akun Anda dinonaktifkan. Hubungi admin.')
         data['user'] = user
         return data
-
-
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
-    tenant_name = serializers.CharField(write_only=True)
-    tenant_slug = serializers.SlugField(write_only=True)
-
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password', 'first_name', 'last_name',
-                  'tenant_name', 'tenant_slug']
-
-    def validate_tenant_slug(self, value):
-        if Tenant.objects.filter(slug=value).exists():
-            raise serializers.ValidationError('This slug is already taken.')
-        return value
-
-    def validate_username(self, value):
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError('This username is already taken.')
-        return value
-
-    def create(self, validated_data):
-        tenant_name = validated_data.pop('tenant_name')
-        tenant_slug = validated_data.pop('tenant_slug')
-        # Direct candidate = agency of one (single code path with consultants).
-        agency = Agency.objects.create(name=tenant_name, slug=tenant_slug)
-        tenant = Tenant.objects.create(name=tenant_name, slug=tenant_slug, agency=agency)
-        password = validated_data.pop('password')
-        user = User(**validated_data)
-        user.tenant = tenant
-        user.agency = agency
-        user.role = 'candidate'
-        user.set_password(password)
-        user.save()
-        return user
 
 
 class TokenResponseSerializer(serializers.Serializer):
