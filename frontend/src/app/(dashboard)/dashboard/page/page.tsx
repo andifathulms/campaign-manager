@@ -87,7 +87,7 @@ export default function CampaignPageBuilderPage() {
     <div className="p-8 w-full">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Halaman Kampanye</h1>
+          <h1 className="font-display text-2xl font-bold">Halaman Kampanye</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Kelola konten dan publikasi halaman kampanye publik Anda.
           </p>

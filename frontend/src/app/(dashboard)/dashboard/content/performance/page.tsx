@@ -72,7 +72,7 @@ export default function ContentPerformancePage() {
           <Share2 className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Performa Konten</h1>
+          <h1 className="font-display text-2xl font-bold">Performa Konten</h1>
           <p className="text-muted-foreground text-sm">Konten yang dibagikan relawan — verifikasi untuk memberi poin.</p>
         </div>
       </div>

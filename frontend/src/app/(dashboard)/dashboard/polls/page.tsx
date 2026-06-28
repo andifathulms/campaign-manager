@@ -146,7 +146,7 @@ export default function PollsPage() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Survey & Poll</h1>
+          <h1 className="font-display text-2xl font-bold">Survey & Poll</h1>
           <p className="text-muted-foreground text-sm mt-1">Buat survei singkat untuk mengetahui preferensi pemilih.</p>
         </div>
         <Button onClick={() => setShowCreate(true)} className="gap-2">

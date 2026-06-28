@@ -77,7 +77,7 @@ export default function RelawanRequestsPage() {
           <UserCheck className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">Permintaan Relawan</h1>
+          <h1 className="font-display text-2xl font-bold">Permintaan Relawan</h1>
           <p className="text-muted-foreground text-sm">Setujui atau tolak relawan yang mendaftar lewat halaman publik.</p>
         </div>
       </div>

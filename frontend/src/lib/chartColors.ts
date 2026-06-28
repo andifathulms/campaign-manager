@@ -1,14 +1,14 @@
 /**
- * Shared chart palette aligned to the "Civic Gold" design tokens.
+ * Shared chart palette aligned to the "Sovereign Navy & Gold" design tokens.
  * Use CHART_SERIES for generic multi-series charts. Platform-brand colors
  * (Meta/TikTok/Google) are mandated by the platforms — keep those as-is.
  */
 export const CHART = {
-  primary: '#2456E6', // ballot blue (token --primary)
-  gold: '#F5A524', // victory gold (token --gold)
-  teal: '#0EA5A4',
-  green: '#16A34A',
-  pink: '#EC4899',
+  primary: '#0A1A3F', // navy (token --primary)
+  gold: '#C9A24B', // antique gold (token --gold)
+  goldSoft: '#E3C77E',
+  navyMid: '#1E3A6E',
+  emerald: '#1FA37A',
   slate: '#64748B',
 } as const;
 
@@ -16,9 +16,9 @@ export const CHART = {
 export const CHART_SERIES = [
   CHART.primary,
   CHART.gold,
-  CHART.teal,
-  CHART.green,
-  CHART.pink,
+  CHART.navyMid,
+  CHART.emerald,
+  CHART.goldSoft,
 ];
 
 /** Platform-brand colors — mandated, do not theme. */

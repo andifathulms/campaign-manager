@@ -142,7 +142,7 @@ export default function AspirasiPage() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-3">
+          <h1 className="font-display text-2xl font-bold flex items-center gap-3">
             Aspirasi Masuk
             {unreadCount > 0 && (
               <span className="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">

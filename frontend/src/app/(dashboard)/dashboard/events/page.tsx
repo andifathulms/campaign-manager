@@ -360,7 +360,7 @@ export default function EventsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Events Kampanye</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground">Events Kampanye</h1>
           <p className="text-muted-foreground text-sm mt-1">Kelola acara kampanye dan check-in peserta via QR</p>
         </div>
         <button

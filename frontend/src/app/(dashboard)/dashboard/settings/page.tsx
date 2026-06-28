@@ -116,7 +116,7 @@ export default function SettingsPage() {
   return (
     <div className="p-8 w-full max-w-4xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Pengaturan</h1>
+        <h1 className="font-display text-2xl font-bold">Pengaturan</h1>
         <p className="text-muted-foreground text-sm mt-1">Kelola akun, keamanan, dan integrasi platform.</p>
       </div>
 

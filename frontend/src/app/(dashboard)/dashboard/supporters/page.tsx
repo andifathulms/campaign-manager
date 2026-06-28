@@ -97,7 +97,7 @@ export default function SupportersPage() {
     <div className="p-8 w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Pendukung</h1>
+          <h1 className="font-display text-2xl font-bold">Pendukung</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Daftar pendukung yang telah mendaftar melalui halaman kampanye.
           </p>
@@ -116,7 +116,7 @@ export default function SupportersPage() {
         {stats?.by_kecamatan?.slice(0, 3).map((item, i) => (
           <div key={i} className="bg-white rounded-xl border border-border p-4 shadow-sm">
             <p className="text-xs text-muted-foreground mb-1 truncate">{item.kecamatan}</p>
-            <p className="text-2xl font-bold text-primary">{item.count}</p>
+            <p className="font-display text-2xl font-bold text-primary">{item.count}</p>
             <p className="text-xs text-muted-foreground">pendukung</p>
           </div>
         ))}

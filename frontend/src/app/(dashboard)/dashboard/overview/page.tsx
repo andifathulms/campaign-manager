@@ -53,7 +53,7 @@ export default async function OverviewPage() {
       label: 'Anggota Tim',
       value: stats ? String(stats.team_count) : '—',
       desc: stats?.team_count > 0 ? `${stats.team_count} anggota aktif` : 'Tambahkan tim sukses',
-      icon: Megaphone, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100',
+      icon: Megaphone, color: 'text-gold', bg: 'bg-gold/10', border: 'border-gold/20',
     },
     {
       label: 'Total Belanja Iklan',
@@ -69,7 +69,7 @@ export default async function OverviewPage() {
         <p className="text-muted-foreground text-sm font-medium mb-1">
           {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
-        <h1 className="text-2xl font-bold text-foreground">
+        <h1 className="font-display text-3xl font-bold text-foreground tracking-tight">
           Selamat datang, <span className="text-primary">{name}</span>
         </h1>
         <p className="text-muted-foreground text-sm mt-1">Berikut ringkasan kampanye Anda hari ini.</p>
@@ -107,7 +107,7 @@ export default async function OverviewPage() {
             <a
               key={action.href}
               href={action.href}
-              className="flex flex-col gap-2 p-4 rounded-lg bg-slate-50 hover:bg-accent border border-transparent hover:border-accent transition-all group"
+              className="flex flex-col gap-2 p-4 rounded-lg bg-secondary hover:bg-accent border border-transparent hover:border-gold/30 transition-all group"
             >
               <p className="text-sm font-medium text-foreground">{action.label}</p>
               <p className="text-xs font-semibold text-primary group-hover:translate-x-0.5 transition-transform">

@@ -193,7 +193,7 @@ export default function TeamPage() {
     <div className="p-8 w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Tim Sukses</h1>
+          <h1 className="font-display text-2xl font-bold">Tim Sukses</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Kelola anggota tim dan pantau performa referral.
           </p>

@@ -144,7 +144,7 @@ export default function AdsPage() {
     { label: 'Total Belanja Iklan', value: formatRp(dashboard?.total_spend ?? 0), icon: Wallet, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
     { label: 'Total Jangkauan', value: formatNum(dashboard?.total_reach ?? 0), icon: Eye, color: 'text-primary', bg: 'bg-accent', border: 'border-accent' },
     { label: 'Total Impresi', value: formatNum(dashboard?.total_impressions ?? 0), icon: TrendingUp, color: 'text-primary', bg: 'bg-accent', border: 'border-accent' },
-    { label: 'Total Klik', value: formatNum(dashboard?.total_clicks ?? 0), icon: MousePointer, color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100' },
+    { label: 'Total Klik', value: formatNum(dashboard?.total_clicks ?? 0), icon: MousePointer, color: 'text-gold', bg: 'bg-gold/10', border: 'border-gold/20' },
   ];
 
   return (
@@ -153,7 +153,7 @@ export default function AdsPage() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard Iklan</h1>
+          <h1 className="font-display text-2xl font-bold">Dashboard Iklan</h1>
           <p className="text-muted-foreground text-sm mt-1">Pantau performa Meta & TikTok Ads dalam satu tempat.</p>
         </div>
         <div className="flex items-center gap-2">

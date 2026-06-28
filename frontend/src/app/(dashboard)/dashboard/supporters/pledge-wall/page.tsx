@@ -74,7 +74,7 @@ export default function PledgeWallPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Pledge Wall</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground">Pledge Wall</h1>
           <p className="text-muted-foreground text-sm mt-1">Moderasi pernyataan dukungan publik dari pendukung</p>
         </div>
       </div>
@@ -82,15 +82,15 @@ export default function PledgeWallPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-card border border-border rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-foreground">{supporters.filter(s => s.statement).length}</p>
+          <p className="font-display text-2xl font-bold text-foreground">{supporters.filter(s => s.statement).length}</p>
           <p className="text-muted-foreground text-xs mt-1">Total Pernyataan</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-amber-400">{pendingCount}</p>
+          <p className="font-display text-2xl font-bold text-amber-400">{pendingCount}</p>
           <p className="text-muted-foreground text-xs mt-1">Menunggu Review</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-green-400">{verifiedCount}</p>
+          <p className="font-display text-2xl font-bold text-green-400">{verifiedCount}</p>
           <p className="text-muted-foreground text-xs mt-1">Ditampilkan Publik</p>
         </div>
       </div>

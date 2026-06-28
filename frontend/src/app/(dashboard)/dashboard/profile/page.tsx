@@ -122,7 +122,7 @@ export default function ProfilePage() {
     <div className="p-8 w-full max-w-4xl">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Profil Kandidat</h1>
+          <h1 className="font-display text-2xl font-bold">Profil Kandidat</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Informasi ini ditampilkan di halaman kampanye publik Anda.
           </p>

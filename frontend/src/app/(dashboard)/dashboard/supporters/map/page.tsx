@@ -78,22 +78,22 @@ export default function SupporterMapPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Peta Sebaran Pendukung</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground">Peta Sebaran Pendukung</h1>
         <p className="text-muted-foreground text-sm mt-1">Distribusi pendukung berdasarkan wilayah</p>
       </div>
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-card border border-border rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-foreground">{total.toLocaleString('id-ID')}</p>
+          <p className="font-display text-2xl font-bold text-foreground">{total.toLocaleString('id-ID')}</p>
           <p className="text-muted-foreground text-xs mt-1">Total Pendukung</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-primary">{sorted.length}</p>
+          <p className="font-display text-2xl font-bold text-primary">{sorted.length}</p>
           <p className="text-muted-foreground text-xs mt-1">{GROUP_LABELS[groupBy]} Terjangkau</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-green-400">
+          <p className="font-display text-2xl font-bold text-green-400">
             {sorted.length > 0 ? Math.round(total / sorted.length) : 0}
           </p>
           <p className="text-muted-foreground text-xs mt-1">Rata-rata per Wilayah</p>

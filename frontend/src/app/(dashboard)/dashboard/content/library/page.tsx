@@ -133,7 +133,7 @@ export default function CreativeLibraryPage() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Library Kreatif</h1>
+          <h1 className="font-display text-2xl font-bold">Library Kreatif</h1>
           <p className="text-muted-foreground text-sm mt-1">Simpan dan kelola gambar, video, dan caption iklan.</p>
         </div>
         <Button onClick={() => setShowUpload(true)} className="gap-2">
