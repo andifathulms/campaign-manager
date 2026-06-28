@@ -17,14 +17,14 @@ export function AdminSidebar({ role }: { role?: string }) {
   const visible = items.filter((i) => !i.superadminOnly || role === 'superadmin');
 
   return (
-    <aside className="bg-card border-r border-border flex flex-col flex-shrink-0 w-60">
-      <div className="px-3 py-4 border-b border-border flex items-center gap-2.5 min-h-[60px]">
-        <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-primary-foreground flex-shrink-0">
+    <aside className="bg-navy text-navy-foreground border-r border-navy-border flex flex-col flex-shrink-0 w-60">
+      <div className="px-3 py-4 border-b border-navy-border flex items-center gap-2.5 min-h-[60px]">
+        <div className="w-7 h-7 rounded-md bg-gold flex items-center justify-center text-gold-foreground flex-shrink-0">
           <ShieldCheck className="w-4 h-4" />
         </div>
         <div>
-          <p className="text-foreground font-display font-semibold text-sm leading-tight">KampanyeKit</p>
-          <p className="text-muted-foreground text-[10px] leading-tight">Admin Portal</p>
+          <p className="font-display font-semibold text-sm leading-tight">KampanyeKit</p>
+          <p className="text-navy-foreground/50 text-[10px] leading-tight">Admin Portal</p>
         </div>
       </div>
 
@@ -38,21 +38,21 @@ export function AdminSidebar({ role }: { role?: string }) {
               href={item.href}
               className={cn(
                 'relative flex items-center gap-3 px-2.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
-                isActive ? 'bg-accent text-accent-foreground font-semibold' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                isActive ? 'bg-white/10 text-navy-foreground font-semibold' : 'text-navy-foreground/65 hover:text-navy-foreground hover:bg-white/5'
               )}
             >
-              {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-primary" />}
-              <Icon className={cn('h-4 w-4 flex-shrink-0', isActive ? 'text-primary' : 'text-muted-foreground')} />
+              {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-gold" />}
+              <Icon className={cn('h-4 w-4 flex-shrink-0', isActive ? 'text-gold' : 'text-navy-foreground/55')} />
               <span className="truncate">{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="px-2 py-3 border-t border-border">
+      <div className="px-2 py-3 border-t border-navy-border">
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
-          className="flex items-center gap-3 px-2.5 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted w-full transition-all"
+          className="flex items-center gap-3 px-2.5 py-2.5 rounded-lg text-sm font-medium text-navy-foreground/65 hover:text-navy-foreground hover:bg-white/5 w-full transition-all"
         >
           <LogOut className="h-4 w-4 flex-shrink-0" />
           <span>Keluar</span>
