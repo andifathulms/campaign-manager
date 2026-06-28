@@ -89,7 +89,7 @@ export default async function CampaignPage({ params }: Props) {
   const candidate = await getCandidate(params.slug);
   if (!candidate) notFound();
 
-  const primary = candidate.color_primary || '#2456E6';
+  const primary = candidate.color_primary || '#0A1A3F';
   const hasMisi = candidate.misi?.length > 0;
   const hasProgram = candidate.program_unggulan?.length > 0;
   const hasSosmed = Object.values(candidate.sosmed || {}).some(v => !!v);
@@ -369,7 +369,7 @@ export default async function CampaignPage({ params }: Props) {
         </p>
         <p className="text-gray-600 text-xs">
           Dibuat dengan{' '}
-          <Link href="/" className="text-gray-300 hover:text-white transition-colors font-medium">KampanyeKit</Link>
+          <Link href="/" className="font-display font-semibold text-[#C9A24B] hover:text-[#E3C77E] transition-colors">KampanyeKit</Link>
           {' '}— Platform Kampanye Digital Indonesia
         </p>
       </footer>

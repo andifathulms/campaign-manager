@@ -29,7 +29,7 @@ export default async function DukungPage({
 }) {
   const candidate = await getCandidate(params.slug);
   if (!candidate) notFound();
-  const primary = candidate.color_primary || '#2456E6';
+  const primary = candidate.color_primary || '#0A1A3F';
 
   return (
     <main className="min-h-screen py-12 px-4" style={{ background: `${primary}0a` }}>
