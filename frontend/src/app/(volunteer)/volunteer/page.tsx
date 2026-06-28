@@ -25,7 +25,7 @@ export default function VolunteerDashboardPage() {
 
   const widgets = [
     { label: 'Poin Saya', value: data?.total_points ?? 0, icon: Star, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { label: 'Tugas Aktif', value: data?.active_tasks ?? 0, icon: ClipboardList, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: 'Tugas Aktif', value: data?.active_tasks ?? 0, icon: ClipboardList, color: 'text-gold', bg: 'bg-gold/10' },
     { label: 'Pendukung Bulan Ini', value: data?.supporters_this_month ?? 0, icon: Users, color: 'text-emerald-500', bg: 'bg-emerald-50' },
     { label: 'Konten Dibagikan', value: data?.shares_this_month ?? 0, icon: Share2, color: 'text-primary', bg: 'bg-accent' },
   ];
@@ -46,7 +46,7 @@ export default function VolunteerDashboardPage() {
               <div className={`w-9 h-9 rounded-lg ${w.bg} flex items-center justify-center mb-3`}>
                 <w.icon className={`w-4.5 h-4.5 ${w.color}`} />
               </div>
-              <p className="text-2xl font-bold">{w.value.toLocaleString('id-ID')}</p>
+              <p className="font-display text-2xl font-bold">{w.value.toLocaleString('id-ID')}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{w.label}</p>
             </CardContent>
           </Card>
@@ -61,7 +61,7 @@ export default function VolunteerDashboardPage() {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Peringkat Leaderboard</p>
-            <p className="text-2xl font-bold">#{data?.leaderboard_rank ?? '-'}</p>
+            <p className="font-display text-2xl font-bold">#{data?.leaderboard_rank ?? '-'}</p>
           </div>
         </CardContent>
       </Card>

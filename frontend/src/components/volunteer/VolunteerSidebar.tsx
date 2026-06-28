@@ -21,8 +21,9 @@ export function VolunteerSidebar() {
     <>
       {/* Desktop sidebar */}
       <aside className="hidden md:flex flex-col w-56 border-r border-border bg-white flex-shrink-0">
-        <div className="h-14 flex items-center px-5 border-b border-border">
-          <span className="text-lg font-bold text-primary">KampanyeKit</span>
+        <div className="h-14 flex items-center gap-2 px-5 border-b border-border">
+          <span className="w-6 h-6 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-[11px]">K</span>
+          <span className="font-display text-lg font-semibold text-foreground">KampanyeKit</span>
         </div>
         <nav className="flex-1 py-3 space-y-0.5 px-2">
           {NAV_ITEMS.map(item => {
@@ -31,13 +32,14 @@ export function VolunteerSidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   active
-                    ? 'bg-accent text-primary'
+                    ? 'bg-accent text-accent-foreground font-semibold'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                 }`}
               >
-                <item.icon className="w-4 h-4 flex-shrink-0" />
+                {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-gold" />}
+                <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-gold' : ''}`} />
                 {item.label}
               </Link>
             );

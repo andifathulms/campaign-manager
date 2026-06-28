@@ -49,7 +49,7 @@ export default function VolunteerSupportersPage() {
                 <Users className="w-4 h-4 text-primary" />
                 <span className="text-xs text-muted-foreground">Total Rekrutan</span>
               </div>
-              <p className="text-2xl font-bold mt-1">{summary.total}</p>
+              <p className="font-display text-2xl font-bold mt-1">{summary.total}</p>
             </CardContent>
           </Card>
           <Card className="border-0 shadow-sm">
@@ -58,7 +58,7 @@ export default function VolunteerSupportersPage() {
                 <UserPlus className="w-4 h-4 text-emerald-500" />
                 <span className="text-xs text-muted-foreground">Hari Ini</span>
               </div>
-              <p className="text-2xl font-bold mt-1">{summary.today}</p>
+              <p className="font-display text-2xl font-bold mt-1">{summary.today}</p>
             </CardContent>
           </Card>
           <Card className="border-0 shadow-sm">
@@ -67,7 +67,7 @@ export default function VolunteerSupportersPage() {
                 <Star className="w-4 h-4 text-amber-500" />
                 <span className="text-xs text-muted-foreground">Poin dari Pendukung</span>
               </div>
-              <p className="text-2xl font-bold mt-1">{summary.points_from_supporters}</p>
+              <p className="font-display text-2xl font-bold mt-1">{summary.points_from_supporters}</p>
             </CardContent>
           </Card>
           <Card className="border-0 shadow-sm">
@@ -76,7 +76,7 @@ export default function VolunteerSupportersPage() {
                 <MapPin className="w-4 h-4 text-primary" />
                 <span className="text-xs text-muted-foreground">Kecamatan</span>
               </div>
-              <p className="text-2xl font-bold mt-1">{summary.by_kecamatan?.length || 0}</p>
+              <p className="font-display text-2xl font-bold mt-1">{summary.by_kecamatan?.length || 0}</p>
             </CardContent>
           </Card>
         </div>

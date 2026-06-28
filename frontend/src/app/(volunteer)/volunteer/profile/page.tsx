@@ -39,7 +39,7 @@ export default function VolunteerProfilePage() {
           <div className="ml-auto text-right">
             <div className="flex items-center gap-1.5">
               <Star className="w-5 h-5 text-amber-500" />
-              <span className="text-2xl font-bold">{data?.total_points?.toLocaleString('id-ID') ?? 0}</span>
+              <span className="font-display text-2xl font-bold">{data?.total_points?.toLocaleString('id-ID') ?? 0}</span>
             </div>
             <p className="text-xs text-muted-foreground">Total Poin</p>
           </div>
