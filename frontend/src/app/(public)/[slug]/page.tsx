@@ -9,6 +9,7 @@ import {
 import { ViewTracker } from '@/components/campaign/ViewTracker';
 import { ShareButton } from '@/components/campaign/ShareButton';
 import { MobileActionBar } from '@/components/campaign/MobileActionBar';
+import { CampaignCountdown } from '@/components/campaign/CampaignCountdown';
 
 interface Props {
   params: { slug: string };
@@ -18,6 +19,9 @@ interface PublicCandidate {
   id: string;
   nama_lengkap: string;
   foto_url: string | null;
+  foto_sampul_url: string | null;
+  galeri: Array<{ url: string; caption?: string }>;
+  tanggal_pemilihan: string | null;
   nomor_urut: number | null;
   jenis_pemilihan: string;
   dapil: string;
@@ -98,6 +102,9 @@ export default async function CampaignPage({ params }: Props) {
   const hasSosmed = Object.values(candidate.sosmed || {}).some(v => !!v);
   const jenisLabel = JENIS_LABEL[candidate.jenis_pemilihan] || candidate.jenis_pemilihan;
   const views = candidate.campaign_page?.view_count ?? 0;
+  const galeri = (candidate.galeri || []).filter(g => g?.url);
+  const hasGaleri = galeri.length > 0;
+  const cover = candidate.foto_sampul_url;
 
   return (
     <div className="min-h-screen bg-white text-gray-900" style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
@@ -138,6 +145,13 @@ export default async function CampaignPage({ params }: Props) {
             linear-gradient(160deg, ${primary} 0%, ${primary}d9 45%, #14181F 130%)`,
         }}
       >
+        {/* cover photo — atmospheric backdrop, blended under the brand gradient */}
+        {cover && (
+          <div className="absolute inset-0 pointer-events-none">
+            <img src={cover} alt="" className="w-full h-full object-cover opacity-25 mix-blend-luminosity" />
+            <div className="absolute inset-0" style={{ background: `linear-gradient(160deg, ${primary}e6 0%, ${primary}cc 45%, #14181Fee 130%)` }} />
+          </div>
+        )}
         {/* dotted texture */}
         <div className="absolute inset-0 opacity-10 pointer-events-none"
           style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
@@ -328,6 +342,46 @@ export default async function CampaignPage({ params }: Props) {
         </section>
       )}
 
+      {/* ── GALERI KEGIATAN ──────────────────────────────────── */}
+      {hasGaleri && (
+        <section className="py-20 md:py-24 px-6 bg-white">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <span className="inline-block text-xs font-bold tracking-widest uppercase mb-3 px-3 py-1 rounded-full" style={{ background: `${primary}15`, color: primary }}>
+                Galeri Kegiatan
+              </span>
+              <h2 className="font-display text-3xl md:text-4xl font-extrabold text-gray-900">Bersama Masyarakat</h2>
+              <p className="text-gray-500 mt-3 max-w-xl mx-auto">Dokumentasi langkah nyata di tengah warga — bukan sekadar janji.</p>
+            </div>
+            {/* masonry-ish grid: first photo spans larger */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+              {galeri.map((g, i) => (
+                <figure
+                  key={i}
+                  className={`group relative overflow-hidden rounded-2xl bg-gray-100 ${i === 0 ? 'col-span-2 row-span-2 aspect-square lg:aspect-auto' : 'aspect-square'}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={g.url}
+                    alt={g.caption || candidate.nama_lengkap}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {g.caption && (
+                    <>
+                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <figcaption className="absolute inset-x-0 bottom-0 p-3 md:p-4 text-white text-xs md:text-sm font-medium translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
+                        {g.caption}
+                      </figcaption>
+                    </>
+                  )}
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── MARI BERGABUNG (engagement) ──────────────────────── */}
       <section className="py-20 md:py-24 px-6" style={{ background: `${primary}06` }}>
         <div className="max-w-5xl mx-auto">
@@ -379,6 +433,12 @@ export default async function CampaignPage({ params }: Props) {
           <p className="text-white/60 max-w-xl mx-auto mb-10">
             Di hari pemungutan suara, pastikan pilihan Anda tepat. Dukung perubahan nyata bersama {candidate.nama_lengkap}.
           </p>
+
+          {candidate.tanggal_pemilihan && (
+            <div className="mb-12">
+              <CampaignCountdown date={candidate.tanggal_pemilihan} tone="dark" />
+            </div>
+          )}
 
           {candidate.nomor_urut != null && (
             <div className="inline-flex items-stretch rounded-3xl overflow-hidden shadow-2xl mb-10 border border-white/10">

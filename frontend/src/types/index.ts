@@ -64,7 +64,12 @@ export interface CandidateProfile {
   nama_lengkap: string;
   foto: string | null;
   foto_url: string | null;
+  foto_external: string;
+  foto_sampul_external: string;
+  foto_sampul_url: string | null;
+  galeri: Array<{ url: string; caption?: string }>;
   nomor_urut: number | null;
+  tanggal_pemilihan: string | null;
   jenis_pemilihan: string;
   dapil: string;
   partai: string;

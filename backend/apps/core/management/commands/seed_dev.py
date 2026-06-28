@@ -90,11 +90,30 @@ ARTICLE_BODY = (
 )
 
 
+# ── Demo photos (Unsplash — free license, hotlinkable, verified) ─────────────
+def _img(pid, w=800, h=600):
+    return f'https://images.unsplash.com/photo-{pid}?auto=format&fit=crop&q=80&w={w}&h={h}'
+
+
+# Activity gallery shared across demo candidates (community / rally / blusukan).
+GALERI_UMUM = [
+    {'url': _img('1566409031818-9508be68fc74'), 'caption': 'Semangat kebangsaan bersama warga'},
+    {'url': _img('1641391460340-df6898498efd'), 'caption': 'Dukungan masyarakat yang terus tumbuh'},
+    {'url': _img('1542897643-8158da5b4607'), 'caption': 'Turun ke jalan bersama relawan'},
+    {'url': _img('1574936924661-23374e86f1a8'), 'caption': 'Blusukan menyapa warga di lapangan'},
+    {'url': _img('1542562460-67f4b9aa9a25'), 'caption': 'Dialog hangat dengan komunitas'},
+]
+COVER_RALLY = _img('1544531586-fde5298cdd40', 1600, 900)
+PEMILIHAN_DATE = date(2026, 11, 27)  # demo voting day for the countdown
+
+
 # ── Demo campaign definitions ────────────────────────────────────────────────
 CAMPAIGNS = [
     {
         'slug': 'afms', 'username': 'afms',
         'nama': 'Andi Fathul Mukminin', 'plan': 'pro', 'color': '#2456E6',
+        'foto': _img('1626499370263-b2a0501f2773', 600, 600),
+        'cover': COVER_RALLY, 'galeri': GALERI_UMUM, 'tanggal': PEMILIHAN_DATE,
         'jenis': 'pileg_dprd_kota', 'nomor_urut': 3,
         'dapil': 'Kota Bandung Dapil 2', 'partai': 'Partai Maju Bersama',
         'tagline': 'Bersama Kita Bisa, Bandung Lebih Baik',
@@ -125,6 +144,8 @@ CAMPAIGNS = [
     {
         'slug': 'sripurnama', 'username': 'sri', 'superuser': False,
         'nama': 'Sri Purnama Wardani', 'plan': 'premium', 'color': '#0E9F6E',
+        'foto': _img('1494790108377-be9c29b29330', 600, 600),
+        'cover': COVER_RALLY, 'galeri': GALERI_UMUM, 'tanggal': PEMILIHAN_DATE,
         'jenis': 'pilkada_walikota', 'nomor_urut': 2,
         'dapil': 'Kota Surabaya', 'partai': 'Partai Hijau Nusantara',
         'tagline': 'Surabaya Maju, Warga Sejahtera',
@@ -152,6 +173,8 @@ CAMPAIGNS = [
     {
         'slug': 'hartono', 'username': 'hartono', 'superuser': False,
         'nama': 'H. Hartono Prawiro', 'plan': 'starter', 'color': '#B91C1C',
+        'foto': _img('1500648767791-00dcc994a43e', 600, 600),
+        'cover': COVER_RALLY, 'galeri': GALERI_UMUM[:3], 'tanggal': PEMILIHAN_DATE,
         'jenis': 'pileg_dpr', 'nomor_urut': 7,
         'dapil': 'Jawa Tengah Dapil 5', 'partai': 'Partai Rakyat Bersatu',
         'tagline': 'Suara Rakyat, Amanah Kita',
@@ -176,6 +199,8 @@ CAMPAIGNS = [
     {
         'slug': 'wirautama', 'username': 'wira', 'superuser': False,
         'nama': 'Dr. Wira Utama, M.M.', 'plan': 'enterprise', 'color': '#0F766E',
+        'foto': _img('1472099645785-5658abf4ff4e', 600, 600),
+        'cover': COVER_RALLY, 'galeri': GALERI_UMUM, 'tanggal': PEMILIHAN_DATE,
         'jenis': 'pilkada_gubernur', 'nomor_urut': 1,
         'dapil': 'Provinsi Jawa Barat', 'partai': 'Koalisi Jabar Juara',
         'tagline': 'Jabar Juara, Untuk Semua',
@@ -364,6 +389,10 @@ class Command(BaseCommand):
         candidate.program_unggulan = cfg['program']
         candidate.sosmed = cfg['sosmed']
         candidate.color_primary = cfg['color']
+        candidate.foto_external = cfg.get('foto', '')
+        candidate.foto_sampul_external = cfg.get('cover', '')
+        candidate.galeri = cfg.get('galeri', [])
+        candidate.tanggal_pemilihan = cfg.get('tanggal')
         candidate.status = 'published'
         candidate.save()
 

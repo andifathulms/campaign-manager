@@ -8,7 +8,12 @@ class Candidate(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='candidate')
     nama_lengkap = models.CharField(max_length=200)
     foto = models.ImageField(upload_to='candidates/photos/', null=True, blank=True)
+    # External URL fallbacks — used when no file is uploaded (demo / quick-paste).
+    foto_external = models.URLField(max_length=500, blank=True)         # headshot
+    foto_sampul_external = models.URLField(max_length=500, blank=True)  # cover / hero banner
+    galeri = models.JSONField(default=list)  # [{url, caption}] — activity gallery
     nomor_urut = models.IntegerField(null=True, blank=True)
+    tanggal_pemilihan = models.DateField(null=True, blank=True)  # voting day — drives countdown
     jenis_pemilihan = models.CharField(
         max_length=30,
         choices=[
