@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Users, Plus, Trophy, Copy, Check, Trash2, ChevronDown } from 'lucide-react';
-import { useTeamMembers, useLeaderboard, useCreateTeamMember, useDeleteTeamMember } from '@/hooks/useTeam';
+import { useTeamMembers, useLeaderboard, useCreateTeamMember, useDeleteTeamMember, useSetMemberPassword } from '@/hooks/useTeam';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -65,6 +65,8 @@ function CopyButton({ text }: { text: string }) {
 function MemberRow({ member, onDelete }: { member: TeamMember; onDelete: (id: string) => void }) {
   const [open, setOpen] = useState(false);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+  const setPassword = useSetMemberPassword();
+  const [creds, setCreds] = useState<{ username: string; password: string } | null>(null);
 
   return (
     <div className="border border-border rounded-lg overflow-hidden">
@@ -120,6 +122,36 @@ function MemberRow({ member, onDelete }: { member: TeamMember; onDelete: (id: st
               })}
             </div>
           )}
+
+          {/* Login access — admin-issued password (replaces WhatsApp OTP) */}
+          <div className="border-t border-border pt-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Akses Login Relawan</p>
+                <p className="text-[11px] text-muted-foreground">Beri password agar relawan bisa masuk dengan No. HP.</p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={setPassword.isPending}
+                onClick={async () => {
+                  const res = await setPassword.mutateAsync({ id: member.id });
+                  setCreds({ username: res.username, password: res.password });
+                }}
+              >
+                {setPassword.isPending ? '…' : creds ? 'Reset Password' : 'Beri Password'}
+              </Button>
+            </div>
+            {creds && (
+              <div className="mt-2 rounded-lg bg-white border border-border p-3 text-xs space-y-1">
+                <p className="text-muted-foreground">Bagikan kredensial ini ke relawan (sekali tampil):</p>
+                <p>Masuk via: <strong>/login</strong></p>
+                <p>No. HP / Username: <strong className="font-mono">{member.phone}</strong> <span className="text-muted-foreground">atau {creds.username}</span></p>
+                <p>Password: <strong className="font-mono">{creds.password}</strong></p>
+                <CopyButton text={`No. HP: ${member.phone}\nPassword: ${creds.password}`} />
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

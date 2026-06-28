@@ -188,6 +188,39 @@ class TeamMemberViewSet(TenantQuerysetMixin, viewsets.ModelViewSet):
         links = member.referral_links.all()
         return Response(ReferralLinkSerializer(links, many=True).data)
 
+    @extend_schema(summary="Set/reset a relawan's login password (admin-issued, replaces OTP)")
+    @action(detail=True, methods=['post'], url_path='set-password')
+    def set_password(self, request, pk=None):
+        if request.user.role not in ('candidate', 'admin', 'superadmin'):
+            return Response({'detail': 'Tidak diizinkan.'}, status=status.HTTP_403_FORBIDDEN)
+        import secrets
+        from apps.accounts.models import User
+
+        member = self.get_object()
+        tenant = active_tenant(request)
+        password = (request.data.get('password') or '').strip() or secrets.token_urlsafe(6)
+
+        user = member.user
+        if user is None:
+            username = f'relawan_{tenant.slug}_{member.phone}'[:150]
+            user = User.objects.filter(username=username).first()
+            if user is None:
+                user = User.objects.create_user(
+                    username=username, phone=member.phone, role='volunteer',
+                    tenant=tenant, agency=tenant.agency, is_active=True,
+                )
+            member.user = user
+            member.status = 'active'
+            member.is_active = True
+            member.save(update_fields=['user', 'status', 'is_active'])
+
+        user.set_password(password)
+        user.is_active = True
+        user.role = 'volunteer'
+        user.save()
+        # Returned once so the admin/candidate can hand the credentials over.
+        return Response({'username': user.username, 'phone': member.phone, 'password': password})
+
 
 @extend_schema(tags=['teams'])
 class ReferralListView(generics.ListAPIView):

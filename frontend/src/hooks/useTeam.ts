@@ -113,6 +113,24 @@ export function useCreateTeamMember() {
   });
 }
 
+export function useSetMemberPassword() {
+  const { data: session } = useSession();
+  const token = (session as any)?.accessToken as string | undefined;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (vars: { id: string; password?: string }) =>
+      axios
+        .post<{ username: string; phone: string; password: string }>(
+          `${apiBase}/teams/members/${vars.id}/set-password/`,
+          vars.password ? { password: vars.password } : {},
+          { headers: authHeaders(token!) },
+        )
+        .then(r => r.data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['team-members'] }),
+  });
+}
+
 export function useDeleteTeamMember() {
   const { data: session } = useSession();
   const token = (session as any)?.accessToken as string | undefined;
