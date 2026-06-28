@@ -79,7 +79,7 @@ class PublicRelawanRegisterView(APIView):
         if user is None:
             import secrets
             user = User.objects.create_user(
-                username=username, phone=phone, role='relawan',
+                username=username, phone=phone, role='volunteer',
                 tenant=tenant, agency=tenant.agency,
                 is_active=auto, password=secrets.token_urlsafe(16),
             )

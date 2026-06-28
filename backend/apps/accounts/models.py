@@ -57,19 +57,17 @@ class User(AbstractUser):
     agency = models.ForeignKey(
         Agency, null=True, blank=True, on_delete=models.SET_NULL, related_name='members'
     )
+    # Four canonical roles, one per portal:
+    #   superadmin / admin -> Admin Portal (KampanyeKit platform staff)
+    #   candidate          -> Candidate Portal (incl. consultants via Agency)
+    #   volunteer          -> Volunteer Portal (relawan)
     role = models.CharField(
         max_length=30,
         choices=[
-            ('platform_admin', 'Platform Admin'),
-            ('consultant_admin', 'Consultant Admin'),
+            ('superadmin', 'Super Admin'),
+            ('admin', 'Admin'),
             ('candidate', 'Candidate'),
-            ('koordinator_utama', 'Koordinator Utama'),
-            ('koordinator_wilayah', 'Koordinator Wilayah'),
-            ('koordinator_kecamatan', 'Koordinator Kecamatan'),
-            ('koordinator_kelurahan', 'Koordinator Kelurahan'),
-            ('staf_ads', 'Staf Ads'),
-            ('staf_admin', 'Staf Admin'),
-            ('relawan', 'Relawan'),
+            ('volunteer', 'Volunteer'),
         ],
         default='candidate'
     )

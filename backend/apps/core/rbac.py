@@ -20,16 +20,15 @@ normalized wilayah tree + the product decisions in the PRD open questions
 from django.db.models import Q
 from rest_framework.permissions import BasePermission
 
-FULL_ACCESS_ROLES = {
-    'platform_admin', 'consultant_admin', 'candidate', 'koordinator_utama', 'staf_admin',
-}
-WILAYAH_SCOPED_ROLES = {
-    'koordinator_wilayah', 'koordinator_kecamatan', 'koordinator_kelurahan',
-}
-ADS_MANAGER_ROLES = {
-    'platform_admin', 'consultant_admin', 'candidate', 'koordinator_utama', 'staf_ads',
-}
-TIMSES_ROLES = FULL_ACCESS_ROLES | WILAYAH_SCOPED_ROLES | {'staf_ads'}
+# Role model collapsed to 4 roles (one per portal). Candidate-portal users
+# (`candidate`) have full access to their own tenant; platform staff
+# (`superadmin`/`admin`) are full-access too. Wilayah-scoped coordinator roles
+# were removed in the role collapse, so WILAYAH_SCOPED_ROLES is now empty and
+# `wilayah_filter` is a no-op (kept for call-site compatibility).
+FULL_ACCESS_ROLES = {'superadmin', 'admin', 'candidate'}
+WILAYAH_SCOPED_ROLES: set[str] = set()
+ADS_MANAGER_ROLES = {'superadmin', 'admin', 'candidate'}
+TIMSES_ROLES = {'superadmin', 'admin', 'candidate'}
 
 def _role(user):
     return getattr(user, 'role', None)

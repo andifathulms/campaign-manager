@@ -219,7 +219,7 @@ class OTPVerifyView(APIView):
             user = User.objects.create_user(
                 username=f'wa_{phone}',
                 phone=phone,
-                role='relawan',
+                role='volunteer',
                 password=secrets.token_urlsafe(16),
             )
 

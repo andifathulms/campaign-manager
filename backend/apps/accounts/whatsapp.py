@@ -100,7 +100,7 @@ def notify_tenant_admins(tenant, message: str):
         return
     from apps.accounts.models import User
     phones = (
-        User.objects.filter(tenant=tenant, role__in=['candidate', 'koordinator_utama', 'staf_admin'])
+        User.objects.filter(tenant=tenant, role='candidate')
         .exclude(phone__isnull=True).exclude(phone='')
         .values_list('phone', flat=True)
     )

@@ -85,7 +85,7 @@ class TestConsultantSwitch:
         agency = Agency.objects.create(name='Konsultan X', slug='konsultan-x')
         t_a = make_tenant('cab-a', agency=agency)
         t_b = make_tenant('cab-b', agency=agency)
-        consultant = make_user('consultant', t_a, role='consultant_admin', agency=agency)
+        consultant = make_user('consultant', t_a, role='candidate', agency=agency)
         return agency, t_a, t_b, consultant
 
     def test_no_header_uses_home_tenant(self):
@@ -127,7 +127,7 @@ class TestConsultantSwitch:
         assert {r['nama'] for r in rows(resp_b)} == {'B Person'}
 
 
-# ── wilayah scoping ─────────────────────────────────────────────────────────
+# ── wilayah scoping (removed in the 4-role collapse — now a no-op) ───────────
 
 @pytest.mark.django_db
 class TestWilayahScoping:
@@ -137,21 +137,23 @@ class TestWilayahScoping:
         assert is_full_access(candidate)
         assert wilayah_filter(candidate, fields=('kecamatan',)) == Q()
 
-    def test_scoped_coordinator_is_narrowed(self, api_client):
+    def test_candidate_sees_all_wilayah(self, api_client):
+        # After the role collapse there are no wilayah-scoped roles, so a
+        # candidate-portal user sees every supporter in their tenant.
         t = make_tenant('scoped')
         make_supporter(t, 'In Area', kecamatan='Semarang Tengah')
         make_supporter(t, 'Out Area', kecamatan='Demak Kota')
-        korcam = make_user('korcam', t, role='koordinator_kecamatan', wilayah='Semarang Tengah')
-        assert is_wilayah_scoped(korcam)
+        user = make_user('cand2', t, role='candidate', wilayah='Semarang Tengah')
+        assert not is_wilayah_scoped(user)
 
-        api_client.force_authenticate(user=korcam)
+        api_client.force_authenticate(user=user)
         resp = api_client.get(reverse('supporter-list'))
-        assert {r['nama'] for r in rows(resp)} == {'In Area'}
+        assert {r['nama'] for r in rows(resp)} == {'In Area', 'Out Area'}
 
-    def test_scoped_without_wilayah_is_noop(self):
+    def test_wilayah_filter_is_noop_for_all_roles(self):
         t = make_tenant('scoped2')
-        korcam = make_user('korcam2', t, role='koordinator_kecamatan', wilayah=None)
-        assert wilayah_filter(korcam, fields=('kecamatan',)) == Q()
+        user = make_user('cand3', t, role='candidate', wilayah=None)
+        assert wilayah_filter(user, fields=('kecamatan',)) == Q()
 
 
 # ── feature-flag enforcement ────────────────────────────────────────────────

@@ -41,7 +41,7 @@ class TestRelawanRegistration:
         assert member.status == 'pending'
         assert member.is_active is False
         assert member.level == 4
-        assert member.user.role == 'relawan'
+        assert member.user.role == 'volunteer'
         assert member.user.is_active is False  # cannot log in until approved
 
     def test_register_auto_approve_activates(self, api_client):
@@ -103,6 +103,6 @@ class TestApprovalQueue:
 
     def test_queue_blocked_for_relawan_role(self, api_client):
         t = make_tenant('zeta')
-        relawan = User.objects.create_user(username='r1', password='pw12345678', tenant=t, role='relawan')
+        relawan = User.objects.create_user(username='r1', password='pw12345678', tenant=t, role='volunteer')
         api_client.force_authenticate(user=relawan)
         assert api_client.get(reverse('relawan-requests')).status_code == 403
