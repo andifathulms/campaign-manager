@@ -362,7 +362,10 @@ export default function HomePage() {
             <div className="w-7 h-7 rounded-md bg-gradient-to-br from-[#2456E6] to-[#22D3EE] flex items-center justify-center text-white font-bold text-xs">K</div>
             <span className="font-display font-semibold text-sm">KampanyeKit</span>
           </div>
-          <p className="text-white/40 text-xs text-center">© {new Date().getFullYear()} KampanyeKit — Platform Kampanye Digital Indonesia</p>
+          <div className="flex items-center gap-5 text-xs">
+            <Link href="/admin/login" className="text-white/40 hover:text-white/80 transition-colors">Admin Portal</Link>
+            <p className="text-white/40">© {new Date().getFullYear()} KampanyeKit — Platform Kampanye Digital Indonesia</p>
+          </div>
         </div>
       </footer>
     </main>
