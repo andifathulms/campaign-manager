@@ -18,7 +18,7 @@ export default function LoginPage() {
           }}
         />
         {/* glow */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary/20 blur-3xl" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#1E3A6E]/40 blur-3xl" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-gold/15 blur-3xl" />
 
         <div className="relative z-10">
@@ -33,8 +33,8 @@ export default function LoginPage() {
             <p className="text-muted-foreground text-sm font-medium uppercase tracking-widest">Platform Kampanye Digital</p>
             <h2 className="font-display text-4xl font-bold leading-tight text-balance">
               Kelola kampanye Anda dengan{' '}
-              <span className="text-primary">cerdas</span> dan{' '}
-              <span className="text-gold">terukur.</span>
+              <span className="text-white">cerdas</span> dan{' '}
+              <span className="italic text-gold">terukur.</span>
             </h2>
           </div>
           <div className="space-y-3">
