@@ -3,9 +3,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   Instagram, Youtube, Facebook, Twitter, Music2,
-  Heart, MessageSquare, UserPlus, Eye, MapPin, ArrowRight, ChevronDown,
+  Heart, MessageSquare, UserPlus, MapPin, ArrowRight, ChevronDown,
+  Newspaper, CheckCircle2, Award,
 } from 'lucide-react';
 import { ViewTracker } from '@/components/campaign/ViewTracker';
+import { ShareButton } from '@/components/campaign/ShareButton';
+import { MobileActionBar } from '@/components/campaign/MobileActionBar';
 
 interface Props {
   params: { slug: string };
@@ -112,13 +115,16 @@ export default async function CampaignPage({ params }: Props) {
               <span className="flex-shrink-0 text-[11px] font-bold text-white bg-white/20 rounded-md px-1.5 py-0.5">#{candidate.nomor_urut}</span>
             )}
           </div>
-          <Link
-            href={`/${candidate.tenant_slug}/dukung`}
-            className="flex-shrink-0 text-sm font-semibold rounded-full bg-white px-4 py-1.5 hover:shadow-lg transition-shadow"
-            style={{ color: primary }}
-          >
-            Dukung
-          </Link>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <ShareButton name={candidate.nama_lengkap} nomorUrut={candidate.nomor_urut} />
+            <Link
+              href={`/${candidate.tenant_slug}/dukung`}
+              className="text-sm font-semibold rounded-full bg-white px-4 py-1.5 hover:shadow-lg transition-shadow"
+              style={{ color: primary }}
+            >
+              Dukung
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -159,9 +165,21 @@ export default async function CampaignPage({ params }: Props) {
             )}
 
             {candidate.tagline && (
-              <p className="text-lg md:text-xl text-white/95 font-light italic leading-relaxed mb-8 max-w-md mx-auto md:mx-0">
+              <p className="text-lg md:text-xl text-white/95 font-light italic leading-relaxed mb-6 max-w-md mx-auto md:mx-0">
                 &ldquo;{candidate.tagline}&rdquo;
               </p>
+            )}
+
+            {candidate.nomor_urut != null && (
+              <div className="inline-flex items-center gap-3 mb-8 rounded-2xl bg-white pl-3 pr-5 py-2 shadow-xl">
+                <span className="font-display text-3xl md:text-4xl font-extrabold leading-none w-12 h-12 rounded-xl flex items-center justify-center text-white" style={{ background: primary }}>
+                  {candidate.nomor_urut}
+                </span>
+                <span className="text-left leading-tight">
+                  <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400">Coblos Nomor Urut</span>
+                  <span className="block font-display font-extrabold text-lg" style={{ color: primary }}>Nomor {candidate.nomor_urut}</span>
+                </span>
+              </div>
             )}
 
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
@@ -216,14 +234,16 @@ export default async function CampaignPage({ params }: Props) {
       <section className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto grid grid-cols-3 divide-x divide-gray-100">
           {[
-            { label: 'Daerah Pemilihan', value: candidate.dapil || '—' },
+            { label: 'Nomor Urut', value: candidate.nomor_urut != null ? String(candidate.nomor_urut) : '—', emphasize: true },
             { label: 'Maju Sebagai', value: jenisLabel },
-            { label: 'Kunjungan Halaman', value: views.toLocaleString('id-ID'), icon: true },
+            { label: 'Daerah Pemilihan', value: candidate.dapil || '—' },
           ].map((s, i) => (
             <div key={i} className="px-4 py-6 text-center">
               <p className="text-[11px] uppercase tracking-wider text-gray-400 font-semibold mb-1.5">{s.label}</p>
-              <p className="font-display font-bold text-gray-900 text-sm md:text-lg flex items-center justify-center gap-1.5 leading-tight">
-                {s.icon && <Eye className="w-4 h-4 flex-shrink-0" style={{ color: primary }} />}
+              <p
+                className={`font-display font-extrabold flex items-center justify-center gap-1.5 leading-tight ${s.emphasize ? 'text-2xl md:text-3xl' : 'text-sm md:text-lg text-gray-900'}`}
+                style={s.emphasize ? { color: primary } : undefined}
+              >
                 <span className="truncate">{s.value}</span>
               </p>
             </div>
@@ -317,11 +337,12 @@ export default async function CampaignPage({ params }: Props) {
             </span>
             <h2 className="font-display text-3xl md:text-4xl font-extrabold text-gray-900">Jadilah Bagian dari Perubahan</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
               { Icon: Heart, title: 'Jadi Pendukung', desc: 'Daftar sebagai pendukung dan dapatkan kartu anggota digital.', href: `/${candidate.tenant_slug}/dukung`, cta: 'Daftar Sekarang' },
               { Icon: UserPlus, title: 'Jadi Relawan', desc: 'Bergabung dengan tim sukses dan bantu menangkan kampanye.', href: `/${candidate.tenant_slug}/relawan`, cta: 'Gabung Relawan' },
               { Icon: MessageSquare, title: 'Kirim Aspirasi', desc: 'Sampaikan harapan dan masukan Anda langsung ke kandidat.', href: `/${candidate.tenant_slug}/aspirasi`, cta: 'Sampaikan' },
+              { Icon: Newspaper, title: 'Kabar Terbaru', desc: 'Ikuti berita, agenda, dan kegiatan kampanye terkini.', href: `/${candidate.tenant_slug}/berita`, cta: 'Baca Berita' },
             ].map(({ Icon, title, desc, href, cta }) => (
               <Link key={title} href={href}
                 className="group bg-white rounded-2xl p-7 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
@@ -335,6 +356,63 @@ export default async function CampaignPage({ params }: Props) {
                 </span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BALLOT REMINDER (climax) ─────────────────────────── */}
+      <section
+        className="relative overflow-hidden px-6 py-20 md:py-28"
+        style={{
+          background: `radial-gradient(800px 400px at 50% -20%, ${primary}, transparent 60%), linear-gradient(180deg, #0E1116, #14181F)`,
+        }}
+      >
+        <div className="absolute inset-0 opacity-[0.07] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase text-white/70 mb-5 px-3 py-1 rounded-full border border-white/20 bg-white/5">
+            <Award className="w-3.5 h-3.5" /> Hari Penentuan
+          </span>
+          <h2 className="font-display text-3xl md:text-5xl font-extrabold text-white leading-tight mb-4 text-balance">
+            Satu suara Anda menentukan masa depan {candidate.dapil ? candidate.dapil.replace(/\s*dapil.*$/i, '').trim() || 'kita' : 'kita'}.
+          </h2>
+          <p className="text-white/60 max-w-xl mx-auto mb-10">
+            Di hari pemungutan suara, pastikan pilihan Anda tepat. Dukung perubahan nyata bersama {candidate.nama_lengkap}.
+          </p>
+
+          {candidate.nomor_urut != null && (
+            <div className="inline-flex items-stretch rounded-3xl overflow-hidden shadow-2xl mb-10 border border-white/10">
+              {candidate.foto_url && (
+                <div className="hidden sm:block w-28 bg-white/5">
+                  <img src={candidate.foto_url} alt={candidate.nama_lengkap} className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="bg-white px-7 py-6 text-left flex items-center gap-5">
+                <div>
+                  <span className="block text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">Coblos</span>
+                  <span className="block font-display text-lg font-bold text-gray-900 leading-none">Nomor Urut</span>
+                </div>
+                <span className="font-display text-6xl md:text-7xl font-extrabold leading-none" style={{ color: primary }}>
+                  {candidate.nomor_urut}
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href={`/${candidate.tenant_slug}/dukung`}
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-white font-semibold shadow-xl hover:scale-[1.03] transition-transform"
+              style={{ color: primary }}
+            >
+              <Heart className="w-4 h-4" /> Daftar Jadi Pendukung
+            </Link>
+            <ShareButton
+              name={candidate.nama_lengkap}
+              nomorUrut={candidate.nomor_urut}
+              variant="header"
+              label="Ajak Teman"
+            />
           </div>
         </div>
       </section>
@@ -367,12 +445,22 @@ export default async function CampaignPage({ params }: Props) {
         <p className="text-gray-400 text-sm mb-2">
           Halaman kampanye resmi <span className="text-white font-semibold">{candidate.nama_lengkap}</span>
         </p>
+        {views > 0 && (
+          <p className="inline-flex items-center gap-1.5 text-gray-500 text-xs mb-3">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            Telah dilihat {views.toLocaleString('id-ID')} kali
+          </p>
+        )}
         <p className="text-gray-600 text-xs">
           Dibuat dengan{' '}
           <Link href="/" className="font-display font-semibold text-[#C9A24B] hover:text-[#E3C77E] transition-colors">KampanyeKit</Link>
           {' '}— Platform Kampanye Digital Indonesia
         </p>
       </footer>
+
+      {/* spacer so the sticky mobile bar never covers footer content */}
+      <div className="h-20 md:hidden" />
+      <MobileActionBar slug={candidate.tenant_slug} primary={primary} nomorUrut={candidate.nomor_urut} />
     </div>
   );
 }
