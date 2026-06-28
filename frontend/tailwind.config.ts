@@ -47,6 +47,12 @@ const config: Config = {
           DEFAULT: 'hsl(var(--gold))',
           foreground: 'hsl(var(--gold-foreground))',
         },
+        navy: {
+          DEFAULT: 'hsl(var(--navy))',
+          foreground: 'hsl(var(--navy-foreground))',
+          muted: 'hsl(var(--navy-muted))',
+          border: 'hsl(var(--navy-border))',
+        },
         success: {
           DEFAULT: 'hsl(var(--success))',
           foreground: 'hsl(var(--success-foreground))',

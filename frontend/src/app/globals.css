@@ -4,62 +4,71 @@
 
 @layer base {
   :root {
-    /* Civic Gold — light (dashboard, public, default) */
-    --background: 40 33% 98%;
-    --foreground: 222 30% 11%;
+    /* Sovereign Navy & Gold — light (calm portal: dashboard, admin, volunteer, public) */
+    --background: 45 38% 96%;        /* ivory canvas */
+    --foreground: 222 30% 9%;        /* ink */
     --card: 0 0% 100%;
-    --card-foreground: 222 30% 11%;
+    --card-foreground: 222 30% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 30% 11%;
-    --primary: 224 78% 52%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 40 20% 94%;
-    --secondary-foreground: 222 30% 11%;
-    --muted: 40 20% 94%;
-    --muted-foreground: 224 12% 45%;
-    --accent: 224 70% 95%;
-    --accent-foreground: 224 60% 38%;
-    --gold: 38 92% 55%;
-    --gold-foreground: 28 60% 14%;
-    --success: 142 60% 38%;
+    --popover-foreground: 222 30% 9%;
+    --primary: 222 73% 14%;          /* navy */
+    --primary-foreground: 45 38% 96%;
+    --secondary: 45 24% 92%;         /* warm sand */
+    --secondary-foreground: 222 30% 9%;
+    --muted: 45 24% 92%;
+    --muted-foreground: 222 12% 42%; /* slate */
+    --accent: 41 53% 90%;            /* soft gold tint */
+    --accent-foreground: 35 55% 24%;
+    --gold: 41 53% 54%;              /* antique gold */
+    --gold-foreground: 222 40% 12%;
+    --success: 161 68% 30%;          /* emerald */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 38 80% 46%;
     --warning-foreground: 28 60% 14%;
-    --destructive: 0 72% 51%;
+    --destructive: 6 64% 46%;        /* signal red */
     --destructive-foreground: 0 0% 100%;
-    --border: 40 15% 88%;
-    --input: 40 15% 88%;
-    --ring: 224 78% 52%;
+    --border: 42 18% 86%;
+    --input: 42 18% 86%;
+    --ring: 222 73% 14%;
     --radius: 0.75rem;
+    /* Navy surface — sidebars / dark chrome on light pages */
+    --navy: 222 73% 14%;
+    --navy-foreground: 45 38% 96%;
+    --navy-muted: 217 45% 24%;
+    --navy-border: 217 40% 28%;
   }
 
   .dark {
-    /* Civic Gold — warm near-black (landing + login) */
-    --background: 222 30% 7%;
-    --foreground: 40 20% 96%;
-    --card: 222 25% 10%;
-    --card-foreground: 40 20% 96%;
-    --popover: 222 25% 10%;
-    --popover-foreground: 40 20% 96%;
-    --primary: 224 80% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 20% 16%;
-    --secondary-foreground: 40 20% 96%;
-    --muted: 222 18% 16%;
-    --muted-foreground: 220 12% 62%;
-    --accent: 224 50% 18%;
-    --accent-foreground: 224 80% 82%;
-    --gold: 38 92% 58%;
-    --gold-foreground: 28 60% 12%;
-    --success: 142 55% 45%;
+    /* Sovereign Navy & Gold — deep navy near-black (landing + login) */
+    --background: 222 60% 7%;        /* navy near-black */
+    --foreground: 45 30% 95%;        /* ivory text */
+    --card: 222 45% 11%;
+    --card-foreground: 45 30% 95%;
+    --popover: 222 45% 11%;
+    --popover-foreground: 45 30% 95%;
+    --primary: 41 53% 54%;           /* gold leads on dark */
+    --primary-foreground: 222 60% 9%;
+    --secondary: 217 35% 17%;
+    --secondary-foreground: 45 30% 95%;
+    --muted: 217 30% 16%;
+    --muted-foreground: 220 14% 64%;
+    --accent: 217 45% 20%;
+    --accent-foreground: 41 60% 72%;
+    --gold: 41 60% 60%;
+    --gold-foreground: 222 60% 9%;
+    --success: 161 55% 44%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 55%;
+    --warning: 38 85% 56%;
     --warning-foreground: 28 60% 12%;
-    --destructive: 0 65% 55%;
+    --destructive: 6 62% 52%;
     --destructive-foreground: 0 0% 100%;
-    --border: 222 18% 18%;
-    --input: 222 18% 18%;
-    --ring: 224 80% 60%;
+    --border: 217 30% 20%;
+    --input: 217 30% 20%;
+    --ring: 41 53% 54%;
+    --navy: 222 60% 7%;
+    --navy-foreground: 45 30% 95%;
+    --navy-muted: 217 35% 17%;
+    --navy-border: 217 30% 22%;
   }
 }
 

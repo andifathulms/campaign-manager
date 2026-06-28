@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
+import { Inter, Fraunces } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/shared/Providers';
 
@@ -9,9 +9,11 @@ const inter = Inter({
   display: 'swap',
 });
 
-const jakarta = Plus_Jakarta_Sans({
+// Editorial serif for display/headlines — establishment gravitas.
+const fraunces = Fraunces({
   subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
   variable: '--font-display',
   display: 'swap',
 });
@@ -27,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className={`h-full w-full ${inter.variable} ${jakarta.variable}`}>
+    <html lang="id" className={`h-full w-full ${inter.variable} ${fraunces.variable}`}>
       <body className={`${inter.className} h-full w-full`}>
         <Providers>{children}</Providers>
       </body>
