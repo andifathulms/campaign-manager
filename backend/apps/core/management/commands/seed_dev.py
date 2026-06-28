@@ -43,6 +43,52 @@ STATEMENTS = [
     'Maju terus pantang mundur', 'Kami menanti perubahan', '',
 ]
 
+# (title, category, excerpt, status)  — status 'published' unless noted
+ARTICLES = [
+    ('Kunjungan ke Pasar Tradisional, Serap Aspirasi Pedagang', 'kegiatan',
+     'Berdialog langsung dengan para pedagang soal harga dan retribusi pasar.', 'published'),
+    ('Program Pendidikan Gratis Resmi Diluncurkan', 'program',
+     'Komitmen pendidikan berkualitas tanpa biaya bagi keluarga kurang mampu.', 'published'),
+    ('Jadwal Kampanye Akbar Akhir Pekan Ini', 'pengumuman',
+     'Catat tanggal dan lokasinya, mari hadir dan ramaikan bersama.', 'published'),
+    ('Liputan Media: Visi Pembangunan Daerah yang Berkelanjutan', 'media',
+     'Diliput sejumlah media lokal soal gagasan pembangunan jangka panjang.', 'published'),
+    ('Dialog Bersama Pemuda dan Pelaku UMKM', 'kegiatan',
+     'Mendengar harapan generasi muda dan kebutuhan pelaku usaha kecil.', 'draft'),
+]
+
+# (judul, platform, jenis, status)
+CONTENT_ITEMS = [
+    ('Reels: Sapa Warga Pagi Hari', 'instagram', 'reel', 'published'),
+    ('Carousel Program Unggulan', 'instagram', 'post', 'scheduled'),
+    ('Story Kunjungan Lapangan', 'instagram', 'story', 'published'),
+    ('Video Testimoni Warga', 'tiktok', 'reel', 'scheduled'),
+    ('Live QnA Bersama Kandidat', 'facebook', 'live', 'draft'),
+    ('Thread Visi & Misi', 'twitter', 'post', 'published'),
+]
+
+# (pesan, tema, status, is_published, balasan)
+ASPIRASI = [
+    ('Pak/Bu, tolong perbaiki jalan di RT kami yang rusak parah saat hujan.', 'infrastruktur',
+     'replied', True, 'Terima kasih laporannya, sudah kami koordinasikan untuk perbaikan.'),
+    ('Mohon bantuan beasiswa untuk anak kami yang berprestasi tapi kurang mampu.', 'pendidikan',
+     'read', False, ''),
+    ('Puskesmas sering kehabisan obat, mohon perhatiannya.', 'kesehatan', 'unread', False, ''),
+    ('Harga kebutuhan pokok naik terus, adakah program bantuan untuk warga?', 'ekonomi',
+     'unread', False, ''),
+    ('Sampah menumpuk di sungai dekat pemukiman, mohon ditindaklanjuti.', 'lingkungan',
+     'replied', True, 'Sudah kami jadwalkan kerja bakti dan koordinasi dengan dinas terkait.'),
+    ('Pemuda butuh lapangan olahraga yang layak di kelurahan kami.', 'sosial', 'read', False, ''),
+]
+
+ARTICLE_BODY = (
+    'Dalam kegiatan ini, kami mendengarkan langsung aspirasi warga dan menegaskan '
+    'komitmen untuk memperjuangkannya. Setiap masukan menjadi bagian penting dari '
+    'penyusunan program yang benar-benar dirasakan masyarakat.\n\n'
+    'Kami percaya perubahan dimulai dari kebersamaan. Mari terus bergerak bersama '
+    'mewujudkan daerah yang lebih baik untuk kita semua.'
+)
+
 
 # ── Demo campaign definitions ────────────────────────────────────────────────
 CAMPAIGNS = [
@@ -258,6 +304,9 @@ class Command(BaseCommand):
             self._seed_ads(tenant, cfg['ads'])
         else:
             self.stdout.write('  • no ads connected (empty state demo)')
+        self._seed_articles(tenant, user)
+        self._seed_content(tenant)
+        self._seed_aspirasi(tenant, cfg)
 
     def _seed_team(self, tenant, cfg):
         from apps.teams.models import TeamMember, ReferralLink
@@ -354,6 +403,59 @@ class Command(BaseCommand):
             },
         )
         self.stdout.write(f'  ✓ {len(ads_cfg["platforms"])} ads accounts, {snaps} snapshots, budget Rp {ads_cfg["budget"]:,}')
+
+    def _seed_articles(self, tenant, user):
+        from django.utils.text import slugify
+        from apps.content.models import Article
+        created = 0
+        for i, (title, category, excerpt, status) in enumerate(ARTICLES):
+            slug = f'{slugify(title)[:80]}-{i + 1}'
+            published_at = timezone.now() - timedelta(days=i * 4 + 1) if status == 'published' else None
+            _, was_created = Article.objects.get_or_create(
+                tenant=tenant, slug=slug,
+                defaults=dict(
+                    title=title, body=ARTICLE_BODY, excerpt=excerpt, category=category,
+                    status=status, author=user, published_at=published_at,
+                    view_count=random.randint(20, 1500) if status == 'published' else 0,
+                ),
+            )
+            created += int(was_created)
+        self.stdout.write(f'  ✓ {created} berita/articles')
+
+    def _seed_content(self, tenant):
+        from apps.content.models import ContentItem
+        created = 0
+        for i, (judul, platform, jenis, status) in enumerate(CONTENT_ITEMS):
+            scheduled_at = timezone.now() + timedelta(days=i + 1) if status == 'scheduled' else None
+            published_at = timezone.now() - timedelta(days=i + 1) if status == 'published' else None
+            _, was_created = ContentItem.objects.get_or_create(
+                tenant=tenant, judul=judul,
+                defaults=dict(
+                    caption=f'{judul} — konten kampanye untuk audiens {platform}.',
+                    platform=platform, jenis=jenis, status=status,
+                    scheduled_at=scheduled_at, published_at=published_at,
+                    tags=['kampanye', jenis],
+                ),
+            )
+            created += int(was_created)
+        self.stdout.write(f'  ✓ {created} item konten (kalender)')
+
+    def _seed_aspirasi(self, tenant, cfg):
+        from apps.engagement.models import Aspirasi
+        created = 0
+        kecs = cfg['kecamatan']
+        for i, (pesan, tema, status, is_pub, balasan) in enumerate(ASPIRASI):
+            _, was_created = Aspirasi.objects.get_or_create(
+                tenant=tenant, pesan=pesan,
+                defaults=dict(
+                    nama=NAME_POOL[(i * 5) % len(NAME_POOL)],
+                    phone=f'0857{i:06d}',
+                    tema=tema, status=status, wilayah=kecs[i % len(kecs)],
+                    balasan_publik=balasan, is_published=is_pub,
+                ),
+            )
+            created += int(was_created)
+        self.stdout.write(f'  ✓ {created} aspirasi warga')
 
     def _print_credentials(self):
         self.stdout.write(self.style.SUCCESS('\n\n🚀 Seed complete!  All accounts use password: ') + self.style.WARNING(DEV_PASSWORD))
