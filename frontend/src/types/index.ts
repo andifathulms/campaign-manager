@@ -2,7 +2,7 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  role: 'superadmin' | 'admin' | 'candidate' | 'volunteer';
+  role: 'superadmin' | 'admin' | 'candidate' | 'coordinator' | 'volunteer';
   tenant_id: string | null;
 }
 

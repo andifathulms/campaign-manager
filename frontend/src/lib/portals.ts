@@ -1,6 +1,6 @@
 // Canonical 4-role model + role -> portal mapping. Kept in sync with the
 // backend apps/core/roles.py. One portal per role.
-export type Role = 'superadmin' | 'admin' | 'candidate' | 'volunteer';
+export type Role = 'superadmin' | 'admin' | 'candidate' | 'coordinator' | 'volunteer';
 export type Portal = 'admin' | 'dashboard' | 'volunteer';
 
 export const PLATFORM_ROLES: Role[] = ['superadmin', 'admin'];
@@ -14,6 +14,7 @@ export function portalForRole(role?: string | null): string {
     case 'volunteer':
       return '/volunteer';
     case 'candidate':
+    case 'coordinator':
     default:
       return '/dashboard/overview';
   }
@@ -23,7 +24,7 @@ export function portalForRole(role?: string | null): string {
 export function rolesForPortal(portal: Portal): Role[] {
   if (portal === 'admin') return ['superadmin', 'admin'];
   if (portal === 'volunteer') return ['volunteer'];
-  return ['candidate'];
+  return ['candidate', 'coordinator'];
 }
 
 /** Unified login page — one smart form for every portal. */

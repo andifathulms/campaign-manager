@@ -66,7 +66,12 @@ function MemberRow({ member, onDelete }: { member: TeamMember; onDelete: (id: st
   const [open, setOpen] = useState(false);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
   const setPassword = useSetMemberPassword();
-  const [creds, setCreds] = useState<{ username: string; password: string } | null>(null);
+  const [creds, setCreds] = useState<{ username: string; password: string; access: string; portal: string } | null>(null);
+
+  const issue = async (access: 'coordinator' | 'volunteer') => {
+    const res = await setPassword.mutateAsync({ id: member.id, access });
+    setCreds(res);
+  };
 
   return (
     <div className="border border-border rounded-lg overflow-hidden">
@@ -125,30 +130,29 @@ function MemberRow({ member, onDelete }: { member: TeamMember; onDelete: (id: st
 
           {/* Login access — admin-issued password (replaces WhatsApp OTP) */}
           <div className="border-t border-border pt-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Akses Login Relawan</p>
-                <p className="text-[11px] text-muted-foreground">Beri password agar relawan bisa masuk dengan No. HP.</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Beri Akses Login</p>
+                <p className="text-[11px] text-muted-foreground">Anggota masuk dengan No. HP + password ini.</p>
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={setPassword.isPending}
-                onClick={async () => {
-                  const res = await setPassword.mutateAsync({ id: member.id });
-                  setCreds({ username: res.username, password: res.password });
-                }}
-              >
-                {setPassword.isPending ? '…' : creds ? 'Reset Password' : 'Beri Password'}
-              </Button>
+              <div className="flex gap-2 flex-shrink-0">
+                <Button size="sm" variant="outline" disabled={setPassword.isPending} onClick={() => issue('coordinator')}>
+                  {setPassword.isPending ? '…' : 'Koordinator'}
+                </Button>
+                <Button size="sm" variant="outline" disabled={setPassword.isPending} onClick={() => issue('volunteer')}>
+                  Relawan
+                </Button>
+              </div>
             </div>
             {creds && (
               <div className="mt-2 rounded-lg bg-white border border-border p-3 text-xs space-y-1">
-                <p className="text-muted-foreground">Bagikan kredensial ini ke relawan (sekali tampil):</p>
+                <p className="text-muted-foreground">
+                  Akses <strong className="text-foreground">{creds.access === 'coordinator' ? 'Koordinator (portal kandidat)' : 'Relawan (portal relawan)'}</strong> dibuat. Bagikan kredensial ini (sekali tampil):
+                </p>
                 <p>Masuk via: <strong>/login</strong></p>
                 <p>No. HP / Username: <strong className="font-mono">{member.phone}</strong> <span className="text-muted-foreground">atau {creds.username}</span></p>
                 <p>Password: <strong className="font-mono">{creds.password}</strong></p>
-                <CopyButton text={`No. HP: ${member.phone}\nPassword: ${creds.password}`} />
+                <CopyButton text={`Masuk: /login\nNo. HP: ${member.phone}\nPassword: ${creds.password}`} />
               </div>
             )}
           </div>

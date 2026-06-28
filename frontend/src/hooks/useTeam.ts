@@ -119,11 +119,11 @@ export function useSetMemberPassword() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (vars: { id: string; password?: string }) =>
+    mutationFn: (vars: { id: string; access: 'coordinator' | 'volunteer'; password?: string }) =>
       axios
-        .post<{ username: string; phone: string; password: string }>(
+        .post<{ username: string; phone: string; password: string; access: string; portal: string }>(
           `${apiBase}/teams/members/${vars.id}/set-password/`,
-          vars.password ? { password: vars.password } : {},
+          { access: vars.access, ...(vars.password ? { password: vars.password } : {}) },
           { headers: authHeaders(token!) },
         )
         .then(r => r.data),
