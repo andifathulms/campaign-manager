@@ -93,7 +93,7 @@ ARTICLE_BODY = (
 # ── Demo campaign definitions ────────────────────────────────────────────────
 CAMPAIGNS = [
     {
-        'slug': 'afms', 'username': 'afms', 'superuser': True,
+        'slug': 'afms', 'username': 'afms',
         'nama': 'Andi Fathul Mukminin', 'plan': 'pro', 'color': '#2456E6',
         'jenis': 'pileg_dprd_kota', 'nomor_urut': 3,
         'dapil': 'Kota Bandung Dapil 2', 'partai': 'Partai Maju Bersama',
@@ -227,14 +227,39 @@ class Command(BaseCommand):
             slugs = [c['slug'] for c in CAMPAIGNS]
             Tenant.objects.filter(slug__in=slugs).delete()
             Agency.objects.filter(slug__in=slugs).delete()
-            User.objects.filter(username__in=[c['username'] for c in CAMPAIGNS]).delete()
+            User.objects.filter(
+                username__in=[c['username'] for c in CAMPAIGNS] + ['super', 'admin']
+            ).delete()
             self.stdout.write(self.style.WARNING(f'Wiped demo tenants: {", ".join(slugs)}'))
 
         random.seed(42)  # reproducible numbers across machines
+        self._seed_staff()
         for idx, cfg in enumerate(CAMPAIGNS, start=1):
             self._seed_campaign(idx, cfg)
 
         self._print_credentials()
+
+    def _seed_staff(self):
+        """Platform staff (Admin Portal): one superadmin + one admin, no tenant."""
+        from apps.accounts.models import User
+        staff = [
+            ('super', 'superadmin', 'Super Admin', True),
+            ('admin', 'admin', 'Admin Operasional', False),
+        ]
+        for username, role, full_name, is_super in staff:
+            user, _ = User.objects.get_or_create(username=username, defaults={'email': f'{username}@kampanyekit.id'})
+            first, _, last = full_name.partition(' ')
+            user.first_name, user.last_name = first, last
+            user.role = role
+            user.tenant = None
+            user.agency = None
+            user.is_active = True
+            user.is_staff = is_super
+            user.is_superuser = is_super
+            user.set_password(DEV_PASSWORD)
+            user.save()
+        self.stdout.write(self.style.HTTP_INFO('\n── Platform staff ───────────────'))
+        self.stdout.write('  ✓ superadmin (super) + admin (admin)')
 
     @transaction.atomic
     def _seed_campaign(self, idx, cfg):
@@ -459,10 +484,16 @@ class Command(BaseCommand):
 
     def _print_credentials(self):
         self.stdout.write(self.style.SUCCESS('\n\n🚀 Seed complete!  All accounts use password: ') + self.style.WARNING(DEV_PASSWORD))
-        self.stdout.write(self.style.SUCCESS('\nLogin at /login with any of these usernames:\n'))
+
+        self.stdout.write(self.style.SUCCESS('\nADMIN PORTAL — login at /admin/login:'))
+        self.stdout.write('  super      Super Admin          (full control + Django /admin)')
+        self.stdout.write('  admin      Admin Operasional    (platform staff)')
+
+        self.stdout.write(self.style.SUCCESS('\nCANDIDATE PORTAL — login at /login:'))
         self.stdout.write('  USERNAME    CAMPAIGN                              PUBLIC PAGE')
         self.stdout.write('  ' + '-' * 74)
         for c in CAMPAIGNS:
-            extra = '  (admin)' if c.get('superuser') else ''
-            self.stdout.write(f'  {c["username"]:<10}  {c["nama"]:<36}  /{c["slug"]}{extra}')
+            self.stdout.write(f'  {c["username"]:<10}  {c["nama"]:<36}  /{c["slug"]}')
+
+        self.stdout.write(self.style.SUCCESS('\nVOLUNTEER PORTAL — login at /volunteer/login (WhatsApp OTP).'))
         self.stdout.write('')
